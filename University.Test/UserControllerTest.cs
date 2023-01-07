@@ -1,8 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Net;
 using University.Server.Controllers;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
@@ -26,11 +24,6 @@ namespace University.Test
             });
             _mapper = config.CreateMapper();
 
-            using var loggerFactory = LoggerFactory.Create(loggingBuilder =>
-                loggingBuilder
-                .SetMinimumLevel(LogLevel.Trace)
-                .AddConsole());
-            
             _service = new Mock<IUserService>();
             _service
                 .Setup(x => x.ListAsync())
@@ -56,8 +49,9 @@ namespace University.Test
                     },
                 }.AsEnumerable());
 
+            var _logger = new Mock<ILogger<UserController>>();
             _controller = new UserController(
-                logger: loggerFactory.CreateLogger<UserController>(),
+                logger: _logger.Object,
                 userService: _service.Object,
                 mapper: _mapper);
         }
