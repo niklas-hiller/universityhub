@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
+using University.Server.Extensions;
 using University.Server.Resources;
 
 namespace University.Server.Controllers
@@ -23,6 +24,34 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
+        /// Creates a new User
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <returns>The new created user</returns>
+        [HttpPost("/users", Name = "Create User")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var user = _mapper.Map<SaveUserResource, User>(resource);
+            var result = await _userService.SaveAsync(user);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            var userResource = _mapper.Map<User, UserResource>(result.User);
+            return Created("", value: userResource);
+        }
+
+        /// <summary>
         /// Retrieves a specific User by his id
         /// </summary>
         /// <param name="id"></param>
@@ -34,7 +63,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var user = await _userService.GetAsync(id);
-            if (user == null) {
+            if (user == null)
+            {
                 return NotFound();
             }
             var resource = _mapper.Map<User, UserResource>(user);

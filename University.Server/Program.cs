@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using University.Server.Domain.Persistence;
 using University.Server.Domain.Persistence.Contexts;
 using University.Server.Domain.Persistence.Repositories;
+using University.Server.Domain.Repositories;
 using University.Server.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

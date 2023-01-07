@@ -6,5 +6,6 @@ namespace University.Server.Domain.Persistence
     {
         Task<IEnumerable<User>> ListAsync();
         Task<User?> GetAsync(Guid id);
+        Task AddAsync(User user);
     }
 }
