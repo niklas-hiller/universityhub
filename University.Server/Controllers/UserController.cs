@@ -65,7 +65,7 @@ namespace University.Server.Controllers
             var user = await _userService.GetAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound($"Couldn't find any user with the id {id}");
             }
             var resource = _mapper.Map<User, UserResource>(user);
             return Ok(resource);
