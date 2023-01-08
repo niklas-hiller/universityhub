@@ -5,6 +5,7 @@ using Moq;
 using University.Server.Controllers;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
+using University.Server.Domain.Services.Communication;
 using University.Server.Mapping;
 using University.Server.Resources;
 
@@ -49,18 +50,28 @@ namespace University.Test
                         Authorization = EAuthorization.Student
                     },
                 }.AsEnumerable());
+
+            var sampleUser = new User
+            {
+                Id = Guid.Parse("02051bb9-7a52-48df-a6f4-069b80277a69"),
+                FirstName = "Max",
+                LastName = "Mustermann",
+                Authorization = EAuthorization.Administrator
+            };
+
             _service
                 .Setup(x => x.GetAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((User?)null);
             _service
-                .Setup(x => x.GetAsync(Guid.Parse("02051bb9-7a52-48df-a6f4-069b80277a69")))
-                .ReturnsAsync(new User
-                {
-                    Id = Guid.Parse("02051bb9-7a52-48df-a6f4-069b80277a69"),
-                    FirstName = "Max",
-                    LastName = "Mustermann",
-                    Authorization = EAuthorization.Administrator
-                });
+                .Setup(x => x.GetAsync(sampleUser.Id))
+                .ReturnsAsync(sampleUser);
+
+            _service
+                .Setup(x => x.DeleteAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(new UserResponse("User not found."));
+            _service
+                .Setup(x => x.DeleteAsync(sampleUser.Id))
+                .ReturnsAsync(new UserResponse(sampleUser));
 
             var _logger = new Mock<ILogger<UserController>>();
             _controller = new UserController(
@@ -103,6 +114,30 @@ namespace University.Test
             // Assert
             Assert.NotNull(result);
             Assert.Equal(404, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_WhenCalled_ReturnsNothing_204()
+        {
+            // Act
+            var response = await _controller.DeleteAsync(Guid.Parse("02051bb9-7a52-48df-a6f4-069b80277a69"));
+            var result = response as StatusCodeResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(204, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_WhenCalled_ReturnsNothing_400()
+        {
+            // Act
+            var response = await _controller.DeleteAsync(Guid.Parse("76f7735e-66ed-4751-ba38-448560fb4d96"));
+            var result = response as ObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
         }
     }
 }

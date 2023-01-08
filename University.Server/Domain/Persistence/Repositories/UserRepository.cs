@@ -28,5 +28,10 @@ namespace University.Server.Domain.Persistence.Repositories
         {
             await _context.Users.AddAsync(user);
         }
+
+        public void Remove(User user)
+        {
+            _context.Users.Remove(user);
+        }
     }
 }

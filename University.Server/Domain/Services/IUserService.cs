@@ -7,6 +7,7 @@ namespace University.Server.Domain.Services
     {
         Task<IEnumerable<User>> ListAsync();
         Task<User?> GetAsync(Guid id);
-        Task<SaveUserResponse> SaveAsync(User user);
+        Task<UserResponse> SaveAsync(User user);
+        Task<UserResponse> DeleteAsync(Guid id);
     }
 }

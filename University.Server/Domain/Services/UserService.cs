@@ -28,19 +28,40 @@ namespace University.Server.Domain.Services
             return await _userRepository.GetAsync(id);
         }
 
-        public async Task<SaveUserResponse> SaveAsync(User user)
+        public async Task<UserResponse> SaveAsync(User user)
         {
             try
             {
                 await _userRepository.AddAsync(user);
                 await _unitOfWork.CompleteAsync();
 
-                return new SaveUserResponse(user);
+                return new UserResponse(user);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new SaveUserResponse($"An error occurred when saving the user: {ex.Message}");
+                return new UserResponse($"An error occurred when saving the user: {ex.Message}");
+            }
+        }
+
+        public async Task<UserResponse> DeleteAsync(Guid id)
+        {
+            var existingUser = await _userRepository.GetAsync(id);
+
+            if (existingUser == null)
+                return new UserResponse("User not found.");
+
+            try
+            {
+                _userRepository.Remove(existingUser);
+                await _unitOfWork.CompleteAsync();
+
+                return new UserResponse(existingUser);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new UserResponse($"An error occurred when deleting the user: {ex.Message}");
             }
         }
     }

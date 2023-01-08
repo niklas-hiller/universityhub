@@ -84,5 +84,23 @@ namespace University.Server.Controllers
             return resources;
         }
 
+        /// <summary>
+        /// Deletes a specific User by his id
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpDelete("/users/{id}", Name = "Delete User By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var result = await _userService.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return NoContent();
+        }
+
     }
 }

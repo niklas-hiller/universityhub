@@ -2,11 +2,11 @@
 
 namespace University.Server.Domain.Services.Communication
 {
-    public class SaveUserResponse : BaseResponse
+    public class UserResponse : BaseResponse
     {
         public User User { get; private set; }
 
-        private SaveUserResponse(bool success, string message, User user) : base(success, message)
+        private UserResponse(bool success, string message, User user) : base(success, message)
         {
             User = user;
         }
@@ -16,7 +16,7 @@ namespace University.Server.Domain.Services.Communication
         /// </summary>
         /// <param name="user">Saved user.</param>
         /// <returns>Response.</returns>
-        public SaveUserResponse(User user) : this(true, string.Empty, user)
+        public UserResponse(User user) : this(true, string.Empty, user)
         { }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace University.Server.Domain.Services.Communication
         /// </summary>
         /// <param name="message">Error message.</param>
         /// <returns>Response.</returns>
-        public SaveUserResponse(string message) : this(false, message, null)
+        public UserResponse(string message) : this(false, message, null)
         { }
     }
 }
