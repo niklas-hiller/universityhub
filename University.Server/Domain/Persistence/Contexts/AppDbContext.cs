@@ -6,6 +6,7 @@ namespace University.Server.Domain.Persistence.Contexts
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Module> Modules { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -33,6 +34,10 @@ namespace University.Server.Domain.Persistence.Contexts
                     Authorization = EAuthorization.Student
                 }
             );
+
+            builder.Entity<User>().ToTable("Modules");
+            builder.Entity<User>().HasKey(p => p.Id);
+            builder.Entity<User>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace University.Server.Mapping
         public ResourceToModelProfile()
         {
             CreateMap<SaveUserResource, User>();
+            CreateMap<SaveModuleResource, Module>();
         }
     }
 }

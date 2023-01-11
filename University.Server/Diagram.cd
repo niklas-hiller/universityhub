@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="University.Server.Domain.Models.Course">
-    <Position X="17.25" Y="6.25" Width="1.5" />
+    <Position X="9.5" Y="9.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAICAAAAAAAAAAAAABAAAAQAAAAAAAAAAAAAEAAAAAA=</HashCode>
       <FileName>Domain\Models\Course.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
-      <Property Name="OptionalModules" />
       <Property Name="Students" />
       <Property Name="CompulsoryModules" />
+      <Property Name="OptionalModules" />
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Lecture">
-    <Position X="13.75" Y="0.5" Width="1.5" />
+    <Position X="11.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAACAAAAAAIAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\Lecture.cs</FileName>
@@ -23,7 +23,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Location">
-    <Position X="16.5" Y="0.5" Width="1.5" />
+    <Position X="8.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\Location.cs</FileName>
@@ -33,14 +33,17 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Module">
-    <Position X="0.5" Y="3.5" Width="1.5" />
+    <Position X="6.5" Y="9.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAIAAAgAAAAAAAAAAQAAAAAAAAAAAABAAAAAAA=</HashCode>
       <FileName>Domain\Models\Module.cs</FileName>
     </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="AvailableProfessors" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.ModuleAssignment">
-    <Position X="8.25" Y="6.25" Width="1.5" />
+    <Position X="3.5" Y="8.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\ModuleAssignment.cs</FileName>
@@ -51,7 +54,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Professor">
-    <Position X="6.25" Y="6.25" Width="1.5" />
+    <Position X="6.5" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\Professor.cs</FileName>
@@ -61,7 +64,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Semester">
-    <Position X="6" Y="0.5" Width="1.5" />
+    <Position X="14" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAEAAAAA=</HashCode>
       <FileName>Domain\Models\Semester.cs</FileName>
@@ -71,7 +74,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.SemesterModule">
-    <Position X="9.75" Y="0.5" Width="1.5" />
+    <Position X="11.25" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAABAAASAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\SemesterModule.cs</FileName>
@@ -85,7 +88,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Student">
-    <Position X="13.25" Y="6.25" Width="1.5" />
+    <Position X="8.75" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>Domain\Models\Student.cs</FileName>
@@ -98,20 +101,20 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.University">
-    <Position X="10.5" Y="2.75" Width="1.5" />
+    <Position X="11" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACACAAAAAAAAAAIAAAAAAQAAAAAAAAAAAAABAAAAA=</HashCode>
       <FileName>Domain\Models\University.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
-      <Property Name="Courses" />
       <Property Name="Modules" />
       <Property Name="Semesters" />
       <Property Name="Users" />
+      <Property Name="Courses" />
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.User">
-    <Position X="3.75" Y="0.5" Width="1.5" />
+    <Position X="7.75" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAEAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
       <FileName>Domain\Models\User.cs</FileName>
@@ -121,21 +124,21 @@
     </ShowAsAssociation>
   </Class>
   <Struct Name="University.Server.Domain.Models.Coordinates">
-    <Position X="16.5" Y="2.75" Width="1.5" />
+    <Position X="8.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\Coordinates.cs</FileName>
     </TypeIdentifier>
   </Struct>
-  <Enum Name="University.Server.Domain.Models.EAuthorization" Collapsed="true">
-    <Position X="0.5" Y="0.5" Width="1.5" />
+  <Enum Name="University.Server.Domain.Models.EAuthorization">
+    <Position X="4.75" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAQAAAAAAAAAAAAACAAAEAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\EAuthorization.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="University.Server.Domain.Models.EModuleStatus" Collapsed="true">
-    <Position X="8.25" Y="8" Width="1.5" />
+  <Enum Name="University.Server.Domain.Models.EModuleStatus">
+    <Position X="0.5" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAACIACAAAAAAAAAAIAAAAAAAAAAABAAAAAAAAg=</HashCode>
       <FileName>Domain\Models\EModuleStatus.cs</FileName>
