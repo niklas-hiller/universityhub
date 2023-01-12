@@ -1,6 +1,5 @@
 ﻿using University.Server.Domain.Models;
 using University.Server.Domain.Persistence;
-using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -31,7 +30,7 @@ namespace University.Server.Domain.Services
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new ModuleResponse($"An error occurred when saving the user: {ex.Message}");
+                return new ModuleResponse($"An error occurred when saving the module: {ex.Message}");
             }
         }
     }

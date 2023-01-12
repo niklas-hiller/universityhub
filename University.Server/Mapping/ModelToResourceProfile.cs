@@ -10,6 +10,7 @@ namespace University.Server.Mapping
         {
             CreateMap<User, UserResource>();
             CreateMap<Module, ModuleResource>();
+            CreateMap<Location, LocationResource>();
         }
     }
 }

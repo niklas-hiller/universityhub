@@ -2,7 +2,7 @@
 {
     public struct Coordinates
     {
-        double latitude;
-        double longitude;
+        public double latitude { get; set; }
+        public double longitude { get; set; }
     }
 }

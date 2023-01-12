@@ -7,6 +7,7 @@ namespace University.Server.Domain.Persistence.Contexts
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Module> Modules { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -35,9 +36,13 @@ namespace University.Server.Domain.Persistence.Contexts
                 }
             );
 
-            builder.Entity<User>().ToTable("Modules");
-            builder.Entity<User>().HasKey(p => p.Id);
-            builder.Entity<User>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
+            builder.Entity<Module>().ToTable("Modules");
+            builder.Entity<Module>().HasKey(p => p.Id);
+            builder.Entity<Module>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
+
+            builder.Entity<Location>().ToTable("Locations");
+            builder.Entity<Location>().HasKey(p => p.Id);
+            builder.Entity<Location>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
         }
     }
 }
