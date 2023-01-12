@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using University.Server.Domain.Models;
+﻿using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Contexts;
-
+using University.Server.Domain.Repositories;
 
 namespace University.Server.Domain.Persistence.Repositories
 {

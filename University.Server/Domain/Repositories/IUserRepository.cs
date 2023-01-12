@@ -1,6 +1,6 @@
 ﻿using University.Server.Domain.Models;
 
-namespace University.Server.Domain.Persistence
+namespace University.Server.Domain.Repositories
 {
     public interface IUserRepository
     {

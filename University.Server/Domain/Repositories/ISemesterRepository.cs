@@ -2,8 +2,8 @@
 
 namespace University.Server.Domain.Repositories
 {
-    public interface ILocationRepository
+    public interface ISemesterRepository
     {
-        Task AddAsync(Location location);
+        Task AddAsync(Semester semester);
     }
 }

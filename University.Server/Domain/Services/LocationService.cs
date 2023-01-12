@@ -1,5 +1,4 @@
 ﻿using University.Server.Domain.Models;
-using University.Server.Domain.Persistence;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
