@@ -1,4 +1,5 @@
 ﻿using University.Server.Domain.Models;
+using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -30,6 +31,57 @@ namespace University.Server.Domain.Services
             {
                 // Do some logging stuff
                 return new ModuleResponse($"An error occurred when saving the module: {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<Module>> ListAsync()
+        {
+            return await _moduleRepository.ListAsync();
+        }
+
+        public async Task<Module?> GetAsync(Guid id)
+        {
+            return await _moduleRepository.GetAsync(id);
+        }
+
+        public async Task<ModuleResponse> UpdateAsync(Guid id, Module module)
+        {
+            var existingModule = await _moduleRepository.GetAsync(id);
+
+            if (existingModule == null)
+                return new ModuleResponse("Module not found.");
+
+            existingModule.Name = module.Name;
+            existingModule.Description = module.Description;
+            existingModule.CreditPoints = module.CreditPoints;
+
+            try
+            {
+                _moduleRepository.Update(existingModule);
+                await _unitOfWork.CompleteAsync();
+
+                return new ModuleResponse(existingModule);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new ModuleResponse($"An error occurred when updating the module: {ex.Message}");
+            }
+        }
+
+        public async Task<ModuleResponse> UpdateProfessorsAsync(Module module)
+        {
+            try
+            {
+                _moduleRepository.Update(module);
+                await _unitOfWork.CompleteAsync();
+
+                return new ModuleResponse(module);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new ModuleResponse($"An error occurred when updating the module: {ex.Message}");
             }
         }
     }
