@@ -6,6 +6,9 @@ namespace University.Server.Domain.Persistence.Contexts
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Module> Modules { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<Semester> Semesters { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -33,6 +36,18 @@ namespace University.Server.Domain.Persistence.Contexts
                     Authorization = EAuthorization.Student
                 }
             );
+
+            builder.Entity<Module>().ToTable("Modules");
+            builder.Entity<Module>().HasKey(p => p.Id);
+            builder.Entity<Module>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
+
+            builder.Entity<Location>().ToTable("Locations");
+            builder.Entity<Location>().HasKey(p => p.Id);
+            builder.Entity<Location>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
+
+            builder.Entity<Semester>().ToTable("Semesters");
+            builder.Entity<Semester>().HasKey(p => p.Id);
+            builder.Entity<Semester>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
         }
     }
 }

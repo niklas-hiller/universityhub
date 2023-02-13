@@ -1,6 +1,8 @@
-﻿namespace University.Server.Domain.Models
+﻿using University.Server.Domain.Models;
+
+namespace University.Server.Resources
 {
-    public class Module
+    public class ExtendedModuleResource
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
