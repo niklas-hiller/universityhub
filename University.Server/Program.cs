@@ -2,13 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using University.Server.Domain.Persistence;
 using University.Server.Domain.Persistence.Contexts;
 using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "_myAllowSpecificOrigins",
+                      builder =>
+                      {
+                          builder.WithOrigins("https://localhost",
+                                              "http://localhost");
+                      });
+});
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(opts =>
@@ -77,10 +86,13 @@ using (var context = scope.ServiceProvider.GetService<AppDbContext>())
 //     app.UseSwaggerUI();
 // }
 
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors("_myAllowSpecificOrigins");
 
 app.UseAuthorization();
 
