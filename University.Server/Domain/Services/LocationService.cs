@@ -32,5 +32,36 @@ namespace University.Server.Domain.Services
                 return new LocationResponse($"An error occurred when saving the location: {ex.Message}");
             }
         }
+
+        public async Task<IEnumerable<Location>> ListAsync()
+        {
+            return await _locationRepository.ListAsync();
+        }
+
+        public async Task<Location?> GetAsync(Guid id)
+        {
+            return await _locationRepository.GetAsync(id);
+        }
+
+        public async Task<LocationResponse> DeleteAsync(Guid id)
+        {
+            var existingLocation = await _locationRepository.GetAsync(id);
+
+            if (existingLocation == null)
+                return new LocationResponse("Location not found.");
+
+            try
+            {
+                _locationRepository.Remove(existingLocation);
+                await _unitOfWork.CompleteAsync();
+
+                return new LocationResponse(existingLocation);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new LocationResponse($"An error occurred when deleting the location: {ex.Message}");
+            }
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace University.Server.Domain.Repositories
         Task<IEnumerable<Module>> ListAsync();
         Task<Module?> GetAsync(Guid id);
         void Update(Module module);
+        void Remove(Module module);
     }
 }

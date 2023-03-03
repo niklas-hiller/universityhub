@@ -17,7 +17,7 @@ namespace University.Server.Controllers
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService, 
+        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService,
             IUserService userService, IMapper mapper)
         {
             _logger = logger;
@@ -34,7 +34,7 @@ namespace University.Server.Controllers
         [HttpPost("/modules", Name = "Create Module")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ExtendedModuleResource))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostAsync([FromBody] SaveModuleResource resource)
         {
@@ -50,7 +50,7 @@ namespace University.Server.Controllers
                 return BadRequest(result.Message);
             }
 
-            var moduleResource = _mapper.Map<Module, ExtendedModuleResource>(result.Module);
+            var moduleResource = _mapper.Map<Module, ModuleResource>(result.Module);
             return Created("", value: moduleResource);
         }
 
@@ -61,7 +61,7 @@ namespace University.Server.Controllers
         /// <returns>The retrieved module</returns>
         [HttpGet("/modules/{id}", Name = "Get Module By Id")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExtendedModuleResource))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
@@ -70,7 +70,7 @@ namespace University.Server.Controllers
             {
                 return NotFound($"Couldn't find any module with the id {id}");
             }
-            var resource = _mapper.Map<Module, ExtendedModuleResource>(module);
+            var resource = _mapper.Map<Module, ModuleResource>(module);
             return Ok(resource);
         }
 
@@ -88,45 +88,6 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Adds/Removes a Professor from Module
-        /// </summary>
-        /// <param name="moduleId"></param>
-        /// <param name="profId"></param>
-        /// <param name="isAdd"></param>
-        /// <returns>The updated module</returns>
-        [HttpPatch("/modules/{moduleId}/professors/{profId}", Name = "Add/Remove Professor from Module")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExtendedModuleResource))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PatchProfessorAsync(Guid moduleId, Guid profId, bool isAdd)
-        {
-            var module = await _moduleService.GetAsync(moduleId);
-            if (module == null)
-            {
-                return NotFound($"Couldn't find any module with the id {moduleId}");
-            }
-            var prof = await _userService.GetAsync(profId);
-            if (prof == null)
-            {
-                return NotFound($"Couldn't find any user with the id {profId}");
-            }
-            if (prof.Authorization != EAuthorization.Professor)
-            {
-                return BadRequest($"The retrieved user is not a professor");
-            }
-            if (isAdd) {
-                module.AvailableProfessors.Add(prof);
-            } 
-            else 
-            {
-                module.AvailableProfessors.Remove(prof);
-            }
-            var result = await _moduleService.UpdateProfessorsAsync(module);
-            var resource = _mapper.Map<Module, ExtendedModuleResource>(result.Module);
-            return Ok(resource);
-        }
-
-        /// <summary>
         /// Updates a Module
         /// </summary>
         /// <param name="id"></param>
@@ -134,7 +95,7 @@ namespace University.Server.Controllers
         /// <returns>The updated module</returns>
         [HttpPut("/modules/{id}", Name = "Updates a Module")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExtendedModuleResource))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateModuleResource resource)
         {
@@ -146,8 +107,27 @@ namespace University.Server.Controllers
             var module = _mapper.Map<UpdateModuleResource, Module>(resource);
             var result = await _moduleService.UpdateAsync(id, module);
 
-            var updatedResource = _mapper.Map<Module, ExtendedModuleResource>(result.Module);
+            var updatedResource = _mapper.Map<Module, ModuleResource>(result.Module);
             return Ok(updatedResource);
         }
+
+        /// <summary>
+        /// Deletes a specific Module by his id
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpDelete("/modules/{id}", Name = "Delete Module By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var result = await _moduleService.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return NoContent();
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using University.Server.Domain.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Contexts;
 using University.Server.Domain.Repositories;
 
@@ -16,6 +17,21 @@ namespace University.Server.Domain.Persistence.Repositories
         public async Task AddAsync(Location location)
         {
             await _context.Locations.AddAsync(location);
+        }
+
+        public async Task<Location?> GetAsync(Guid id)
+        {
+            return await _context.Locations.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<Location>> ListAsync()
+        {
+            return await _context.Locations.ToListAsync();
+        }
+
+        public void Remove(Location location)
+        {
+            _context.Locations.Remove(location);
         }
     }
 }

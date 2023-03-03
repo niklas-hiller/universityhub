@@ -8,6 +8,7 @@ namespace University.Server.Domain.Persistence.Contexts
         public DbSet<User> Users { get; set; }
         public DbSet<Module> Modules { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Course> Courses { get; set; }
         public DbSet<Semester> Semesters { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
@@ -48,6 +49,10 @@ namespace University.Server.Domain.Persistence.Contexts
             builder.Entity<Semester>().ToTable("Semesters");
             builder.Entity<Semester>().HasKey(p => p.Id);
             builder.Entity<Semester>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
+
+            builder.Entity<Course>().ToTable("Courses");
+            builder.Entity<Course>().HasKey(p => p.Id);
+            builder.Entity<Course>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
         }
     }
 }

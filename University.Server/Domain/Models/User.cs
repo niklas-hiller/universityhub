@@ -6,5 +6,6 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public EAuthorization Authorization { get; set; }
+        public List<ModuleAssignment>? ModuleAssignments { get; set; }
     }
 }

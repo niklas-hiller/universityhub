@@ -51,5 +51,55 @@ namespace University.Server.Controllers
             return Created("", value: locationResource);
         }
 
+        /// <summary>
+        /// Retrieves a specific Location by his id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The retrieved location</returns>
+        [HttpGet("/locations/{id}", Name = "Get Location By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAsync(Guid id)
+        {
+            var location = await _locationService.GetAsync(id);
+            if (location == null)
+            {
+                return NotFound($"Couldn't find any location with the id {id}");
+            }
+            var resource = _mapper.Map<Location, LocationResource>(location);
+            return Ok(resource);
+        }
+
+        /// <summary>
+        /// Retrieves a all locations
+        /// </summary>
+        /// <returns>The retrieved locations</returns>
+        [HttpGet("/locations", Name = "Get all Locations")]
+        [Produces("application/json")]
+        public async Task<IEnumerable<LocationResource>> GetAllAsync()
+        {
+            var locations = await _locationService.ListAsync();
+            var resources = _mapper.Map<IEnumerable<Location>, IEnumerable<LocationResource>>(locations);
+            return resources;
+        }
+
+        /// <summary>
+        /// Deletes a specific Location by his id
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpDelete("/locations/{id}", Name = "Delete Location By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var result = await _locationService.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return NoContent();
+        }
     }
 }

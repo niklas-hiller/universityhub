@@ -32,5 +32,36 @@ namespace University.Server.Domain.Services
                 return new SemesterResponse($"An error occurred when saving the semester: {ex.Message}");
             }
         }
+
+        public async Task<IEnumerable<Semester>> ListAsync()
+        {
+            return await _semesterRepository.ListAsync();
+        }
+
+        public async Task<Semester?> GetAsync(Guid id)
+        {
+            return await _semesterRepository.GetAsync(id);
+        }
+
+        public async Task<SemesterResponse> DeleteAsync(Guid id)
+        {
+            var existingSemester = await _semesterRepository.GetAsync(id);
+
+            if (existingSemester == null)
+                return new SemesterResponse("User not found.");
+
+            try
+            {
+                _semesterRepository.Remove(existingSemester);
+                await _unitOfWork.CompleteAsync();
+
+                return new SemesterResponse(existingSemester);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new SemesterResponse($"An error occurred when deleting the semester: {ex.Message}");
+            }
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using University.Server.Domain.Models;
-using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -69,19 +68,24 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<ModuleResponse> UpdateProfessorsAsync(Module module)
+        public async Task<ModuleResponse> DeleteAsync(Guid id)
         {
+            var existingModule = await _moduleRepository.GetAsync(id);
+
+            if (existingModule == null)
+                return new ModuleResponse("User not found.");
+
             try
             {
-                _moduleRepository.Update(module);
+                _moduleRepository.Remove(existingModule);
                 await _unitOfWork.CompleteAsync();
 
-                return new ModuleResponse(module);
+                return new ModuleResponse(existingModule);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new ModuleResponse($"An error occurred when updating the module: {ex.Message}");
+                return new ModuleResponse($"An error occurred when deleting the module: {ex.Message}");
             }
         }
     }

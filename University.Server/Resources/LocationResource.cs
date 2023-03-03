@@ -6,6 +6,6 @@ namespace University.Server.Resources
     {
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }
-        // public Dictionary<string, string> Assets { get; set; }
+        public int Seats { get; set; }
     }
 }

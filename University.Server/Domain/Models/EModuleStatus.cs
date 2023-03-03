@@ -4,6 +4,10 @@ namespace University.Server.Domain.Models
 {
     public enum EModuleStatus : byte
     {
+        // EDUCATES | Unterrichtet Modul
+        [Description("Educates")]
+        Educates = 0,
+
         // ENROLLED | Angemeldet zur Prüfung
         [Description("Enrolled")]
         Enrolled = 1,

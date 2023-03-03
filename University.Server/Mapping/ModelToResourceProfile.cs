@@ -10,9 +10,10 @@ namespace University.Server.Mapping
         {
             CreateMap<User, UserResource>();
             CreateMap<Module, ModuleResource>();
-            CreateMap<Module, ExtendedModuleResource>();
+                //.ForMember(dest => dest.Professors, opt => opt.MapFrom(src => src.Professors.Select(m => m.Id)));
             CreateMap<Location, LocationResource>();
             CreateMap<Semester, SemesterResource>();
+            CreateMap<Course, CourseResource>();
         }
     }
 }
