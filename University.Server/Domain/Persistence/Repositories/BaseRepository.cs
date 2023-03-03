@@ -8,7 +8,7 @@ namespace University.Server.Domain.Persistence.Repositories
 
         public BaseRepository(AppDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
     }
 }

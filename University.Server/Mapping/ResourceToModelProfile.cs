@@ -7,7 +7,7 @@ namespace University.Server.Mapping
 {
     public class ResourceToModelProfile : Profile
     {
-        public ResourceToModelProfile(IUserService userService)
+        public ResourceToModelProfile()
         {
             CreateMap<SaveUserResource, User>();
             CreateMap<SaveModuleResource, Module>();
@@ -15,13 +15,6 @@ namespace University.Server.Mapping
             CreateMap<SaveSemesterResource, Semester>();
             CreateMap<SaveCourseResource, Course>();
             CreateMap<UpdateModuleResource, Module>();
-                //.AfterMap((src, dest, ctx) =>
-                //{
-                //    dest.Professors = src.Professors.Select(async id => await userService.GetAsync(id))
-                //                                    .Select(t => t.Result)
-                //                                    .Where(i => i != null)
-                //                                    .ToList();
-                //});
         }
     }
 }
