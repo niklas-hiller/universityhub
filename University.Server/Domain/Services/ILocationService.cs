@@ -8,6 +8,7 @@ namespace University.Server.Domain.Services
         Task<LocationResponse> SaveAsync(Location location);
         Task<IEnumerable<Location>> ListAsync();
         Task<Location?> GetAsync(Guid id);
+        Task<LocationResponse> UpdateAsync(Guid id, Location location);
         Task<LocationResponse> DeleteAsync(Guid id);
     }
 }

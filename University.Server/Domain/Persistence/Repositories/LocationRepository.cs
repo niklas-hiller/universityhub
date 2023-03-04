@@ -29,6 +29,11 @@ namespace University.Server.Domain.Persistence.Repositories
             return await _context.Locations.ToListAsync();
         }
 
+        public void Update(Location location)
+        {
+            _context.Locations.Update(location);
+        }
+
         public void Remove(Location location)
         {
             _context.Locations.Remove(location);

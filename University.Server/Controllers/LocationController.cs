@@ -52,6 +52,36 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
+        /// Updates a Location
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated location</returns>
+        [HttpPatch("/locations/{id}", Name = "Update Location")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateLocationResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var location = _mapper.Map<UpdateLocationResource, Location>(resource);
+            var result = await _locationService.UpdateAsync(id, location);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            var locationResource = _mapper.Map<Location, LocationResource>(result.Location);
+            return Ok(value: locationResource);
+        }
+
+        /// <summary>
         /// Retrieves a specific Location by id
         /// </summary>
         /// <param name="id"></param>
