@@ -40,8 +40,6 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    env:
-      CONNECTIONSTRING: ${{ secrets.CONNECTIONSTRING }}
 
     steps:
       - name: Download artifact from build job
@@ -57,4 +55,3 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3C4DECCF13FF4FFCAE3D409360E7B690 }}
           package: .
-          app-settings: "ConnectionString=${{ env.CONNECTIONSTRING }}"
