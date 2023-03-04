@@ -1,4 +1,5 @@
-﻿using University.Server.Domain.Models;
+﻿using System.Net;
+using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
@@ -34,9 +35,15 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Module>> ListAsync()
+        public async Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType)
         {
-            return await _moduleRepository.ListAsync();
+            var modules = await _moduleRepository.ListAsync();
+            if (moduleType != null)
+            {
+                modules = modules.Where(module => module.ModuleType == moduleType);
+            }
+
+            return modules;
         }
 
         public async Task<Module?> GetAsync(Guid id)
@@ -51,9 +58,22 @@ namespace University.Server.Domain.Services
             if (existingModule == null)
                 return new ModuleResponse("Module not found.");
 
-            existingModule.Name = module.Name;
-            existingModule.Description = module.Description;
-            existingModule.CreditPoints = module.CreditPoints;
+            if (!String.IsNullOrEmpty(module.Name))
+            {
+                existingModule.Name = module.Name;
+            }
+            if (!String.IsNullOrEmpty(module.Description))
+            {
+                existingModule.Description = module.Description;
+            }
+            if (module.CreditPoints > 0)
+            {
+                existingModule.CreditPoints = module.CreditPoints;
+            }
+            if (module.ModuleType != 0)
+            {
+                existingModule.ModuleType = module.ModuleType;
+            }
 
             try
             {
@@ -69,19 +89,24 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<ModuleResponse> UpdateProfessorsAsync(Module module)
+        public async Task<ModuleResponse> DeleteAsync(Guid id)
         {
+            var existingModule = await _moduleRepository.GetAsync(id);
+
+            if (existingModule == null)
+                return new ModuleResponse("User not found.");
+
             try
             {
-                _moduleRepository.Update(module);
+                _moduleRepository.Remove(existingModule);
                 await _unitOfWork.CompleteAsync();
 
-                return new ModuleResponse(module);
+                return new ModuleResponse(existingModule);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new ModuleResponse($"An error occurred when updating the module: {ex.Message}");
+                return new ModuleResponse($"An error occurred when deleting the module: {ex.Message}");
             }
         }
     }

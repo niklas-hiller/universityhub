@@ -2,10 +2,10 @@
 
 namespace University.Server.Resources
 {
-    public class LocationResource
+    public class CourseResource
     {
         public string Name { get; set; }
-        public Coordinates Coordinates { get; set; }
-        public int Seats { get; set; }
+        public List<User> Students { get; set; }
+        public List<Module> Modules { get; set; }
     }
 }

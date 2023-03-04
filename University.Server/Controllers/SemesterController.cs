@@ -51,5 +51,69 @@ namespace University.Server.Controllers
             return Created("", value: semesterResource);
         }
 
+        /// <summary>
+        /// Retrieves a specific Semester by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The retrieved semester</returns>
+        [HttpGet("/semesters/{id}", Name = "Get Semester By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAsync(Guid id)
+        {
+            var semester = await _semesterService.GetAsync(id);
+            if (semester == null)
+            {
+                return NotFound($"Couldn't find any semester with the id {id}");
+            }
+            var resource = _mapper.Map<Semester, SemesterResource>(semester);
+            return Ok(resource);
+        }
+
+        /// <summary>
+        /// Retrieves a all semesters
+        /// </summary>
+        /// <returns>The retrieved semesters</returns>
+        [HttpGet("/semesters", Name = "Get all Semesters")]
+        [Produces("application/json")]
+        public async Task<IEnumerable<SemesterResource>> GetAllAsync()
+        {
+            var semesters = await _semesterService.ListAsync();
+            var resources = _mapper.Map<IEnumerable<Semester>, IEnumerable<SemesterResource>>(semesters);
+            return resources;
+        }
+
+        /// <summary>
+        /// Deletes a specific Semester by id
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpDelete("/semesters/{id}", Name = "Delete Semester By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var result = await _semesterService.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Initializes a specific Semester by id
+        /// </summary>
+        /// <param name="id"></param>
+        [HttpPost("/semesters/{id}/initialize", Name = "Initialize Semester By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SemesterResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> InitializeAsync(Guid id)
+        {
+            return null;
+        }
     }
 }

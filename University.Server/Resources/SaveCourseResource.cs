@@ -3,13 +3,11 @@ using University.Server.Domain.Models;
 
 namespace University.Server.Resources
 {
-    public class SaveLocationResource
+    public class SaveCourseResource
     {
         [Required]
         public string Name { get; set; }
-        [Required]
-        public Coordinates Coordinates { get; set; }
-        [Required]
-        public int Seats { get; set; }
+        public List<Guid> Students { get; set; }
+        public List<Guid> Modules { get; set; }
     }
 }

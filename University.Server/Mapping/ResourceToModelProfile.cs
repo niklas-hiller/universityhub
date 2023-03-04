@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using University.Server.Domain.Models;
+using University.Server.Domain.Services;
 using University.Server.Resources;
 
 namespace University.Server.Mapping
@@ -12,6 +13,13 @@ namespace University.Server.Mapping
             CreateMap<SaveModuleResource, Module>();
             CreateMap<SaveLocationResource, Location>();
             CreateMap<SaveSemesterResource, Semester>();
+            CreateMap<SaveCourseResource, Course>();
+
+            CreateMap<UpdateUserResource, User>();
+            CreateMap<UpdateLocationResource, Location>();
+            CreateMap<UpdateCourseResource, Course>();
+
+            CreateMap<OverwriteCourseResource, Course>();
         }
     }
 }

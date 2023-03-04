@@ -33,5 +33,10 @@ namespace University.Server.Domain.Persistence.Repositories
         {
             _context.Modules.Update(module);
         }
+
+        public void Remove(Module module)
+        {
+            _context.Modules.Remove(module);
+        }
     }
 }

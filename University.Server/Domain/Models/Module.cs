@@ -6,6 +6,6 @@
         public string Name { get; set; }
         public string? Description { get; set; }
         public int CreditPoints { get; set; }
-        public List<User> AvailableProfessors { get; set; }
+        public EModuleType ModuleType { get; set; }
     }
 }
