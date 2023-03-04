@@ -3,6 +3,9 @@
 
 name: Build and deploy ASP.Net Core app to Azure Web App - universityhub
 
+env:
+  ConnectionString: ${{ secrets.CONNECTIONSTRING }}
+
 on:
   push:
     branches:
@@ -12,7 +15,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
+    
     steps:
       - uses: actions/checkout@v2
 
