@@ -1,4 +1,6 @@
-﻿using University.Server.Domain.Models;
+﻿using System.Net;
+using University.Server.Domain.Models;
+using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -33,9 +35,15 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Module>> ListAsync()
+        public async Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType)
         {
-            return await _moduleRepository.ListAsync();
+            var modules = await _moduleRepository.ListAsync();
+            if (moduleType != null)
+            {
+                modules = modules.Where(module => module.ModuleType == moduleType);
+            }
+
+            return modules;
         }
 
         public async Task<Module?> GetAsync(Guid id)
@@ -50,9 +58,22 @@ namespace University.Server.Domain.Services
             if (existingModule == null)
                 return new ModuleResponse("Module not found.");
 
-            existingModule.Name = module.Name;
-            existingModule.Description = module.Description;
-            existingModule.CreditPoints = module.CreditPoints;
+            if (!String.IsNullOrEmpty(module.Name))
+            {
+                existingModule.Name = module.Name;
+            }
+            if (!String.IsNullOrEmpty(module.Description))
+            {
+                existingModule.Description = module.Description;
+            }
+            if (module.CreditPoints > 0)
+            {
+                existingModule.CreditPoints = module.CreditPoints;
+            }
+            if (module.ModuleType != 0)
+            {
+                existingModule.ModuleType = module.ModuleType;
+            }
 
             try
             {

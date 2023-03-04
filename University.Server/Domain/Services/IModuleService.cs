@@ -6,7 +6,7 @@ namespace University.Server.Domain.Services
     public interface IModuleService
     {
         Task<ModuleResponse> SaveAsync(Module module);
-        Task<IEnumerable<Module>> ListAsync();
+        Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType);
         Task<Module?> GetAsync(Guid id);
         Task<ModuleResponse> UpdateAsync(Guid id, Module module);
         Task<ModuleResponse> DeleteAsync(Guid id);

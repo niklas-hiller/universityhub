@@ -75,14 +75,15 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves a all modules
+        /// Retrieves all modules matching filter
         /// </summary>
+        /// <param name="moduleType"></param>
         /// <returns>The retrieved modules</returns>
-        [HttpGet("/modules", Name = "Get all Modules")]
+        [HttpGet("/modules", Name = "Get all Modules matching filter")]
         [Produces("application/json")]
-        public async Task<IEnumerable<ModuleResource>> GetAllAsync()
+        public async Task<IEnumerable<ModuleResource>> GetFilteredAsync(EModuleType? moduleType)
         {
-            var modules = await _moduleService.ListAsync();
+            var modules = await _moduleService.ListAsync(moduleType);
             var resources = _mapper.Map<IEnumerable<Module>, IEnumerable<ModuleResource>>(modules);
             return resources;
         }
@@ -93,18 +94,18 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
-        [HttpPut("/modules/{id}", Name = "Updates a Module")]
+        [HttpPatch("/modules/{id}", Name = "Updates a Module")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] SaveModuleResource resource)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateModuleResource resource)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
 
-            var module = _mapper.Map<SaveModuleResource, Module>(resource);
+            var module = _mapper.Map<UpdateModuleResource, Module>(resource);
             var result = await _moduleService.UpdateAsync(id, module);
 
             var updatedResource = _mapper.Map<Module, ModuleResource>(result.Module);

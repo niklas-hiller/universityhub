@@ -82,12 +82,12 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Overwrites Course
+        /// Overwrites Course Students and Modules
         /// </summary>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
-        [HttpPut("/courses/{id}", Name = "Overwrite Course")]
+        [HttpPut("/courses/{id}", Name = "Overwrite Course Students and Modules")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
