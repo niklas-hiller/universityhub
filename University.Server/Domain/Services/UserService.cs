@@ -17,16 +17,6 @@ namespace University.Server.Domain.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<User>> ListAsync()
-        {
-            return await _userRepository.ListAsync();
-        }
-
-        public async Task<User?> GetAsync(Guid id)
-        {
-            return await _userRepository.GetAsync(id);
-        }
-
         public async Task<UserResponse> SaveAsync(User user)
         {
             try
@@ -41,6 +31,52 @@ namespace University.Server.Domain.Services
                 // Do some logging stuff
                 return new UserResponse($"An error occurred when saving the user: {ex.Message}");
             }
+        }
+
+        public async Task<UserResponse> UpdateAsync(Guid id, User user)
+        {
+            var existingUser = await _userRepository.GetAsync(id);
+
+            if (existingUser == null)
+                return new UserResponse("User not found.");
+
+            if (!String.IsNullOrEmpty(user.FirstName))
+            {
+                existingUser.FirstName = user.FirstName;
+            }
+            if (!String.IsNullOrEmpty(user.LastName))
+            {
+                existingUser.LastName = user.LastName;
+            }
+
+            try
+            {
+                _userRepository.Update(existingUser);
+                await _unitOfWork.CompleteAsync();
+
+                return new UserResponse(existingUser);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new UserResponse($"An error occurred when updating the user: {ex.Message}");
+            }
+        }
+
+        public async Task<User?> GetAsync(Guid id)
+        {
+            return await _userRepository.GetAsync(id);
+        }
+
+        public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
+        {
+            var users = await _userRepository.ListAsync();
+            if (authorization != null)
+            {
+                users = users.Where(user => user.Authorization == authorization);
+            }
+
+            return users;
         }
 
         public async Task<UserResponse> DeleteAsync(Guid id)

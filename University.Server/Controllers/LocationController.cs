@@ -52,7 +52,7 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves a specific Location by his id
+        /// Retrieves a specific Location by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved location</returns>
@@ -72,7 +72,7 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves a all locations
+        /// Retrieves all locations
         /// </summary>
         /// <returns>The retrieved locations</returns>
         [HttpGet("/locations", Name = "Get all Locations")]
@@ -85,7 +85,7 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific Location by his id
+        /// Deletes a specific Location by id
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("/locations/{id}", Name = "Delete Location By Id")]

@@ -8,7 +8,6 @@ namespace University.Server.Resources
         [Required]
         public string Name { get; set; }
         public List<Guid> Students { get; set; }
-        public List<Guid> CompulsoryModules { get; set; }
-        public List<Guid> OptionalModules { get; set; }
+        public List<Guid> Modules { get; set; }
     }
 }

@@ -3,13 +3,12 @@
   <Class Name="University.Server.Domain.Models.Course">
     <Position X="10" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAICAAAAAAAAAAAAABAAAAQAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <HashCode>AAICAAAAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Models\Course.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Property Name="Students" />
-      <Property Name="CompulsoryModules" />
-      <Property Name="OptionalModules" />
+      <Property Name="Modules" />
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="University.Server.Domain.Models.Lecture">

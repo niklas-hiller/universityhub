@@ -12,5 +12,7 @@ namespace University.Server.Resources
         public string? Description { get; set; }
         [Required]
         public int CreditPoints { get; set; }
+        [Required]
+        public EModuleType ModuleType { get; set; }
     }
 }

@@ -97,14 +97,14 @@ namespace University.Server.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateModuleResource resource)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] SaveModuleResource resource)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
 
-            var module = _mapper.Map<UpdateModuleResource, Module>(resource);
+            var module = _mapper.Map<SaveModuleResource, Module>(resource);
             var result = await _moduleService.UpdateAsync(id, module);
 
             var updatedResource = _mapper.Map<Module, ModuleResource>(result.Module);

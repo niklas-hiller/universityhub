@@ -52,6 +52,36 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
+        /// Updates a User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated user</returns>
+        [HttpPatch("/users/{id}", Name = "Update User")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateUserResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var user = _mapper.Map<UpdateUserResource, User>(resource);
+            var result = await _userService.UpdateAsync(id, user);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            var userResource = _mapper.Map<User, UserResource>(result.User);
+            return Ok(value: userResource);
+        }
+
+        /// <summary>
         /// Retrieves a specific User by his id
         /// </summary>
         /// <param name="id"></param>
@@ -72,14 +102,15 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves a all users
+        /// Retrieves all users matching filter
         /// </summary>
+        /// <param name="authorization"></param>
         /// <returns>The retrieved users</returns>
-        [HttpGet("/users", Name = "Get all Users")]
+        [HttpGet("/users", Name = "Get all Users matching filter")]
         [Produces("application/json")]
-        public async Task<IEnumerable<UserResource>> GetAllAsync()
+        public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
         {
-            var users = await _userService.ListAsync();
+            var users = await _userService.ListAsync(authorization);
             var resources = _mapper.Map<IEnumerable<User>, IEnumerable<UserResource>>(users);
             return resources;
         }
