@@ -3,9 +3,6 @@
 
 name: Build and deploy ASP.Net Core app to Azure Web App - universityhub
 
-env:
-  ConnectionString: ${{ secrets.CONNECTIONSTRING }}
-
 on:
   push:
     branches:
@@ -58,3 +55,4 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3C4DECCF13FF4FFCAE3D409360E7B690 }}
           package: .
+          env: ConnectionString=${{ secrets.CONNECTIONSTRING }}
