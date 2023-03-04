@@ -29,6 +29,11 @@ namespace University.Server.Domain.Persistence.Repositories
             return await _context.Courses.ToListAsync();
         }
 
+        public void Update(Course course)
+        {
+            _context.Courses.Update(course);
+        }
+
         public void Remove(Course course)
         {
             _context.Courses.Remove(course);

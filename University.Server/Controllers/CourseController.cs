@@ -52,7 +52,67 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves a specific Course by his id
+        /// Updates a Course
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated course</returns>
+        [HttpPatch("/courses/{id}", Name = "Update Course")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateCourseResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var course = _mapper.Map<UpdateCourseResource, Course>(resource);
+            var result = await _courseService.UpdateAsync(id, course);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            var courseResource = _mapper.Map<Course, CourseResource>(result.Course);
+            return Ok(value: courseResource);
+        }
+
+        /// <summary>
+        /// Overwrites Course
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated course</returns>
+        [HttpPut("/courses/{id}", Name = "Overwrite Course")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] OverwriteCourseResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var course = _mapper.Map<OverwriteCourseResource, Course>(resource);
+            var result = await _courseService.OverwriteAsync(id, course);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            var courseResource = _mapper.Map<Course, CourseResource>(result.Course);
+            return Ok(value: courseResource);
+        }
+
+        /// <summary>
+        /// Retrieves a specific Course by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved course</returns>
@@ -72,7 +132,7 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves a all courses
+        /// Retrieves all courses
         /// </summary>
         /// <returns>The retrieved courses</returns>
         [HttpGet("/courses", Name = "Get all Courses")]
@@ -85,7 +145,7 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific Course by his id
+        /// Deletes a specific Course by id
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("/courses/{id}", Name = "Delete Course By Id")]

@@ -17,6 +17,9 @@ namespace University.Server.Mapping
 
             CreateMap<UpdateUserResource, User>();
             CreateMap<UpdateLocationResource, Location>();
+            CreateMap<UpdateCourseResource, Course>();
+
+            CreateMap<OverwriteCourseResource, Course>();
         }
     }
 }

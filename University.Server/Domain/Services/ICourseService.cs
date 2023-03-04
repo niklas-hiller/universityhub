@@ -8,6 +8,8 @@ namespace University.Server.Domain.Services
         Task<CourseResponse> SaveAsync(Course course);
         Task<IEnumerable<Course>> ListAsync();
         Task<Course?> GetAsync(Guid id);
+        Task<CourseResponse> UpdateAsync(Guid id, Course course);
+        Task<CourseResponse> OverwriteAsync(Guid id, Course course);
         Task<CourseResponse> DeleteAsync(Guid id);
     }
 }

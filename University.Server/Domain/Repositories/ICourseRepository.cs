@@ -7,6 +7,7 @@ namespace University.Server.Domain.Repositories
         Task AddAsync(Course course);
         Task<IEnumerable<Course>> ListAsync();
         Task<Course?> GetAsync(Guid id);
+        void Update(Course course);
         void Remove(Course course);
     }
 }
