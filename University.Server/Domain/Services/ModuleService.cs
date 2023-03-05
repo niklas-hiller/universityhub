@@ -89,6 +89,29 @@ namespace University.Server.Domain.Services
             }
         }
 
+        public async Task<ModuleResponse> OverwriteAsync(Guid id, Module module)
+        {
+            var existingModule = await _moduleRepository.GetAsync(id);
+
+            if (existingModule == null)
+                return new ModuleResponse("Module not found.");
+
+            existingModule.Professors = module.Professors;
+
+            try
+            {
+                _moduleRepository.Update(existingModule);
+                await _unitOfWork.CompleteAsync();
+
+                return new ModuleResponse(existingModule);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new ModuleResponse($"An error occurred when overwriting the module: {ex.Message}");
+            }
+        }
+
         public async Task<ModuleResponse> DeleteAsync(Guid id)
         {
             var existingModule = await _moduleRepository.GetAsync(id);

@@ -20,6 +20,7 @@ namespace University.Server.Mapping
             CreateMap<UpdateCourseResource, Course>();
 
             CreateMap<OverwriteCourseResource, Course>();
+            CreateMap<OverwriteModuleResource, Module>();
         }
     }
 }
