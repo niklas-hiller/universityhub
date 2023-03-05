@@ -9,6 +9,7 @@ namespace University.Server.Domain.Services
         Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType);
         Task<Module?> GetAsync(Guid id);
         Task<ModuleResponse> UpdateAsync(Guid id, Module module);
+        Task<ModuleResponse> OverwriteAsync(Guid id, Module module);
         Task<ModuleResponse> DeleteAsync(Guid id);
     }
 }

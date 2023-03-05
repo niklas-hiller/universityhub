@@ -113,6 +113,36 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
+        /// Overwrites Module Professors
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated course</returns>
+        [HttpPut("/modules/{id}", Name = "Overwrite Module Professors")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] OverwriteModuleResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var module = _mapper.Map<OverwriteModuleResource, Module>(resource);
+            var result = await _moduleService.OverwriteAsync(id, module);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            var moduleResource = _mapper.Map<Module, ModuleResource>(result.Module);
+            return Ok(value: moduleResource);
+        }
+
+        /// <summary>
         /// Deletes a specific Module by his id
         /// </summary>
         /// <param name="id"></param>
