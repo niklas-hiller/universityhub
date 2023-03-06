@@ -1,5 +1,5 @@
 ﻿using University.Server.Domain.Models;
-using University.Server.Domain.Persistence.Repositories;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -8,22 +8,19 @@ namespace University.Server.Domain.Services
     public class LocationService : ILocationService
     {
         private readonly ILogger<LocationService> _logger;
-        private readonly ILocationRepository _locationRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICosmosDbRepository<Location, LocationEntity> _locationRepository;
 
-        public LocationService(ILogger<LocationService> logger, ILocationRepository locationRepository, IUnitOfWork unitOfWork)
+        public LocationService(ILogger<LocationService> logger, ICosmosDbRepository<Location, LocationEntity> locationRepository)
         {
             _logger = logger;
             _locationRepository = locationRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<LocationResponse> SaveAsync(Location location)
         {
             try
             {
-                await _locationRepository.AddAsync(location);
-                await _unitOfWork.CompleteAsync();
+                await _locationRepository.AddItemAsync(location);
 
                 return new LocationResponse(location);
             }
@@ -36,17 +33,17 @@ namespace University.Server.Domain.Services
 
         public async Task<IEnumerable<Location>> ListAsync()
         {
-            return await _locationRepository.ListAsync();
+            return await _locationRepository.GetItemsAsync("SELECT * FROM c");
         }
 
         public async Task<Location?> GetAsync(Guid id)
         {
-            return await _locationRepository.GetAsync(id);
+            return await _locationRepository.GetItemAsync(id);
         }
 
         public async Task<LocationResponse> UpdateAsync(Guid id, Location location)
         {
-            var existingLocation = await _locationRepository.GetAsync(id);
+            var existingLocation = await _locationRepository.GetItemAsync(id);
 
             if (existingLocation == null)
                 return new LocationResponse("Location not found.");
@@ -62,8 +59,7 @@ namespace University.Server.Domain.Services
 
             try
             {
-                _locationRepository.Update(existingLocation);
-                await _unitOfWork.CompleteAsync();
+                await _locationRepository.UpdateItemAsync(existingLocation.Id, existingLocation);
 
                 return new LocationResponse(existingLocation);
             }
@@ -76,15 +72,14 @@ namespace University.Server.Domain.Services
 
         public async Task<LocationResponse> DeleteAsync(Guid id)
         {
-            var existingLocation = await _locationRepository.GetAsync(id);
+            var existingLocation = await _locationRepository.GetItemAsync(id);
 
             if (existingLocation == null)
                 return new LocationResponse("Location not found.");
 
             try
             {
-                _locationRepository.Remove(existingLocation);
-                await _unitOfWork.CompleteAsync();
+                await _locationRepository.DeleteItemAsync(existingLocation.Id);
 
                 return new LocationResponse(existingLocation);
             }

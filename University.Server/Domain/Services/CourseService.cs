@@ -1,5 +1,5 @@
 ﻿using University.Server.Domain.Models;
-using University.Server.Domain.Persistence.Repositories;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -8,22 +8,19 @@ namespace University.Server.Domain.Services
     public class CourseService : ICourseService
     {
         private readonly ILogger<CourseService> _logger;
-        private readonly ICourseRepository _courseRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICosmosDbRepository<Course, CourseEntity> _courseRepository;
 
-        public CourseService(ILogger<CourseService> logger, ICourseRepository courseRepository, IUnitOfWork unitOfWork)
+        public CourseService(ILogger<CourseService> logger, ICosmosDbRepository<Course, CourseEntity> courseRepository)
         {
             _logger = logger;
             _courseRepository = courseRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<CourseResponse> SaveAsync(Course course)
         {
             try
             {
-                await _courseRepository.AddAsync(course);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.AddItemAsync(course);
 
                 return new CourseResponse(course);
             }
@@ -36,17 +33,17 @@ namespace University.Server.Domain.Services
 
         public async Task<IEnumerable<Course>> ListAsync()
         {
-            return await _courseRepository.ListAsync();
+            return await _courseRepository.GetItemsAsync("SELECT * FROM c");
         }
 
         public async Task<Course?> GetAsync(Guid id)
         {
-            return await _courseRepository.GetAsync(id);
+            return await _courseRepository.GetItemAsync(id);
         }
 
         public async Task<CourseResponse> UpdateAsync(Guid id, Course course)
         {
-            var existingCourse = await _courseRepository.GetAsync(id);
+            var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
                 return new CourseResponse("Course not found.");
@@ -58,8 +55,7 @@ namespace University.Server.Domain.Services
 
             try
             {
-                _courseRepository.Update(existingCourse);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
                 return new CourseResponse(existingCourse);
             }
@@ -72,7 +68,7 @@ namespace University.Server.Domain.Services
 
         public async Task<CourseResponse> OverwriteAsync(Guid id, Course course)
         {
-            var existingCourse = await _courseRepository.GetAsync(id);
+            var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
                 return new CourseResponse("Course not found.");
@@ -82,8 +78,7 @@ namespace University.Server.Domain.Services
 
             try
             {
-                _courseRepository.Update(existingCourse);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
                 return new CourseResponse(existingCourse);
             }
@@ -96,15 +91,14 @@ namespace University.Server.Domain.Services
 
         public async Task<CourseResponse> DeleteAsync(Guid id)
         {
-            var existingCourse = await _courseRepository.GetAsync(id);
+            var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
                 return new CourseResponse("Location not found.");
 
             try
             {
-                _courseRepository.Remove(existingCourse);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.DeleteItemAsync(existingCourse.Id);
 
                 return new CourseResponse(existingCourse);
             }

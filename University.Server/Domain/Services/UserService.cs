@@ -1,4 +1,5 @@
 ﻿using University.Server.Domain.Models;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -7,22 +8,19 @@ namespace University.Server.Domain.Services
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private readonly IUserRepository _userRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
 
-        public UserService(ILogger<UserService> logger, IUserRepository userRepository, IUnitOfWork unitOfWork)
+        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<UserResponse> SaveAsync(User user)
         {
             try
             {
-                await _userRepository.AddAsync(user);
-                await _unitOfWork.CompleteAsync();
+                await _userRepository.AddItemAsync(user);
 
                 return new UserResponse(user);
             }
@@ -35,7 +33,7 @@ namespace University.Server.Domain.Services
 
         public async Task<UserResponse> UpdateAsync(Guid id, User user)
         {
-            var existingUser = await _userRepository.GetAsync(id);
+            var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
                 return new UserResponse("User not found.");
@@ -51,8 +49,7 @@ namespace University.Server.Domain.Services
 
             try
             {
-                _userRepository.Update(existingUser);
-                await _unitOfWork.CompleteAsync();
+                await _userRepository.UpdateItemAsync(existingUser.Id, existingUser);
 
                 return new UserResponse(existingUser);
             }
@@ -65,12 +62,12 @@ namespace University.Server.Domain.Services
 
         public async Task<User?> GetAsync(Guid id)
         {
-            return await _userRepository.GetAsync(id);
+            return await _userRepository.GetItemAsync(id);
         }
 
         public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
         {
-            var users = await _userRepository.ListAsync();
+            var users = await _userRepository.GetItemsAsync("SELECT * FROM c");
             if (authorization != null)
             {
                 users = users.Where(user => user.Authorization == authorization);
@@ -81,15 +78,14 @@ namespace University.Server.Domain.Services
 
         public async Task<UserResponse> DeleteAsync(Guid id)
         {
-            var existingUser = await _userRepository.GetAsync(id);
+            var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
                 return new UserResponse("User not found.");
 
             try
             {
-                _userRepository.Remove(existingUser);
-                await _unitOfWork.CompleteAsync();
+                await _userRepository.DeleteItemAsync(id);
 
                 return new UserResponse(existingUser);
             }
@@ -98,6 +94,20 @@ namespace University.Server.Domain.Services
                 // Do some logging stuff
                 return new UserResponse($"An error occurred when deleting the user: {ex.Message}");
             }
+        }
+
+        public async Task<List<User>> ConvertGuidListToUserList(List<Guid> userIds)
+        {
+            List<User> users = new List<User>();
+            foreach (Guid userId in userIds)
+            {
+                User? user = await GetAsync(userId);
+                if (user != null)
+                {
+                    users.Add(user);
+                }
+            }
+            return users;
         }
     }
 }

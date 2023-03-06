@@ -35,19 +35,23 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
         {
+            _logger.LogInformation("Received post request for 'Users'");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
+            _logger.LogInformation("Mapping request resource to User Object.");
             var user = _mapper.Map<SaveUserResource, User>(resource);
+            _logger.LogInformation("Starting saving process for user.");
             var result = await _userService.SaveAsync(user);
-
+            _logger.LogInformation("Finished saving process for user.");
             if (!result.Success)
             {
                 return BadRequest(result.Message);
             }
-
+            _logger.LogInformation("Mapping object to resource.");
             var userResource = _mapper.Map<User, UserResource>(result.User);
+            _logger.LogInformation("Sending response.");
             return Created("", value: userResource);
         }
 

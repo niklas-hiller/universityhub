@@ -7,6 +7,13 @@ namespace University.Server.Mapping
 {
     public class ResourceToModelProfile : Profile
     {
+        private readonly IUserService _userService;
+
+        public ResourceToModelProfile(IUserService userService)
+        {
+            _userService = userService;
+        }
+
         public ResourceToModelProfile()
         {
             CreateMap<SaveUserResource, User>();
@@ -18,9 +25,12 @@ namespace University.Server.Mapping
             CreateMap<UpdateUserResource, User>();
             CreateMap<UpdateLocationResource, Location>();
             CreateMap<UpdateCourseResource, Course>();
+            CreateMap<UpdateModuleResource, Module>();
 
             CreateMap<OverwriteCourseResource, Course>();
-            CreateMap<OverwriteModuleResource, Module>();
+            CreateMap<OverwriteModuleResource, Module>()
+                .ForMember(dest => dest.Professors, opt => 
+                    opt.MapFrom(src => src.Professors.Select(p => _userService.GetAsync(p).GetAwaiter().GetResult())));
         }
     }
 }
