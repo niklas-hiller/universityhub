@@ -74,7 +74,6 @@ namespace University.Server.Domain.Services
                 return new CourseResponse("Course not found.");
 
             existingCourse.Students = course.Students;
-            existingCourse.Modules = course.Modules;
 
             try
             {

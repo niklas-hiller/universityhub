@@ -57,13 +57,13 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated location</returns>
-        [HttpPatch("/locations/{id}", Name = "Update Location")]
+        [HttpPut("/locations/{id}", Name = "Update Location")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateLocationResource resource)
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateLocationResource resource)
         {
             if (!ModelState.IsValid)
             {

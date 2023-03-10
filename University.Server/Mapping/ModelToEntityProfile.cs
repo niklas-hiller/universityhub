@@ -9,8 +9,7 @@ namespace University.Server.Mapping
         public ModelToEntityProfile()
         {
             CreateMap<Course, CourseEntity>()
-                .ForMember(dest => dest.StudentIds, opt => opt.MapFrom(src => src.Students.Select(m => m.Id)))
-                .ForMember(dest => dest.ModuleIds, opt => opt.MapFrom(src => src.Modules.Select(m => m.Id)));
+                .ForMember(dest => dest.StudentIds, opt => opt.MapFrom(src => src.Students.Select(m => m.Id)));
             CreateMap<Lecture, LectureEntity>()
                 .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.Location.Id));
             CreateMap<Location, LocationEntity>();

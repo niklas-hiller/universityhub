@@ -56,18 +56,37 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Updates a User
+        /// Updates a Assignment of a User
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="id2"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPatch("/users/{id}", Name = "Update User")]
+        [HttpPut("/users/{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateUserResource resource)
+        public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
+        {
+            // Todo
+            return Ok();
+        }
+
+        /// <summary>
+        /// Updates a User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated user</returns>
+        [HttpPut("/users/{id}", Name = "Update User")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateUserResource resource)
         {
             if (!ModelState.IsValid)
             {
@@ -83,6 +102,24 @@ namespace University.Server.Controllers
 
             var userResource = _mapper.Map<User, UserResource>(result.User);
             return Ok(value: userResource);
+        }
+
+        /// <summary>
+        /// Adds/Removes modules to a user (Students only optional, Professor both, Administrators none) 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated user</returns>
+        [HttpPatch("/users/{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
+        {
+            // Todo
+            return Ok();
         }
 
         /// <summary>

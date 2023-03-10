@@ -52,9 +52,9 @@ namespace University.Server.Domain.Services
             {
                 existingLocation.Name = location.Name;
             }
-            if (location.Seats > 0)
+            if (location.Size > 0)
             {
-                existingLocation.Seats = location.Seats;
+                existingLocation.Size = location.Size;
             }
 
             try

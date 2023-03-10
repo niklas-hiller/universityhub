@@ -11,7 +11,7 @@ namespace University.Server.Mapping
         private readonly IModuleService _moduleService;
         private readonly ILocationService _locationService;
 
-        public EntityToModelProfile(IUserService userService, IModuleService moduleService, ILocationService locationService) 
+        public EntityToModelProfile(IUserService userService, IModuleService moduleService, ILocationService locationService)
         {
             _userService = userService;
             _moduleService = moduleService;
@@ -22,11 +22,9 @@ namespace University.Server.Mapping
         {
             CreateMap<CourseEntity, Course>()
                 .ForMember(dest => dest.Students, opt =>
-                    opt.MapFrom(src => src.StudentIds.Select(m => _userService.GetAsync(m).GetAwaiter().GetResult())))
-                .ForMember(dest => dest.Modules, opt =>
-                    opt.MapFrom(src => src.ModuleIds.Select(m => _moduleService.GetAsync(m).GetAwaiter().GetResult())));
+                    opt.MapFrom(src => src.StudentIds.Select(m => _userService.GetAsync(m).GetAwaiter().GetResult())));
             CreateMap<LectureEntity, Lecture>()
-                .ForMember(dest => dest.Location, opt => 
+                .ForMember(dest => dest.Location, opt =>
                     opt.MapFrom(src => _locationService.GetAsync(src.LocationId)));
             CreateMap<LocationEntity, Location>();
             CreateMap<ModuleEntity, Module>()

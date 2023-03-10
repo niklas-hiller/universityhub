@@ -57,13 +57,13 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
-        [HttpPatch("/courses/{id}", Name = "Update Course")]
+        [HttpPut("/courses/{id}", Name = "Update Course")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateCourseResource resource)
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateCourseResource resource)
         {
             if (!ModelState.IsValid)
             {
@@ -82,33 +82,39 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Overwrites Course Students and Modules
+        /// Adds/Removes Students to a course
         /// </summary>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
-        [HttpPut("/courses/{id}", Name = "Overwrite Course Students and Modules")]
+        [HttpPatch("/courses/{id}/students", Name = "Add/Removes students to a course")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutAsync(Guid id, [FromBody] OverwriteCourseResource resource)
+        public async Task<IActionResult> PatchStudentsAsync(Guid id, [FromBody] PatchResource resource)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.GetErrorMessages());
-            }
-            var course = _mapper.Map<OverwriteCourseResource, Course>(resource);
-            var result = await _courseService.OverwriteAsync(id, course);
+            // Todo
+            return Ok();
+        }
 
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-
-            var courseResource = _mapper.Map<Course, CourseResource>(result.Course);
-            return Ok(value: courseResource);
+        /// <summary>
+        /// Adds/Removes Compulsory modules to a all students of a course
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated course</returns>
+        [HttpPatch("/courses/{id}/assignments", Name = "Add/Removes compulsory modules to all students of a course")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
+        {
+            // Todo
+            return Ok();
         }
 
         /// <summary>

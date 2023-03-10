@@ -14,5 +14,7 @@ namespace University.Server.Resources
         public int CreditPoints { get; set; }
         [Required]
         public EModuleType ModuleType { get; set; }
+        [Required]
+        public int MaxSize { get; set; }
     }
 }

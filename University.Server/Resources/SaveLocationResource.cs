@@ -10,6 +10,6 @@ namespace University.Server.Resources
         [Required]
         public Coordinates Coordinates { get; set; }
         [Required]
-        public int Seats { get; set; }
+        public int Size { get; set; }
     }
 }

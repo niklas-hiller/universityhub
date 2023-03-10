@@ -7,6 +7,6 @@ namespace University.Server.Resources
         public Guid Id { get; set; }
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }
-        public int Seats { get; set; }
+        public int Size { get; set; }
     }
 }

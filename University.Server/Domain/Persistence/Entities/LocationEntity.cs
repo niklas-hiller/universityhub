@@ -6,6 +6,6 @@ namespace University.Server.Domain.Persistence.Entities
     {
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }
-        public int Seats { get; set; }
+        public int Size { get; set; }
     }
 }
