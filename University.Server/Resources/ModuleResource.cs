@@ -9,6 +9,8 @@ namespace University.Server.Resources
         public string Description { get; set; }
         public int CreditPoints { get; set; }
         public EModuleType ModuleType { get; set; }
+        public int MaxSize { get; set; }
+
         public List<User> Professors { get; set; }
     }
 }

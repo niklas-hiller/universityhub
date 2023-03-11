@@ -8,6 +8,6 @@ namespace University.Server.Domain.Persistence.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public ICollection<SemesterModuleEntity> SemesterModules { get; set; } = new List<SemesterModuleEntity>();
+        public ICollection<SemesterModuleEntity> Modules { get; set; } = new List<SemesterModuleEntity>();
     }
 }

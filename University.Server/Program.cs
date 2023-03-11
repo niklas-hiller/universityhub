@@ -69,18 +69,6 @@ builder.Services.AddScoped<ICosmosDbRepository<Course, CourseEntity>, CosmosDbRe
 builder.Services.AddScoped<ISemesterService, SemesterService>();
 builder.Services.AddScoped<ICosmosDbRepository<Semester, SemesterEntity>, CosmosDbRepository<Semester, SemesterEntity>>();
 
-//builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
-//{
-//    cfg.AddProfile(new ModelToEntityProfile());
-//    cfg.AddProfile(new EntityToModelProfile(
-//        provider.CreateScope().ServiceProvider.GetService<IUserService>(),
-//        provider.CreateScope().ServiceProvider.GetService<IModuleService>(),
-//        provider.CreateScope().ServiceProvider.GetService<ILocationService>()));
-//    cfg.AddProfile(new ResourceToModelProfile(
-//        provider.CreateScope().ServiceProvider.GetService<IUserService>()));
-//    cfg.AddProfile(new ModelToResourceProfile());
-
-//}).CreateMapper());
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();

@@ -22,9 +22,9 @@ namespace University.Server.Mapping
                 .ForMember(dest => dest.ModuleId, opt => opt.MapFrom(src => src.ReferenceModule.Id))
                 .ForMember(dest => dest.Lectures, opt => opt.MapFrom(src => src.Lectures));
             CreateMap<Semester, SemesterEntity>()
-                .ForMember(dest => dest.SemesterModules, opt => opt.MapFrom(src => src.Modules));
+                .ForMember(dest => dest.Modules, opt => opt.MapFrom(src => src.Modules));
             CreateMap<User, UserEntity>()
-                .ForMember(dest => dest.ModuleAssignments, opt => opt.MapFrom(src => src.Assignments));
+                .ForMember(dest => dest.Assignments, opt => opt.MapFrom(src => src.Assignments));
         }
     }
 }

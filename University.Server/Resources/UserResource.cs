@@ -7,7 +7,9 @@ namespace University.Server.Resources
         public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
-        public List<Assignment>? ModuleAssignments { get; set; }
+
+        public List<Assignment>? Assignments { get; set; }
     }
 }

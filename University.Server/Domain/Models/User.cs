@@ -7,6 +7,6 @@
         public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
 
-        public ICollection<Assignment> Assignments { get; set; }
+        public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
     }
 }

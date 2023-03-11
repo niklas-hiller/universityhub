@@ -6,7 +6,7 @@
         public string? Description { get; set; }
         public int CreditPoints { get; set; }
         public EModuleType ModuleType { get; set; }
-        public string MaxSize { get; set; }
+        public int MaxSize { get; set; }
 
         public ICollection<User> Professors { get; set; } = new List<User>();
     }
