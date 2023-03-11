@@ -9,6 +9,6 @@ namespace University.Server.Domain.Persistence.Entities
         public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
 
-        public ICollection<ModuleAssignmentEntity> ModuleAssignments { get; set; }
+        public ICollection<AssignmentEntity> ModuleAssignments { get; set; }
     }
 }

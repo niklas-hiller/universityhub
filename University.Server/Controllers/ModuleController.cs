@@ -90,10 +90,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
         public async Task<IActionResult> PatchProfessorsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Ok();
+            return Forbid("Currently not implemented");
         }
 
         /// <summary>

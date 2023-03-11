@@ -93,10 +93,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
         public async Task<IActionResult> PatchStudentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Ok();
+            return Forbid("Currently not implemented");
         }
 
         /// <summary>
@@ -111,10 +112,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Ok();
+            return Forbid("Currently not implemented");
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace University.Server.Mapping
             CreateMap<ModuleEntity, Module>()
                 .ForMember(dest => dest.Professors, opt =>
                     opt.MapFrom(src => src.ProfessorIds.Select(m => _userService.GetAsync(m).GetAwaiter().GetResult())));
-            CreateMap<ModuleAssignmentEntity, ModuleAssignment>()
+            CreateMap<AssignmentEntity, Assignment>()
                 .ForMember(dest => dest.ReferenceModule, opt =>
                     opt.MapFrom(src => _moduleService.GetAsync(src.ReferenceModuleId)));
             CreateMap<SemesterModuleEntity, SemesterModule>()
@@ -42,7 +42,7 @@ namespace University.Server.Mapping
             CreateMap<SemesterEntity, Semester>()
                 .ForMember(dest => dest.Modules, opt => opt.MapFrom(src => src.SemesterModules));
             CreateMap<UserEntity, User>()
-                .ForMember(dest => dest.ModuleAssignments, opt => opt.MapFrom(src => src.ModuleAssignments));
+                .ForMember(dest => dest.Assignments, opt => opt.MapFrom(src => src.ModuleAssignments));
         }
     }
 }
