@@ -1,4 +1,5 @@
 ﻿using University.Server.Domain.Models;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -7,22 +8,21 @@ namespace University.Server.Domain.Services
     public class SemesterService : ISemesterService
     {
         private readonly ILogger<SemesterService> _logger;
-        private readonly ISemesterRepository _semesterRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICosmosDbRepository<Semester, SemesterEntity> _semesterRepository;
 
-        public SemesterService(ILogger<SemesterService> logger, ISemesterRepository semesterRepository, IUnitOfWork unitOfWork)
+        public SemesterService(ILogger<SemesterService> logger, ICosmosDbRepository<Semester, SemesterEntity> semesterRepository)
         {
             _logger = logger;
             _semesterRepository = semesterRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<SemesterResponse> SaveAsync(Semester semester)
         {
+            _logger.LogInformation("Attempting to save new semester...");
+
             try
             {
-                await _semesterRepository.AddAsync(semester);
-                await _unitOfWork.CompleteAsync();
+                await _semesterRepository.AddItemAsync(semester);
 
                 return new SemesterResponse(semester);
             }
@@ -33,27 +33,32 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Semester>> ListAsync()
-        {
-            return await _semesterRepository.ListAsync();
-        }
-
         public async Task<Semester?> GetAsync(Guid id)
         {
-            return await _semesterRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to retrieve existing semesters...");
+
+            return await _semesterRepository.GetItemAsync(id);
+        }
+
+        public async Task<IEnumerable<Semester>> ListAsync()
+        {
+            _logger.LogInformation("Attempting to retrieve existing semester...");
+
+            return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
         }
 
         public async Task<SemesterResponse> DeleteAsync(Guid id)
         {
-            var existingSemester = await _semesterRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to delete existing semester...");
+
+            var existingSemester = await _semesterRepository.GetItemAsync(id);
 
             if (existingSemester == null)
                 return new SemesterResponse("User not found.");
 
             try
             {
-                _semesterRepository.Remove(existingSemester);
-                await _unitOfWork.CompleteAsync();
+                await _semesterRepository.DeleteItemAsync(existingSemester.Id);
 
                 return new SemesterResponse(existingSemester);
             }

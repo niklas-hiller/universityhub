@@ -52,6 +52,25 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
+        /// Add/Removes modules to a semester
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated semester</returns>
+        [HttpPatch("/semesters/{id}/modules", Name = "Add/Removes modules to a semester")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
+        public async Task<IActionResult> PatchModulesAsync(Guid id, [FromBody] PatchResource resource)
+        {
+            // Todo
+            return Forbid("Currently not implemented");
+        }
+
+        /// <summary>
         /// Retrieves a specific Semester by id
         /// </summary>
         /// <param name="id"></param>
@@ -100,20 +119,6 @@ namespace University.Server.Controllers
                 return BadRequest(result.Message);
 
             return NoContent();
-        }
-
-        /// <summary>
-        /// Initializes a specific Semester by id
-        /// </summary>
-        /// <param name="id"></param>
-        [HttpPost("/semesters/{id}/initialize", Name = "Initialize Semester By Id")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SemesterResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> InitializeAsync(Guid id)
-        {
-            return null;
         }
     }
 }

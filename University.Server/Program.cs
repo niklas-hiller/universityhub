@@ -1,12 +1,13 @@
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using Microsoft.OpenApi.Models;
-using System.Configuration;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using University.Server.Domain.Persistence.Contexts;
+using University.Server.Domain.Models;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services;
+using University.Server.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,31 +54,24 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
-builder.Services.AddDbContext<AppDbContext>();
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
+builder.Services.AddScoped<ICosmosDbRepository<User, UserEntity>, CosmosDbRepository<User, UserEntity>>();
+
 builder.Services.AddScoped<IModuleService, ModuleService>();
-builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<ICosmosDbRepository<University.Server.Domain.Models.Module, ModuleEntity>, CosmosDbRepository<University.Server.Domain.Models.Module, ModuleEntity>>();
+
 builder.Services.AddScoped<ILocationService, LocationService>();
-builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICosmosDbRepository<Location, LocationEntity>, CosmosDbRepository<Location, LocationEntity>>();
+
 builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<ISemesterRepository, SemesterRepository>();
+builder.Services.AddScoped<ICosmosDbRepository<Course, CourseEntity>, CosmosDbRepository<Course, CourseEntity>>();
+
 builder.Services.AddScoped<ISemesterService, SemesterService>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICosmosDbRepository<Semester, SemesterEntity>, CosmosDbRepository<Semester, SemesterEntity>>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
-
-// Required for Database to be initialized
-using (var scope = app.Services.CreateScope())
-using (var context = scope.ServiceProvider.GetService<AppDbContext>())
-{
-    if (context == null) throw new ArgumentNullException();
-    context.Database.EnsureCreated();
-}
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())

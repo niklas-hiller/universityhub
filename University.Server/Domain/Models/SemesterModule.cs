@@ -1,9 +1,8 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class SemesterModule
+    public class SemesterModule : Base
     {
-        public Guid Id { get; set; }
-        public List<Lecture> Lectures { get; set; }
+        public ICollection<Lecture> Lectures { get; set; } = new List<Lecture>();
         public User Professor { get; set; }
         public Module ReferenceModule { get; set; }
     }

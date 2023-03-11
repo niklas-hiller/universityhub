@@ -1,5 +1,5 @@
 ﻿using University.Server.Domain.Models;
-using University.Server.Domain.Persistence.Repositories;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -8,22 +8,20 @@ namespace University.Server.Domain.Services
     public class CourseService : ICourseService
     {
         private readonly ILogger<CourseService> _logger;
-        private readonly ICourseRepository _courseRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICosmosDbRepository<Course, CourseEntity> _courseRepository;
 
-        public CourseService(ILogger<CourseService> logger, ICourseRepository courseRepository, IUnitOfWork unitOfWork)
+        public CourseService(ILogger<CourseService> logger, ICosmosDbRepository<Course, CourseEntity> courseRepository)
         {
             _logger = logger;
             _courseRepository = courseRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<CourseResponse> SaveAsync(Course course)
         {
+            _logger.LogInformation("Attempting to save new course...");
             try
             {
-                await _courseRepository.AddAsync(course);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.AddItemAsync(course);
 
                 return new CourseResponse(course);
             }
@@ -34,32 +32,34 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Course>> ListAsync()
-        {
-            return await _courseRepository.ListAsync();
-        }
-
         public async Task<Course?> GetAsync(Guid id)
         {
-            return await _courseRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to retrieve existing course...");
+
+            return await _courseRepository.GetItemAsync(id);
+        }
+
+        public async Task<IEnumerable<Course>> ListAsync()
+        {
+            _logger.LogInformation("Attempting to retrieve existing courses...");
+
+            return await _courseRepository.GetItemsAsync("SELECT * FROM c");
         }
 
         public async Task<CourseResponse> UpdateAsync(Guid id, Course course)
         {
-            var existingCourse = await _courseRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to update existing course...");
+
+            var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
                 return new CourseResponse("Course not found.");
 
-            if (!String.IsNullOrEmpty(course.Name))
-            {
-                existingCourse.Name = course.Name;
-            }
+            existingCourse.Description = course.Description;
 
             try
             {
-                _courseRepository.Update(existingCourse);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
                 return new CourseResponse(existingCourse);
             }
@@ -70,41 +70,18 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<CourseResponse> OverwriteAsync(Guid id, Course course)
-        {
-            var existingCourse = await _courseRepository.GetAsync(id);
-
-            if (existingCourse == null)
-                return new CourseResponse("Course not found.");
-
-            existingCourse.Students = course.Students;
-            existingCourse.Modules = course.Modules;
-
-            try
-            {
-                _courseRepository.Update(existingCourse);
-                await _unitOfWork.CompleteAsync();
-
-                return new CourseResponse(existingCourse);
-            }
-            catch (Exception ex)
-            {
-                // Do some logging stuff
-                return new CourseResponse($"An error occurred when overwriting the course: {ex.Message}");
-            }
-        }
-
         public async Task<CourseResponse> DeleteAsync(Guid id)
         {
-            var existingCourse = await _courseRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to delete existing course...");
+
+            var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
                 return new CourseResponse("Location not found.");
 
             try
             {
-                _courseRepository.Remove(existingCourse);
-                await _unitOfWork.CompleteAsync();
+                await _courseRepository.DeleteItemAsync(existingCourse.Id);
 
                 return new CourseResponse(existingCourse);
             }

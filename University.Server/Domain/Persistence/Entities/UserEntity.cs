@@ -1,15 +1,14 @@
 ﻿using University.Server.Domain.Models;
 
-namespace University.Server.Resources
+namespace University.Server.Domain.Persistence.Entities
 {
-    public class UserResource
+    public class UserEntity : BaseEntity
     {
-        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
 
-        public List<Assignment>? Assignments { get; set; }
+        public ICollection<AssignmentEntity> Assignments { get; set; } = new List<AssignmentEntity>();
     }
 }

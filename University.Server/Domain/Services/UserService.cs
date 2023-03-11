@@ -1,4 +1,5 @@
 ﻿using University.Server.Domain.Models;
+using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
 
@@ -7,22 +8,21 @@ namespace University.Server.Domain.Services
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private readonly IUserRepository _userRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
 
-        public UserService(ILogger<UserService> logger, IUserRepository userRepository, IUnitOfWork unitOfWork)
+        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<UserResponse> SaveAsync(User user)
         {
+            _logger.LogInformation("Attempting to save new user...");
+
             try
             {
-                await _userRepository.AddAsync(user);
-                await _unitOfWork.CompleteAsync();
+                await _userRepository.AddItemAsync(user);
 
                 return new UserResponse(user);
             }
@@ -33,26 +33,43 @@ namespace University.Server.Domain.Services
             }
         }
 
+        public async Task<User?> GetAsync(Guid id)
+        {
+            _logger.LogInformation("Attempting to retrieve existing user...");
+
+            return await _userRepository.GetItemAsync(id);
+        }
+
+        public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
+        {
+            _logger.LogInformation("Attempting to retrieve existing users...");
+
+            if (authorization != null)
+            {
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = '{authorization}'");
+            }
+            else
+            {
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c");
+            }
+        }
+
         public async Task<UserResponse> UpdateAsync(Guid id, User user)
         {
-            var existingUser = await _userRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to update existing user...");
+
+            var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
                 return new UserResponse("User not found.");
 
-            if (!String.IsNullOrEmpty(user.FirstName))
-            {
-                existingUser.FirstName = user.FirstName;
-            }
-            if (!String.IsNullOrEmpty(user.LastName))
-            {
-                existingUser.LastName = user.LastName;
-            }
+            existingUser.FirstName = user.FirstName;
+            existingUser.LastName = user.LastName;
+            existingUser.Email = user.Email;
 
             try
             {
-                _userRepository.Update(existingUser);
-                await _unitOfWork.CompleteAsync();
+                await _userRepository.UpdateItemAsync(existingUser.Id, existingUser);
 
                 return new UserResponse(existingUser);
             }
@@ -63,33 +80,18 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<User?> GetAsync(Guid id)
-        {
-            return await _userRepository.GetAsync(id);
-        }
-
-        public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
-        {
-            var users = await _userRepository.ListAsync();
-            if (authorization != null)
-            {
-                users = users.Where(user => user.Authorization == authorization);
-            }
-
-            return users;
-        }
-
         public async Task<UserResponse> DeleteAsync(Guid id)
         {
-            var existingUser = await _userRepository.GetAsync(id);
+            _logger.LogInformation("Attempting to delete existing user...");
+
+            var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
                 return new UserResponse("User not found.");
 
             try
             {
-                _userRepository.Remove(existingUser);
-                await _unitOfWork.CompleteAsync();
+                await _userRepository.DeleteItemAsync(id);
 
                 return new UserResponse(existingUser);
             }

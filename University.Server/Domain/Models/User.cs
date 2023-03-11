@@ -1,11 +1,12 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class User
+    public class User : Base
     {
-        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
-        public List<ModuleAssignment>? ModuleAssignments { get; set; }
+
+        public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
     }
 }

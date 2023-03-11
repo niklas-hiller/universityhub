@@ -35,20 +35,44 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
         {
+            _logger.LogInformation("Received post request for 'Users'");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
+            _logger.LogInformation("Mapping request resource to User Object.");
             var user = _mapper.Map<SaveUserResource, User>(resource);
+            _logger.LogInformation("Starting saving process for user.");
             var result = await _userService.SaveAsync(user);
-
+            _logger.LogInformation("Finished saving process for user.");
             if (!result.Success)
             {
                 return BadRequest(result.Message);
             }
-
+            _logger.LogInformation("Mapping object to resource.");
             var userResource = _mapper.Map<User, UserResource>(result.User);
+            _logger.LogInformation("Sending response.");
             return Created("", value: userResource);
+        }
+
+        /// <summary>
+        /// Updates a Assignment of a User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="id2"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated user</returns>
+        [HttpPut("/users/{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
+        public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
+        {
+            // Todo
+            return Forbid("Currently not implemented");
         }
 
         /// <summary>
@@ -57,13 +81,13 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPatch("/users/{id}", Name = "Update User")]
+        [HttpPut("/users/{id}", Name = "Update User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PatchAsync(Guid id, [FromBody] UpdateUserResource resource)
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateUserResource resource)
         {
             if (!ModelState.IsValid)
             {
@@ -79,6 +103,25 @@ namespace University.Server.Controllers
 
             var userResource = _mapper.Map<User, UserResource>(result.User);
             return Ok(value: userResource);
+        }
+
+        /// <summary>
+        /// Adds/Removes modules to a user (Students only optional, Professor both, Administrators none) 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated user</returns>
+        [HttpPatch("/users/{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
+        public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
+        {
+            // Todo
+            return Forbid("Currently not implemented");
         }
 
         /// <summary>

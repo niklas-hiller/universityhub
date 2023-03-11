@@ -55,6 +55,49 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
+        /// Updates a Module
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated module</returns>
+        [HttpPut("/modules/{id}", Name = "Updates a Module")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateModuleResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+
+            var module = _mapper.Map<UpdateModuleResource, Module>(resource);
+            var result = await _moduleService.UpdateAsync(id, module);
+
+            var updatedResource = _mapper.Map<Module, ModuleResource>(result.Module);
+            return Ok(updatedResource);
+        }
+
+        /// <summary>
+        /// Add/Removes available professors to a module
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated module</returns>
+        [HttpPatch("/modules/{id}/professors", Name = "Add/Removes available professors to a module")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Obsolete]
+        public async Task<IActionResult> PatchProfessorsAsync(Guid id, [FromBody] PatchResource resource)
+        {
+            // Todo
+            return Forbid("Currently not implemented");
+        }
+
+        /// <summary>
         /// Retrieves a specific Module by it's id
         /// </summary>
         /// <param name="id"></param>
@@ -86,60 +129,6 @@ namespace University.Server.Controllers
             var modules = await _moduleService.ListAsync(moduleType);
             var resources = _mapper.Map<IEnumerable<Module>, IEnumerable<ModuleResource>>(modules);
             return resources;
-        }
-
-        /// <summary>
-        /// Updates a Module
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="resource"></param>
-        /// <returns>The updated module</returns>
-        [HttpPatch("/modules/{id}", Name = "Updates a Module")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateModuleResource resource)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.GetErrorMessages());
-            }
-
-            var module = _mapper.Map<UpdateModuleResource, Module>(resource);
-            var result = await _moduleService.UpdateAsync(id, module);
-
-            var updatedResource = _mapper.Map<Module, ModuleResource>(result.Module);
-            return Ok(updatedResource);
-        }
-
-        /// <summary>
-        /// Overwrites Module Professors
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="resource"></param>
-        /// <returns>The updated course</returns>
-        [HttpPut("/modules/{id}", Name = "Overwrite Module Professors")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutAsync(Guid id, [FromBody] OverwriteModuleResource resource)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.GetErrorMessages());
-            }
-            var module = _mapper.Map<OverwriteModuleResource, Module>(resource);
-            var result = await _moduleService.OverwriteAsync(id, module);
-
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-
-            var moduleResource = _mapper.Map<Module, ModuleResource>(result.Module);
-            return Ok(value: moduleResource);
         }
 
         /// <summary>

@@ -1,10 +1,11 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class Semester
+    public class Semester : Base
     {
-        public Guid Id { get; set; }
+        public string Name { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public List<SemesterModule> Modules { get; set; } = new List<SemesterModule>();
+
+        public ICollection<SemesterModule> Modules { get; set; } = new List<SemesterModule>();
     }
 }
