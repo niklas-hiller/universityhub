@@ -1,4 +1,5 @@
-﻿using University.Server.Domain.Models;
+﻿using System.Net;
+using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
@@ -33,13 +34,14 @@ namespace University.Server.Domain.Services
 
         public async Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType)
         {
-            var modules = await _moduleRepository.GetItemsAsync("SELECT * FROM c");
             if (moduleType != null)
             {
-                modules = modules.Where(module => module.ModuleType == moduleType);
+                return await _moduleRepository.GetItemsAsync($"SELECT * FROM c WHERE c.ModuleType = '{moduleType}'");
             }
-
-            return modules;
+            else
+            {
+                return await _moduleRepository.GetItemsAsync("SELECT * FROM c");
+            }
         }
 
         public async Task<Module?> GetAsync(Guid id)

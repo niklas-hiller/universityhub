@@ -38,14 +38,9 @@ namespace University.Server.Domain.Services
             if (existingUser == null)
                 return new UserResponse("User not found.");
 
-            if (!String.IsNullOrEmpty(user.FirstName))
-            {
-                existingUser.FirstName = user.FirstName;
-            }
-            if (!String.IsNullOrEmpty(user.LastName))
-            {
-                existingUser.LastName = user.LastName;
-            }
+            existingUser.FirstName = user.FirstName;
+            existingUser.LastName = user.LastName;
+            existingUser.Email = user.Email;
 
             try
             {
@@ -67,13 +62,15 @@ namespace University.Server.Domain.Services
 
         public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
         {
-            var users = await _userRepository.GetItemsAsync("SELECT * FROM c");
+            
             if (authorization != null)
             {
-                users = users.Where(user => user.Authorization == authorization);
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = '{authorization}'");
             }
-
-            return users;
+            else
+            {
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c");
+            }
         }
 
         public async Task<UserResponse> DeleteAsync(Guid id)
