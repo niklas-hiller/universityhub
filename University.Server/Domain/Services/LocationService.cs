@@ -18,6 +18,7 @@ namespace University.Server.Domain.Services
 
         public async Task<LocationResponse> SaveAsync(Location location)
         {
+            _logger.LogInformation("Attempting to save new location...");
             try
             {
                 await _locationRepository.AddItemAsync(location);
@@ -31,18 +32,24 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Location>> ListAsync()
-        {
-            return await _locationRepository.GetItemsAsync("SELECT * FROM c");
-        }
-
         public async Task<Location?> GetAsync(Guid id)
         {
+            _logger.LogInformation("Attempting to retrieve existing location...");
+
             return await _locationRepository.GetItemAsync(id);
+        }
+
+        public async Task<IEnumerable<Location>> ListAsync()
+        {
+            _logger.LogInformation("Attempting to retrieve existing locations...");
+
+            return await _locationRepository.GetItemsAsync("SELECT * FROM c");
         }
 
         public async Task<LocationResponse> UpdateAsync(Guid id, Location location)
         {
+            _logger.LogInformation("Attempting to update existing location...");
+
             var existingLocation = await _locationRepository.GetItemAsync(id);
 
             if (existingLocation == null)
@@ -72,6 +79,8 @@ namespace University.Server.Domain.Services
 
         public async Task<LocationResponse> DeleteAsync(Guid id)
         {
+            _logger.LogInformation("Attempting to delete existing location...");
+
             var existingLocation = await _locationRepository.GetItemAsync(id);
 
             if (existingLocation == null)

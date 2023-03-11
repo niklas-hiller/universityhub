@@ -18,6 +18,8 @@ namespace University.Server.Domain.Services
 
         public async Task<SemesterResponse> SaveAsync(Semester semester)
         {
+            _logger.LogInformation("Attempting to save new semester...");
+
             try
             {
                 await _semesterRepository.AddItemAsync(semester);
@@ -31,18 +33,24 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Semester>> ListAsync()
-        {
-            return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
-        }
-
         public async Task<Semester?> GetAsync(Guid id)
         {
+            _logger.LogInformation("Attempting to retrieve existing semesters...");
+
             return await _semesterRepository.GetItemAsync(id);
+        }
+
+        public async Task<IEnumerable<Semester>> ListAsync()
+        {
+            _logger.LogInformation("Attempting to retrieve existing semester...");
+
+            return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
         }
 
         public async Task<SemesterResponse> DeleteAsync(Guid id)
         {
+            _logger.LogInformation("Attempting to delete existing semester...");
+
             var existingSemester = await _semesterRepository.GetItemAsync(id);
 
             if (existingSemester == null)

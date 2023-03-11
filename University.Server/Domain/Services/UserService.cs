@@ -18,6 +18,8 @@ namespace University.Server.Domain.Services
 
         public async Task<UserResponse> SaveAsync(User user)
         {
+            _logger.LogInformation("Attempting to save new user...");
+
             try
             {
                 await _userRepository.AddItemAsync(user);
@@ -31,8 +33,31 @@ namespace University.Server.Domain.Services
             }
         }
 
+        public async Task<User?> GetAsync(Guid id)
+        {
+            _logger.LogInformation("Attempting to retrieve existing user...");
+
+            return await _userRepository.GetItemAsync(id);
+        }
+
+        public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
+        {
+            _logger.LogInformation("Attempting to retrieve existing users...");
+
+            if (authorization != null)
+            {
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = '{authorization}'");
+            }
+            else
+            {
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c");
+            }
+        }
+
         public async Task<UserResponse> UpdateAsync(Guid id, User user)
         {
+            _logger.LogInformation("Attempting to update existing user...");
+
             var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
@@ -55,26 +80,10 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<User?> GetAsync(Guid id)
-        {
-            return await _userRepository.GetItemAsync(id);
-        }
-
-        public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)
-        {
-            
-            if (authorization != null)
-            {
-                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = '{authorization}'");
-            }
-            else
-            {
-                return await _userRepository.GetItemsAsync($"SELECT * FROM c");
-            }
-        }
-
         public async Task<UserResponse> DeleteAsync(Guid id)
         {
+            _logger.LogInformation("Attempting to delete existing user...");
+
             var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
@@ -91,20 +100,6 @@ namespace University.Server.Domain.Services
                 // Do some logging stuff
                 return new UserResponse($"An error occurred when deleting the user: {ex.Message}");
             }
-        }
-
-        public async Task<List<User>> ConvertGuidListToUserList(List<Guid> userIds)
-        {
-            List<User> users = new List<User>();
-            foreach (Guid userId in userIds)
-            {
-                User? user = await GetAsync(userId);
-                if (user != null)
-                {
-                    users.Add(user);
-                }
-            }
-            return users;
         }
     }
 }
