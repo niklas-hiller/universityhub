@@ -16,19 +16,19 @@ namespace University.Server.Domain.Services
             _locationRepository = locationRepository;
         }
 
-        public async Task<LocationResponse> SaveAsync(Location location)
+        public async Task<Response<Location>> SaveAsync(Location location)
         {
             _logger.LogInformation("Attempting to save new location...");
             try
             {
                 await _locationRepository.AddItemAsync(location);
 
-                return new LocationResponse(location);
+                return new Response<Location>(StatusCodes.Status201Created, location);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new LocationResponse($"An error occurred when saving the location: {ex.Message}");
+                return new Response<Location>(StatusCodes.Status400BadRequest, $"An error occurred when saving the location: {ex.Message}");
             }
         }
 
@@ -46,56 +46,50 @@ namespace University.Server.Domain.Services
             return await _locationRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<LocationResponse> UpdateAsync(Guid id, Location location)
+        public async Task<Response<Location>> UpdateAsync(Guid id, Location location)
         {
             _logger.LogInformation("Attempting to update existing location...");
 
             var existingLocation = await _locationRepository.GetItemAsync(id);
 
             if (existingLocation == null)
-                return new LocationResponse("Location not found.");
+                return new Response<Location>(StatusCodes.Status404NotFound, "Location not found.");
 
-            if (!String.IsNullOrEmpty(location.Name))
-            {
-                existingLocation.Name = location.Name;
-            }
-            if (location.Size > 0)
-            {
-                existingLocation.Size = location.Size;
-            }
+            existingLocation.Name = location.Name;
+            existingLocation.Size = location.Size;
 
             try
             {
                 await _locationRepository.UpdateItemAsync(existingLocation.Id, existingLocation);
 
-                return new LocationResponse(existingLocation);
+                return new Response<Location>(StatusCodes.Status200OK, existingLocation);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new LocationResponse($"An error occurred when updating the location: {ex.Message}");
+                return new Response<Location>(StatusCodes.Status400BadRequest, $"An error occurred when updating the location: {ex.Message}");
             }
         }
 
-        public async Task<LocationResponse> DeleteAsync(Guid id)
+        public async Task<Response<Location>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing location...");
 
             var existingLocation = await _locationRepository.GetItemAsync(id);
 
             if (existingLocation == null)
-                return new LocationResponse("Location not found.");
+                return new Response<Location>(StatusCodes.Status404NotFound, "Location not found.");
 
             try
             {
                 await _locationRepository.DeleteItemAsync(existingLocation.Id);
 
-                return new LocationResponse(existingLocation);
+                return new Response<Location>(StatusCodes.Status204NoContent);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new LocationResponse($"An error occurred when deleting the location: {ex.Message}");
+                return new Response<Location>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the location: {ex.Message}");
             }
         }
     }

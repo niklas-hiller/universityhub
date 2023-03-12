@@ -14,15 +14,12 @@ namespace University.Server.Controllers
 
         private readonly ILogger<ModuleController> _logger;
         private readonly IModuleService _moduleService;
-        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService,
-            IUserService userService, IMapper mapper)
+        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService, IMapper mapper)
         {
             _logger = logger;
             _moduleService = moduleService;
-            _userService = userService;
             _mapper = mapper;
         }
 
@@ -42,16 +39,22 @@ namespace University.Server.Controllers
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
+
             var module = _mapper.Map<SaveModuleResource, Module>(resource);
             var result = await _moduleService.SaveAsync(module);
 
-            if (!result.Success)
+            switch (result.StatusCode)
             {
-                return BadRequest(result.Message);
+                case StatusCodes.Status201Created:
+                    var createdResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
+                    return Created("", value: createdResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
             }
-
-            var moduleResource = _mapper.Map<Module, ModuleResource>(result.Module);
-            return Created("", value: moduleResource);
         }
 
         /// <summary>
@@ -63,6 +66,7 @@ namespace University.Server.Controllers
         [HttpPut("/modules/{id}", Name = "Updates a Module")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateModuleResource resource)
         {
@@ -74,8 +78,18 @@ namespace University.Server.Controllers
             var module = _mapper.Map<UpdateModuleResource, Module>(resource);
             var result = await _moduleService.UpdateAsync(id, module);
 
-            var updatedResource = _mapper.Map<Module, ModuleResource>(result.Module);
-            return Ok(updatedResource);
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status200OK:
+                    var updatedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
 
         /// <summary>
@@ -109,7 +123,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var module = await _moduleService.GetAsync(id);
-            if (module == null)
+            if (module == null || module.IsArchived)
             {
                 return NotFound($"Couldn't find any module with the id {id}");
             }
@@ -124,6 +138,8 @@ namespace University.Server.Controllers
         /// <returns>The retrieved modules</returns>
         [HttpGet("/modules", Name = "Get all Modules matching filter")]
         [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IEnumerable<ModuleResource>> GetFilteredAsync(EModuleType? moduleType)
         {
             var modules = await _moduleService.ListAsync(moduleType);
@@ -138,15 +154,23 @@ namespace University.Server.Controllers
         [HttpDelete("/modules/{id}", Name = "Delete Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _moduleService.DeleteAsync(id);
 
-            if (!result.Success)
-                return BadRequest(result.Message);
-
-            return NoContent();
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status204NoContent:
+                    return NoContent();
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
 
     }

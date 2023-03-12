@@ -42,13 +42,18 @@ namespace University.Server.Controllers
             var location = _mapper.Map<SaveLocationResource, Location>(resource);
             var result = await _locationService.SaveAsync(location);
 
-            if (!result.Success)
+            switch (result.StatusCode)
             {
-                return BadRequest(result.Message);
+                case StatusCodes.Status201Created:
+                    var createdResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
+                    return Created("", value: createdResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
             }
-
-            var locationResource = _mapper.Map<Location, LocationResource>(result.Location);
-            return Created("", value: locationResource);
         }
 
         /// <summary>
@@ -72,13 +77,18 @@ namespace University.Server.Controllers
             var location = _mapper.Map<UpdateLocationResource, Location>(resource);
             var result = await _locationService.UpdateAsync(id, location);
 
-            if (!result.Success)
+            switch (result.StatusCode)
             {
-                return BadRequest(result.Message);
+                case StatusCodes.Status200OK:
+                    var updatedResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
             }
-
-            var locationResource = _mapper.Map<Location, LocationResource>(result.Location);
-            return Ok(value: locationResource);
         }
 
         /// <summary>
@@ -121,15 +131,23 @@ namespace University.Server.Controllers
         [HttpDelete("/locations/{id}", Name = "Delete Location By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _locationService.DeleteAsync(id);
 
-            if (!result.Success)
-                return BadRequest(result.Message);
-
-            return NoContent();
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status204NoContent:
+                    return NoContent();
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
     }
 }

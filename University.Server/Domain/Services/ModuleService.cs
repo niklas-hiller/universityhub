@@ -16,19 +16,19 @@ namespace University.Server.Domain.Services
             _moduleRepository = moduleRepository;
         }
 
-        public async Task<ModuleResponse> SaveAsync(Module module)
+        public async Task<Response<Module>> SaveAsync(Module module)
         {
             _logger.LogInformation("Attempting to save new module...");
             try
             {
                 await _moduleRepository.AddItemAsync(module);
 
-                return new ModuleResponse(module);
+                return new Response<Module>(StatusCodes.Status201Created, module);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new ModuleResponse($"An error occurred when saving the module: {ex.Message}");
+                return new Response<Module>(StatusCodes.Status400BadRequest, $"An error occurred when saving the module: {ex.Message}");
             }
         }
 
@@ -45,22 +45,22 @@ namespace University.Server.Domain.Services
 
             if (moduleType != null)
             {
-                return await _moduleRepository.GetItemsAsync($"SELECT * FROM c WHERE c.ModuleType = '{moduleType}'");
+                return await _moduleRepository.GetItemsAsync($"SELECT * FROM c WHERE c.ModuleType = '{moduleType}' AND c.IsArchived = 0");
             }
             else
             {
-                return await _moduleRepository.GetItemsAsync("SELECT * FROM c");
+                return await _moduleRepository.GetItemsAsync("SELECT * FROM c WHERE c.IsArchived = 0");
             }
         }
 
-        public async Task<ModuleResponse> UpdateAsync(Guid id, Module module)
+        public async Task<Response<Module>> UpdateAsync(Guid id, Module module)
         {
             _logger.LogInformation("Attempting to update existing module...");
 
             var existingModule = await _moduleRepository.GetItemAsync(id);
 
-            if (existingModule == null)
-                return new ModuleResponse("Module not found.");
+            if (existingModule == null || existingModule.IsArchived)
+                return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
 
             existingModule.Name = module.Name;
             existingModule.Description = module.Description;
@@ -71,34 +71,36 @@ namespace University.Server.Domain.Services
             {
                 await _moduleRepository.UpdateItemAsync(existingModule.Id, existingModule);
 
-                return new ModuleResponse(existingModule);
+                return new Response<Module>(StatusCodes.Status200OK, existingModule);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new ModuleResponse($"An error occurred when updating the module: {ex.Message}");
+                return new Response<Module>(StatusCodes.Status400BadRequest, $"An error occurred when updating the module: {ex.Message}");
             }
         }
 
-        public async Task<ModuleResponse> DeleteAsync(Guid id)
+        public async Task<Response<Module>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing module...");
 
             var existingModule = await _moduleRepository.GetItemAsync(id);
 
             if (existingModule == null)
-                return new ModuleResponse("Module not found.");
+                return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
 
             try
             {
-                await _moduleRepository.DeleteItemAsync(existingModule.Id);
+                // Modules are not deleted, but archived instead.
+                existingModule.IsArchived = true;
+                await _moduleRepository.UpdateItemAsync(existingModule.Id, existingModule);
 
-                return new ModuleResponse(existingModule);
+                return new Response<Module>(StatusCodes.Status204NoContent);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new ModuleResponse($"An error occurred when deleting the module: {ex.Message}");
+                return new Response<Module>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the module: {ex.Message}");
             }
         }
     }

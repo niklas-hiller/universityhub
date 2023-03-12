@@ -5,9 +5,9 @@ namespace University.Server.Domain.Services
 {
     public interface ISemesterService
     {
-        Task<SemesterResponse> SaveAsync(Semester semester);
+        Task<Response<Semester>> SaveAsync(Semester semester);
         Task<Semester?> GetAsync(Guid id);
         Task<IEnumerable<Semester>> ListAsync();
-        Task<SemesterResponse> DeleteAsync(Guid id);
+        Task<Response<Semester>> DeleteAsync(Guid id);
     }
 }
