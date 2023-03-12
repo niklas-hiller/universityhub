@@ -42,13 +42,18 @@ namespace University.Server.Controllers
             var semester = _mapper.Map<SaveSemesterResource, Semester>(resource);
             var result = await _semesterService.SaveAsync(semester);
 
-            if (!result.Success)
+            switch (result.StatusCode)
             {
-                return BadRequest(result.Message);
+                case StatusCodes.Status201Created:
+                    var createdResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
+                    return Created("", value: createdResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
             }
-
-            var semesterResource = _mapper.Map<Semester, SemesterResource>(result.Semester);
-            return Created("", value: semesterResource);
         }
 
         /// <summary>
@@ -110,15 +115,23 @@ namespace University.Server.Controllers
         [HttpDelete("/semesters/{id}", Name = "Delete Semester By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _semesterService.DeleteAsync(id);
 
-            if (!result.Success)
-                return BadRequest(result.Message);
-
-            return NoContent();
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status204NoContent:
+                    return NoContent();
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
     }
 }

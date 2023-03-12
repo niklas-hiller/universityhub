@@ -5,10 +5,10 @@ namespace University.Server.Domain.Services
 {
     public interface ILocationService
     {
-        Task<LocationResponse> SaveAsync(Location location);
+        Task<Response<Location>> SaveAsync(Location location);
         Task<Location?> GetAsync(Guid id);
         Task<IEnumerable<Location>> ListAsync();
-        Task<LocationResponse> UpdateAsync(Guid id, Location location);
-        Task<LocationResponse> DeleteAsync(Guid id);
+        Task<Response<Location>> UpdateAsync(Guid id, Location location);
+        Task<Response<Location>> DeleteAsync(Guid id);
     }
 }

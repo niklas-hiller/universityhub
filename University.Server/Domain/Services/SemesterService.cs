@@ -16,7 +16,7 @@ namespace University.Server.Domain.Services
             _semesterRepository = semesterRepository;
         }
 
-        public async Task<SemesterResponse> SaveAsync(Semester semester)
+        public async Task<Response<Semester>> SaveAsync(Semester semester)
         {
             _logger.LogInformation("Attempting to save new semester...");
 
@@ -24,12 +24,12 @@ namespace University.Server.Domain.Services
             {
                 await _semesterRepository.AddItemAsync(semester);
 
-                return new SemesterResponse(semester);
+                return new Response<Semester>(StatusCodes.Status201Created, semester);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new SemesterResponse($"An error occurred when saving the semester: {ex.Message}");
+                return new Response<Semester>(StatusCodes.Status400BadRequest, $"An error occurred when saving the semester: {ex.Message}");
             }
         }
 
@@ -47,25 +47,25 @@ namespace University.Server.Domain.Services
             return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<SemesterResponse> DeleteAsync(Guid id)
+        public async Task<Response<Semester>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing semester...");
 
             var existingSemester = await _semesterRepository.GetItemAsync(id);
 
             if (existingSemester == null)
-                return new SemesterResponse("User not found.");
+                return new Response<Semester>(StatusCodes.Status404NotFound, "Semester not found.");
 
             try
             {
                 await _semesterRepository.DeleteItemAsync(existingSemester.Id);
 
-                return new SemesterResponse(existingSemester);
+                return new Response<Semester>(StatusCodes.Status204NoContent);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new SemesterResponse($"An error occurred when deleting the semester: {ex.Message}");
+                return new Response<Semester>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the semester: {ex.Message}");
             }
         }
     }

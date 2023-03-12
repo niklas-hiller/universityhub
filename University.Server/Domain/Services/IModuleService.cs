@@ -5,10 +5,10 @@ namespace University.Server.Domain.Services
 {
     public interface IModuleService
     {
-        Task<ModuleResponse> SaveAsync(Module module);
+        Task<Response<Module>> SaveAsync(Module module);
         Task<Module?> GetAsync(Guid id);
         Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType);
-        Task<ModuleResponse> UpdateAsync(Guid id, Module module);
-        Task<ModuleResponse> DeleteAsync(Guid id);
+        Task<Response<Module>> UpdateAsync(Guid id, Module module);
+        Task<Response<Module>> DeleteAsync(Guid id);
     }
 }

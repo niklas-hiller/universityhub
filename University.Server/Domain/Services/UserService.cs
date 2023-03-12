@@ -16,7 +16,7 @@ namespace University.Server.Domain.Services
             _userRepository = userRepository;
         }
 
-        public async Task<UserResponse> SaveAsync(User user)
+        public async Task<Response<User>> SaveAsync(User user)
         {
             _logger.LogInformation("Attempting to save new user...");
 
@@ -24,12 +24,12 @@ namespace University.Server.Domain.Services
             {
                 await _userRepository.AddItemAsync(user);
 
-                return new UserResponse(user);
+                return new Response<User>(StatusCodes.Status201Created, user);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new UserResponse($"An error occurred when saving the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when saving the user: {ex.Message}");
             }
         }
 
@@ -54,14 +54,14 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<UserResponse> UpdateAsync(Guid id, User user)
+        public async Task<Response<User>> UpdateAsync(Guid id, User user)
         {
             _logger.LogInformation("Attempting to update existing user...");
 
             var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
-                return new UserResponse("User not found.");
+                return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
 
             existingUser.FirstName = user.FirstName;
             existingUser.LastName = user.LastName;
@@ -71,34 +71,34 @@ namespace University.Server.Domain.Services
             {
                 await _userRepository.UpdateItemAsync(existingUser.Id, existingUser);
 
-                return new UserResponse(existingUser);
+                return new Response<User>(StatusCodes.Status200OK, existingUser);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new UserResponse($"An error occurred when updating the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when updating the user: {ex.Message}");
             }
         }
 
-        public async Task<UserResponse> DeleteAsync(Guid id)
+        public async Task<Response<User>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing user...");
 
             var existingUser = await _userRepository.GetItemAsync(id);
 
             if (existingUser == null)
-                return new UserResponse("User not found.");
+                return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
 
             try
             {
                 await _userRepository.DeleteItemAsync(id);
 
-                return new UserResponse(existingUser);
+                return new Response<User>(StatusCodes.Status204NoContent);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new UserResponse($"An error occurred when deleting the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the user: {ex.Message}");
             }
         }
     }

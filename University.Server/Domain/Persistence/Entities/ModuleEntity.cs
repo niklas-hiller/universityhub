@@ -2,7 +2,7 @@
 
 namespace University.Server.Domain.Persistence.Entities
 {
-    public class ModuleEntity : BaseEntity
+    public class ModuleEntity : ArchivableEntity
     {
         public string Name { get; set; }
         public string Description { get; set; }

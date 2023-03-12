@@ -2,12 +2,12 @@
 {
     public abstract class BaseResponse
     {
-        public bool Success { get; protected set; }
+        public int StatusCode { get; protected set; }
         public string Message { get; protected set; }
 
-        public BaseResponse(bool success, string message)
+        public BaseResponse(int statusCode, string message)
         {
-            Success = success;
+            StatusCode = statusCode;
             Message = message;
         }
     }

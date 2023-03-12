@@ -5,10 +5,10 @@ namespace University.Server.Domain.Services
 {
     public interface IUserService
     {
-        Task<UserResponse> SaveAsync(User user);
+        Task<Response<User>> SaveAsync(User user);
         Task<User?> GetAsync(Guid id);
         Task<IEnumerable<User>> ListAsync(EAuthorization? authorization);
-        Task<UserResponse> UpdateAsync(Guid id, User user);
-        Task<UserResponse> DeleteAsync(Guid id);
+        Task<Response<User>> UpdateAsync(Guid id, User user);
+        Task<Response<User>> DeleteAsync(Guid id);
     }
 }

@@ -16,19 +16,19 @@ namespace University.Server.Domain.Services
             _courseRepository = courseRepository;
         }
 
-        public async Task<CourseResponse> SaveAsync(Course course)
+        public async Task<Response<Course>> SaveAsync(Course course)
         {
             _logger.LogInformation("Attempting to save new course...");
             try
             {
                 await _courseRepository.AddItemAsync(course);
 
-                return new CourseResponse(course);
+                return new Response<Course>(StatusCodes.Status201Created, course);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new CourseResponse($"An error occurred when saving the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when saving the course: {ex.Message}");
             }
         }
 
@@ -46,14 +46,14 @@ namespace University.Server.Domain.Services
             return await _courseRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<CourseResponse> UpdateAsync(Guid id, Course course)
+        public async Task<Response<Course>> UpdateAsync(Guid id, Course course)
         {
             _logger.LogInformation("Attempting to update existing course...");
 
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
-                return new CourseResponse("Course not found.");
+                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
 
             existingCourse.Description = course.Description;
 
@@ -61,34 +61,34 @@ namespace University.Server.Domain.Services
             {
                 await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
-                return new CourseResponse(existingCourse);
+                return new Response<Course>(StatusCodes.Status200OK, existingCourse);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new CourseResponse($"An error occurred when updating the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {ex.Message}");
             }
         }
 
-        public async Task<CourseResponse> DeleteAsync(Guid id)
+        public async Task<Response<Course>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing course...");
 
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
             if (existingCourse == null)
-                return new CourseResponse("Location not found.");
+                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
 
             try
             {
                 await _courseRepository.DeleteItemAsync(existingCourse.Id);
 
-                return new CourseResponse(existingCourse);
+                return new Response<Course>(StatusCodes.Status204NoContent);
             }
             catch (Exception ex)
             {
                 // Do some logging stuff
-                return new CourseResponse($"An error occurred when deleting the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the course: {ex.Message}");
             }
         }
     }

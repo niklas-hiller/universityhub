@@ -42,13 +42,18 @@ namespace University.Server.Controllers
             var course = _mapper.Map<SaveCourseResource, Course>(resource);
             var result = await _courseService.SaveAsync(course);
 
-            if (!result.Success)
+            switch (result.StatusCode)
             {
-                return BadRequest(result.Message);
+                case StatusCodes.Status201Created:
+                    var createdResource = _mapper.Map<Course, CourseResource>(result.ResponseEntity);
+                    return Created("", value: createdResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
             }
-
-            var courseResource = _mapper.Map<Course, CourseResource>(result.Course);
-            return Created("", value: courseResource);
         }
 
         /// <summary>
@@ -72,13 +77,18 @@ namespace University.Server.Controllers
             var course = _mapper.Map<UpdateCourseResource, Course>(resource);
             var result = await _courseService.UpdateAsync(id, course);
 
-            if (!result.Success)
+            switch (result.StatusCode)
             {
-                return BadRequest(result.Message);
+                case StatusCodes.Status200OK:
+                    var updatedResource = _mapper.Map<Course, CourseResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
             }
-
-            var courseResource = _mapper.Map<Course, CourseResource>(result.Course);
-            return Ok(value: courseResource);
         }
 
         /// <summary>
@@ -159,15 +169,23 @@ namespace University.Server.Controllers
         [HttpDelete("/courses/{id}", Name = "Delete Course By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _courseService.DeleteAsync(id);
 
-            if (!result.Success)
-                return BadRequest(result.Message);
-
-            return NoContent();
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status204NoContent:
+                    return NoContent();
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                case StatusCodes.Status404NotFound:
+                    return NotFound(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
     }
 }
