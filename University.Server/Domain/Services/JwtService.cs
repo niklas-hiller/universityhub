@@ -29,25 +29,6 @@ namespace University.Server.Domain.Services
             _jwtHandler = new JwtSecurityTokenHandler();
         }
 
-        public bool HasAuthorization(ClaimsPrincipal user, EAuthorization authorization)
-        {
-            const string CLAIM = "authorization";
-            switch (authorization)
-            {
-                case EAuthorization.Student:
-                    return user.HasClaim(CLAIM, EAuthorization.Student.ToString())
-                        || user.HasClaim(CLAIM, EAuthorization.Professor.ToString())
-                        || user.HasClaim(CLAIM, EAuthorization.Administrator.ToString());
-                case EAuthorization.Professor:
-                    return user.HasClaim(CLAIM, EAuthorization.Professor.ToString())
-                        || user.HasClaim(CLAIM, EAuthorization.Administrator.ToString());
-                case EAuthorization.Administrator:
-                    return user.HasClaim(CLAIM, EAuthorization.Administrator.ToString());
-                default:
-                    return false;
-            }
-        }
-
         public bool IsSelf(ClaimsPrincipal user, User expectedUser)
         {
             return user.HasClaim("firstName", expectedUser.FirstName)

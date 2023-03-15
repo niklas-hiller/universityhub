@@ -33,12 +33,12 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created user</returns>
-        [Permission(EAuthorization.Administrator)]
         [HttpPost(Name = "Create User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
         {
             if (!ModelState.IsValid)
@@ -180,13 +180,9 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            if (!_jwtService.HasAuthorization(User, EAuthorization.Administrator))
-            {
-                return Forbid();
-            }
-
             var result = await _userService.DeleteAsync(id);
 
             switch (result.StatusCode)

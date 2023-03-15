@@ -10,9 +10,9 @@ namespace University.Server.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class PermissionAttribute : AuthorizeAttribute, IAuthorizationFilter
     {
-        private readonly EAuthorization auth;
+        private readonly EAuthorization[] auth;
 
-        public PermissionAttribute(EAuthorization auth)
+        public PermissionAttribute(params EAuthorization[] auth)
         {
             this.auth = auth;
         }
@@ -39,7 +39,7 @@ namespace University.Server.Attributes
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var user = context.HttpContext.User;
-            if (!HasAuthorization(user, auth))
+            if (!auth.Any(a => HasAuthorization(user, a)))
             {
                 context.Result = new ForbidResult();
                 return;
