@@ -1,4 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
@@ -11,11 +17,18 @@ namespace University.Server.Domain.Services
     {
         private readonly ILogger<UserService> _logger;
         private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
+        private readonly JwtSecurityTokenHandler _jwtHandler;
+        private readonly SigningCredentials _signingCredentials;
 
-        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
+        public UserService(IConfiguration config, ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
+
+            var secret = config["JwtSecret"] ?? throw new ArgumentNullException("JwtSecret");
+            var securityKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(secret));
+            _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            _jwtHandler = new JwtSecurityTokenHandler();
         }
 
         private string Sha256Hash(string rawData)
@@ -35,6 +48,37 @@ namespace University.Server.Domain.Services
                 return builder.ToString();
             }
         }
+
+        public async Task<Response<Token>> LoginAsync(string email, string password)
+        {
+            // Retrieve User
+            var users = await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Email = '{email}' AND c.Password = '{Sha256Hash(password)}'");
+            var user = users.First();
+            if (user == null)
+            {
+                return new Response<Token>(StatusCodes.Status400BadRequest, "Invalid Credentials");
+            }
+            var claims = new List<Claim>()
+            {
+                new Claim("firstName", user.FirstName),
+                new Claim("lastName", user.LastName),
+                new Claim("email", user.Email),
+                new Claim("authorization", user.Authorization.ToString())
+            };
+
+            var jwtSecurityToken = _jwtHandler.CreateJwtSecurityToken(
+                issuer: "UniversityHub",
+                audience: "HybridClient",
+                subject: new ClaimsIdentity(claims),
+                notBefore: DateTime.Now,
+                expires: DateTime.Now.AddHours(6),
+                issuedAt: DateTime.Now,
+                signingCredentials: _signingCredentials);
+
+
+            var login = new Token(_jwtHandler.WriteToken(jwtSecurityToken));
+            return new Response<Token>(StatusCodes.Status201Created, login);
+        } 
 
         public async Task<Response<User>> SaveAsync(User user)
         {

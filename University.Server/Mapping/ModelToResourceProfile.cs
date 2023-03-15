@@ -13,6 +13,8 @@ namespace University.Server.Mapping
             CreateMap<Location, LocationResource>();
             CreateMap<Semester, SemesterResource>();
             CreateMap<Course, CourseResource>();
+            CreateMap<Token, TokenResource>()
+                .ForMember(dest => dest.Token, opt => opt.MapFrom(src => src.Value));
         }
     }
 }
