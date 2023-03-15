@@ -17,15 +17,12 @@ namespace University.Server.Controllers
 
         private readonly ILogger<ModuleController> _logger;
         private readonly IModuleService _moduleService;
-        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService,
-            IJwtService jwtService, IMapper mapper)
+        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService, IMapper mapper)
         {
             _logger = logger;
             _moduleService = moduleService;
-            _jwtService = jwtService;
             _mapper = mapper;
         }
 

@@ -17,15 +17,12 @@ namespace University.Server.Controllers
 
         private readonly ILogger<LocationController> _logger;
         private readonly ILocationService _locationService;
-        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public LocationController(ILogger<LocationController> logger, ILocationService locationService,
-            IJwtService jwtService, IMapper mapper)
+        public LocationController(ILogger<LocationController> logger, ILocationService locationService, IMapper mapper)
         {
             _logger = logger;
             _locationService = locationService;
-            _jwtService = jwtService;
             _mapper = mapper;
         }
 

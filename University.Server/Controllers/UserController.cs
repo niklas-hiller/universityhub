@@ -16,15 +16,12 @@ namespace University.Server.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
-        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, 
-            IJwtService jwtService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
-            _jwtService = jwtService;
             _mapper = mapper;
         }
 
