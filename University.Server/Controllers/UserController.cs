@@ -9,11 +9,10 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("users")]
     [Authorize]
     public class UserController : Controller
     {
-
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
@@ -30,7 +29,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created user</returns>
-        [HttpPost("/users", Name = "Create User")]
+        [HttpPost(Name = "Create User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserResource))]
@@ -66,7 +65,7 @@ namespace University.Server.Controllers
         /// <param name="id2"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPut("/users/{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
+        [HttpPut("{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
@@ -85,7 +84,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPut("/users/{id}", Name = "Update User")]
+        [HttpPut("{id}", Name = "Update User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
@@ -120,7 +119,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPatch("/users/{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
+        [HttpPatch("{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
@@ -138,7 +137,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved user</returns>
-        [HttpGet("/users/{id}", Name = "Get User By Id")]
+        [HttpGet("{id}", Name = "Get User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -158,7 +157,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="authorization"></param>
         /// <returns>The retrieved users</returns>
-        [HttpGet("/users", Name = "Get all Users matching filter")]
+        [HttpGet("", Name = "Get all Users matching filter")]
         [Produces("application/json")]
         public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
         {
@@ -171,7 +170,7 @@ namespace University.Server.Controllers
         /// Deletes a specific User by his id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/users/{id}", Name = "Delete User By Id")]
+        [HttpDelete("{id}", Name = "Delete User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

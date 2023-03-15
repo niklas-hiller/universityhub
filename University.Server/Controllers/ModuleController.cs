@@ -9,7 +9,7 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("modules")]
     [Authorize]
     public class ModuleController : Controller
     {
@@ -30,7 +30,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created module</returns>
-        [HttpPost("/modules", Name = "Create Module")]
+        [HttpPost(Name = "Create Module")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ModuleResource))]
@@ -65,7 +65,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
-        [HttpPut("/modules/{id}", Name = "Updates a Module")]
+        [HttpPut("{id}", Name = "Updates a Module")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -100,7 +100,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
-        [HttpPatch("/modules/{id}/professors", Name = "Add/Removes available professors to a module")]
+        [HttpPatch("{id}/professors", Name = "Add/Removes available professors to a module")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
@@ -118,7 +118,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved module</returns>
-        [HttpGet("/modules/{id}", Name = "Get Module By Id")]
+        [HttpGet("{id}", Name = "Get Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -138,7 +138,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="moduleType"></param>
         /// <returns>The retrieved modules</returns>
-        [HttpGet("/modules", Name = "Get all Modules matching filter")]
+        [HttpGet(Name = "Get all Modules matching filter")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -153,7 +153,7 @@ namespace University.Server.Controllers
         /// Deletes a specific Module by his id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/modules/{id}", Name = "Delete Module By Id")]
+        [HttpDelete("{id}", Name = "Delete Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -7,17 +7,14 @@ using University.Server.Resources;
 
 namespace JWTAuth.WebApi.Controllers
 {
-    [Route("/api/v1/[controller]")]
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public TokenController(IConfiguration config, IJwtService jwtService, IMapper mapper)
+        public TokenController(IJwtService jwtService, IMapper mapper)
         {
-            _configuration = config;
             _jwtService = jwtService;
             _mapper = mapper;
         }
@@ -27,7 +24,7 @@ namespace JWTAuth.WebApi.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created jwt</returns>
-        [HttpPost("/token", Name = "Create JWT Token")]
+        [HttpPost("token", Name = "Create JWT Token")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TokenResource))]

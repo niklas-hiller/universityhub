@@ -9,7 +9,7 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("courses")]
     [Authorize]
     public class CourseController : Controller
     {
@@ -30,7 +30,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created course</returns>
-        [HttpPost("/courses", Name = "Create Course")]
+        [HttpPost(Name = "Create Course")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseResource))]
@@ -64,7 +64,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
-        [HttpPut("/courses/{id}", Name = "Update Course")]
+        [HttpPut("{id}", Name = "Update Course")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
@@ -99,7 +99,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
-        [HttpPatch("/courses/{id}/students", Name = "Add/Removes students to a course")]
+        [HttpPatch("{id}/students", Name = "Add/Removes students to a course")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
@@ -118,7 +118,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
-        [HttpPatch("/courses/{id}/assignments", Name = "Add/Removes compulsory modules to all students of a course")]
+        [HttpPatch("{id}/assignments", Name = "Add/Removes compulsory modules to all students of a course")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
@@ -136,7 +136,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved course</returns>
-        [HttpGet("/courses/{id}", Name = "Get Course By Id")]
+        [HttpGet("{id}", Name = "Get Course By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -155,7 +155,7 @@ namespace University.Server.Controllers
         /// Retrieves all courses
         /// </summary>
         /// <returns>The retrieved courses</returns>
-        [HttpGet("/courses", Name = "Get all Courses")]
+        [HttpGet(Name = "Get all Courses")]
         [Produces("application/json")]
         public async Task<IEnumerable<CourseResource>> GetAllAsync()
         {
@@ -168,7 +168,7 @@ namespace University.Server.Controllers
         /// Deletes a specific Course by id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/courses/{id}", Name = "Delete Course By Id")]
+        [HttpDelete("{id}", Name = "Delete Course By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
