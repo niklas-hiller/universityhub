@@ -19,13 +19,17 @@ namespace University.Server.Domain.Services
         private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
         private readonly JwtSecurityTokenHandler _jwtHandler;
         private readonly SigningCredentials _signingCredentials;
+        private readonly string _issuer;
+        private readonly string _audience;
 
         public UserService(IConfiguration config, ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
 
-            var secret = config["JwtSecret"] ?? throw new ArgumentNullException("JwtSecret");
+            _issuer = config["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer");
+            _audience = config["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt:Audience");
+            var secret = config["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
             var securityKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(secret));
             _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             _jwtHandler = new JwtSecurityTokenHandler();
@@ -53,7 +57,7 @@ namespace University.Server.Domain.Services
         {
             // Retrieve User
             var users = await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Email = '{email}' AND c.Password = '{Sha256Hash(password)}'");
-            var user = users.First();
+            var user = users.FirstOrDefault();
             if (user == null)
             {
                 return new Response<Token>(StatusCodes.Status400BadRequest, "Invalid Credentials");
@@ -67,8 +71,8 @@ namespace University.Server.Domain.Services
             };
 
             var jwtSecurityToken = _jwtHandler.CreateJwtSecurityToken(
-                issuer: "UniversityHub",
-                audience: "HybridClient",
+                issuer: _issuer,
+                audience: _audience,
                 subject: new ClaimsIdentity(claims),
                 notBefore: DateTime.Now,
                 expires: DateTime.Now.AddHours(6),
