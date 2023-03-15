@@ -12,13 +12,13 @@ namespace JWTAuth.WebApi.Controllers
     public class TokenController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public TokenController(IConfiguration config, IUserService userService, IMapper mapper)
+        public TokenController(IConfiguration config, IJwtService jwtService, IMapper mapper)
         {
             _configuration = config;
-            _userService = userService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -39,7 +39,7 @@ namespace JWTAuth.WebApi.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
 
-            var result = await _userService.LoginAsync(resource.Email, resource.Password);
+            var result = await _jwtService.LoginAsync(resource.Email, resource.Password);
 
             switch (result.StatusCode)
             {

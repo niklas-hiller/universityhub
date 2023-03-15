@@ -78,6 +78,8 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICosmosDbRepository<User, UserEntity>, CosmosDbRepository<User, UserEntity>>();
 
