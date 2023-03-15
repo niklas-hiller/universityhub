@@ -16,12 +16,15 @@ namespace University.Server.Controllers
 
         private readonly ILogger<ModuleController> _logger;
         private readonly IModuleService _moduleService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService, IMapper mapper)
+        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService,
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _moduleService = moduleService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -37,6 +40,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostAsync([FromBody] SaveModuleResource resource)
         {
+            if (!_jwtService.HasAuthorization(User, EAuthorization.Administrator))
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -110,7 +118,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchProfessorsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>

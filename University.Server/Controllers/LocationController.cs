@@ -16,12 +16,15 @@ namespace University.Server.Controllers
 
         private readonly ILogger<LocationController> _logger;
         private readonly ILocationService _locationService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public LocationController(ILogger<LocationController> logger, ILocationService locationService, IMapper mapper)
+        public LocationController(ILogger<LocationController> logger, ILocationService locationService,
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _locationService = locationService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -37,6 +40,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostAsync([FromBody] SaveLocationResource resource)
         {
+            if (!_jwtService.HasAuthorization(User, EAuthorization.Administrator))
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());

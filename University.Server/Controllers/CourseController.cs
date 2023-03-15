@@ -16,12 +16,15 @@ namespace University.Server.Controllers
 
         private readonly ILogger<CourseController> _logger;
         private readonly ICourseService _courseService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public CourseController(ILogger<CourseController> logger, ICourseService courseService, IMapper mapper)
+        public CourseController(ILogger<CourseController> logger, ICourseService courseService,
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _courseService = courseService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -37,6 +40,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostAsync([FromBody] SaveCourseResource resource)
         {
+            if (!_jwtService.HasAuthorization(User, EAuthorization.Administrator))
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -109,7 +117,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchStudentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -128,7 +136,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>

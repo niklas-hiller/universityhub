@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
@@ -15,12 +16,15 @@ namespace University.Server.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, 
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -29,6 +33,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created user</returns>
+        [Permission(EAuthorization.Administrator)]
         [HttpPost(Name = "Create User")]
         [Consumes("application/json")]
         [Produces("application/json")]
@@ -75,7 +80,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -129,7 +134,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -177,6 +182,11 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
+            if (!_jwtService.HasAuthorization(User, EAuthorization.Administrator))
+            {
+                return Forbid();
+            }
+
             var result = await _userService.DeleteAsync(id);
 
             switch (result.StatusCode)
