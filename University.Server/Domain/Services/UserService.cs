@@ -1,4 +1,12 @@
-﻿using University.Server.Domain.Models;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
@@ -9,16 +17,77 @@ namespace University.Server.Domain.Services
     {
         private readonly ILogger<UserService> _logger;
         private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
+        private readonly JwtSecurityTokenHandler _jwtHandler;
+        private readonly SigningCredentials _signingCredentials;
+        private readonly string _issuer;
+        private readonly string _audience;
 
-        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
+        public UserService(IConfiguration config, ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
+
+            _issuer = config["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer");
+            _audience = config["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt:Audience");
+            var secret = config["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
+            var securityKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(secret));
+            _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            _jwtHandler = new JwtSecurityTokenHandler();
         }
+
+        private string Sha256Hash(string rawData)
+        {
+            // Create a SHA256   
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public async Task<Response<Token>> LoginAsync(string email, string password)
+        {
+            // Retrieve User
+            var users = await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Email = '{email}' AND c.Password = '{Sha256Hash(password)}'");
+            var user = users.FirstOrDefault();
+            if (user == null)
+            {
+                return new Response<Token>(StatusCodes.Status400BadRequest, "Invalid Credentials");
+            }
+            var claims = new List<Claim>()
+            {
+                new Claim("firstName", user.FirstName),
+                new Claim("lastName", user.LastName),
+                new Claim("email", user.Email),
+                new Claim("authorization", user.Authorization.ToString())
+            };
+
+            var jwtSecurityToken = _jwtHandler.CreateJwtSecurityToken(
+                issuer: _issuer,
+                audience: _audience,
+                subject: new ClaimsIdentity(claims),
+                notBefore: DateTime.Now,
+                expires: DateTime.Now.AddHours(6),
+                issuedAt: DateTime.Now,
+                signingCredentials: _signingCredentials);
+
+
+            var login = new Token(_jwtHandler.WriteToken(jwtSecurityToken));
+            return new Response<Token>(StatusCodes.Status201Created, login);
+        } 
 
         public async Task<Response<User>> SaveAsync(User user)
         {
             _logger.LogInformation("Attempting to save new user...");
+            user.Password = Sha256Hash("testpassword123");
 
             try
             {
@@ -66,6 +135,7 @@ namespace University.Server.Domain.Services
             existingUser.FirstName = user.FirstName;
             existingUser.LastName = user.LastName;
             existingUser.Email = user.Email;
+            existingUser.Password = Sha256Hash(user.Password);
 
             try
             {

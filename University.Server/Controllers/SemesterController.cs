@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
@@ -9,6 +10,7 @@ namespace University.Server.Controllers
 {
     [ApiController]
     [Route("/api/v1/[controller]")]
+    [Authorize]
     public class SemesterController : Controller
     {
 

@@ -10,5 +10,7 @@ namespace University.Server.Resources
         public string LastName { get; set; }
         [MaxLength(90)]
         public string Email { get; set; }
+        [MaxLength(20)]
+        public string Password { get; set; }
     }
 }
