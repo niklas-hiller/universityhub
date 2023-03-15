@@ -5,7 +5,7 @@ namespace University.Server.Domain.Services
 {
     public interface IUserService
     {
-        Task<Response<Token>> LoginAsync(string email, string password);
+        Task<User?> GetUserByCredentials(string email, string password);
         Task<Response<User>> SaveAsync(User user);
         Task<User?> GetAsync(Guid id);
         Task<IEnumerable<User>> ListAsync(EAuthorization? authorization);

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
@@ -9,19 +10,22 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("modules")]
     [Authorize]
     public class ModuleController : Controller
     {
 
         private readonly ILogger<ModuleController> _logger;
         private readonly IModuleService _moduleService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService, IMapper mapper)
+        public ModuleController(ILogger<ModuleController> logger, IModuleService moduleService,
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _moduleService = moduleService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -30,11 +34,12 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created module</returns>
-        [HttpPost("/modules", Name = "Create Module")]
+        [HttpPost(Name = "Create Module")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveModuleResource resource)
         {
             if (!ModelState.IsValid)
@@ -65,7 +70,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
-        [HttpPut("/modules/{id}", Name = "Updates a Module")]
+        [HttpPut("{id}", Name = "Updates a Module")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -100,7 +105,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
-        [HttpPatch("/modules/{id}/professors", Name = "Add/Removes available professors to a module")]
+        [HttpPatch("{id}/professors", Name = "Add/Removes available professors to a module")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
@@ -110,7 +115,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchProfessorsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -118,7 +123,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved module</returns>
-        [HttpGet("/modules/{id}", Name = "Get Module By Id")]
+        [HttpGet("{id}", Name = "Get Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -138,7 +143,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="moduleType"></param>
         /// <returns>The retrieved modules</returns>
-        [HttpGet("/modules", Name = "Get all Modules matching filter")]
+        [HttpGet(Name = "Get all Modules matching filter")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -153,11 +158,12 @@ namespace University.Server.Controllers
         /// Deletes a specific Module by his id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/modules/{id}", Name = "Delete Module By Id")]
+        [HttpDelete("{id}", Name = "Delete Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _moduleService.DeleteAsync(id);

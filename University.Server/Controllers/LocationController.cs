@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
@@ -9,19 +10,22 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("locations")]
     [Authorize]
     public class LocationController : Controller
     {
 
         private readonly ILogger<LocationController> _logger;
         private readonly ILocationService _locationService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public LocationController(ILogger<LocationController> logger, ILocationService locationService, IMapper mapper)
+        public LocationController(ILogger<LocationController> logger, ILocationService locationService,
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _locationService = locationService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -30,11 +34,12 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created location</returns>
-        [HttpPost("/locations", Name = "Create Location")]
+        [HttpPost(Name = "Create Location")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LocationResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveLocationResource resource)
         {
             if (!ModelState.IsValid)
@@ -64,7 +69,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated location</returns>
-        [HttpPut("/locations/{id}", Name = "Update Location")]
+        [HttpPut("{id}", Name = "Update Location")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
@@ -98,7 +103,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved location</returns>
-        [HttpGet("/locations/{id}", Name = "Get Location By Id")]
+        [HttpGet("{id}", Name = "Get Location By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -117,7 +122,7 @@ namespace University.Server.Controllers
         /// Retrieves all locations
         /// </summary>
         /// <returns>The retrieved locations</returns>
-        [HttpGet("/locations", Name = "Get all Locations")]
+        [HttpGet(Name = "Get all Locations")]
         [Produces("application/json")]
         public async Task<IEnumerable<LocationResource>> GetAllAsync()
         {
@@ -130,11 +135,12 @@ namespace University.Server.Controllers
         /// Deletes a specific Location by id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/locations/{id}", Name = "Delete Location By Id")]
+        [HttpDelete("{id}", Name = "Delete Location By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _locationService.DeleteAsync(id);

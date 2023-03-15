@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
@@ -9,19 +10,21 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("users")]
     [Authorize]
     public class UserController : Controller
     {
-
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, 
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -30,11 +33,12 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created user</returns>
-        [HttpPost("/users", Name = "Create User")]
+        [HttpPost(Name = "Create User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
         {
             if (!ModelState.IsValid)
@@ -66,7 +70,7 @@ namespace University.Server.Controllers
         /// <param name="id2"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPut("/users/{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
+        [HttpPut("{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
@@ -76,7 +80,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -85,7 +89,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPut("/users/{id}", Name = "Update User")]
+        [HttpPut("{id}", Name = "Update User")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
@@ -120,7 +124,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPatch("/users/{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
+        [HttpPatch("{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
@@ -130,7 +134,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -138,7 +142,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved user</returns>
-        [HttpGet("/users/{id}", Name = "Get User By Id")]
+        [HttpGet("{id}", Name = "Get User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -158,7 +162,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="authorization"></param>
         /// <returns>The retrieved users</returns>
-        [HttpGet("/users", Name = "Get all Users matching filter")]
+        [HttpGet("", Name = "Get all Users matching filter")]
         [Produces("application/json")]
         public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
         {
@@ -171,11 +175,12 @@ namespace University.Server.Controllers
         /// Deletes a specific User by his id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/users/{id}", Name = "Delete User By Id")]
+        [HttpDelete("{id}", Name = "Delete User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _userService.DeleteAsync(id);

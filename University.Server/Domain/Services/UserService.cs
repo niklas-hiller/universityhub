@@ -17,22 +17,11 @@ namespace University.Server.Domain.Services
     {
         private readonly ILogger<UserService> _logger;
         private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
-        private readonly JwtSecurityTokenHandler _jwtHandler;
-        private readonly SigningCredentials _signingCredentials;
-        private readonly string _issuer;
-        private readonly string _audience;
 
-        public UserService(IConfiguration config, ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
+        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
-
-            _issuer = config["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer");
-            _audience = config["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt:Audience");
-            var secret = config["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
-            var securityKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(secret));
-            _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            _jwtHandler = new JwtSecurityTokenHandler();
         }
 
         private string Sha256Hash(string rawData)
@@ -53,36 +42,11 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Token>> LoginAsync(string email, string password)
+        public async Task<User?> GetUserByCredentials(string email, string password)
         {
-            // Retrieve User
             var users = await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Email = '{email}' AND c.Password = '{Sha256Hash(password)}'");
-            var user = users.FirstOrDefault();
-            if (user == null)
-            {
-                return new Response<Token>(StatusCodes.Status400BadRequest, "Invalid Credentials");
-            }
-            var claims = new List<Claim>()
-            {
-                new Claim("firstName", user.FirstName),
-                new Claim("lastName", user.LastName),
-                new Claim("email", user.Email),
-                new Claim("authorization", user.Authorization.ToString())
-            };
-
-            var jwtSecurityToken = _jwtHandler.CreateJwtSecurityToken(
-                issuer: _issuer,
-                audience: _audience,
-                subject: new ClaimsIdentity(claims),
-                notBefore: DateTime.Now,
-                expires: DateTime.Now.AddHours(6),
-                issuedAt: DateTime.Now,
-                signingCredentials: _signingCredentials);
-
-
-            var login = new Token(_jwtHandler.WriteToken(jwtSecurityToken));
-            return new Response<Token>(StatusCodes.Status201Created, login);
-        } 
+            return users.FirstOrDefault();
+        }
 
         public async Task<Response<User>> SaveAsync(User user)
         {

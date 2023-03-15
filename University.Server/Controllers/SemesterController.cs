@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
@@ -9,19 +10,22 @@ using University.Server.Resources;
 namespace University.Server.Controllers
 {
     [ApiController]
-    [Route("/api/v1/[controller]")]
+    [Route("semesters")]
     [Authorize]
     public class SemesterController : Controller
     {
 
         private readonly ILogger<SemesterController> _logger;
         private readonly ISemesterService _semesterService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public SemesterController(ILogger<SemesterController> logger, ISemesterService semesterService, IMapper mapper)
+        public SemesterController(ILogger<SemesterController> logger, ISemesterService semesterService,
+            IJwtService jwtService, IMapper mapper)
         {
             _logger = logger;
             _semesterService = semesterService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -30,11 +34,12 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created semester</returns>
-        [HttpPost("/semesters", Name = "Create Semester")]
+        [HttpPost(Name = "Create Semester")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SemesterResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveSemesterResource resource)
         {
             if (!ModelState.IsValid)
@@ -64,7 +69,7 @@ namespace University.Server.Controllers
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated semester</returns>
-        [HttpPatch("/semesters/{id}/modules", Name = "Add/Removes modules to a semester")]
+        [HttpPatch("{id}/modules", Name = "Add/Removes modules to a semester")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
@@ -74,7 +79,7 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PatchModulesAsync(Guid id, [FromBody] PatchResource resource)
         {
             // Todo
-            return Forbid("Currently not implemented");
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
@@ -82,7 +87,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns>The retrieved semester</returns>
-        [HttpGet("/semesters/{id}", Name = "Get Semester By Id")]
+        [HttpGet("{id}", Name = "Get Semester By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -101,7 +106,7 @@ namespace University.Server.Controllers
         /// Retrieves a all semesters
         /// </summary>
         /// <returns>The retrieved semesters</returns>
-        [HttpGet("/semesters", Name = "Get all Semesters")]
+        [HttpGet(Name = "Get all Semesters")]
         [Produces("application/json")]
         public async Task<IEnumerable<SemesterResource>> GetAllAsync()
         {
@@ -114,11 +119,12 @@ namespace University.Server.Controllers
         /// Deletes a specific Semester by id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("/semesters/{id}", Name = "Delete Semester By Id")]
+        [HttpDelete("{id}", Name = "Delete Semester By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var result = await _semesterService.DeleteAsync(id);
