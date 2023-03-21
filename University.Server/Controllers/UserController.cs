@@ -49,6 +49,10 @@ namespace University.Server.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status201Created:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
                     var createdResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
                 case StatusCodes.Status400BadRequest:
@@ -104,6 +108,10 @@ namespace University.Server.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
                     var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
                     return Ok(updatedResource);
                 case StatusCodes.Status400BadRequest:
@@ -159,7 +167,7 @@ namespace University.Server.Controllers
         /// </summary>
         /// <param name="authorization"></param>
         /// <returns>The retrieved users</returns>
-        [HttpGet("", Name = "Get all Users matching filter")]
+        [HttpGet(Name = "Get all Users matching filter")]
         [Produces("application/json")]
         public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
         {

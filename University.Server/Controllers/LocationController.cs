@@ -49,6 +49,10 @@ namespace University.Server.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status201Created:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
                     var createdResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
                 case StatusCodes.Status400BadRequest:
@@ -84,6 +88,10 @@ namespace University.Server.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
                     var updatedResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
                     return Ok(updatedResource);
                 case StatusCodes.Status400BadRequest:

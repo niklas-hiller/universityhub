@@ -45,11 +45,12 @@ namespace University.Server.Domain.Services
 
             if (moduleType != null)
             {
-                return await _moduleRepository.GetItemsAsync($"SELECT * FROM c WHERE c.ModuleType = '{moduleType}' AND c.IsArchived = 0");
+                return await _moduleRepository.GetItemsAsync($"SELECT * FROM c WHERE c.ModuleType = '{moduleType}' AND c.IsArchived = false");
             }
             else
             {
-                return await _moduleRepository.GetItemsAsync("SELECT * FROM c WHERE c.IsArchived = 0");
+                _logger.LogInformation("No Module Type specified, retrieving all modules");
+                return await _moduleRepository.GetItemsAsync("SELECT * FROM c WHERE c.IsArchived = false");
             }
         }
 

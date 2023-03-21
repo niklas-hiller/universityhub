@@ -8,6 +8,7 @@ using University.Server.Resources;
 namespace JWTAuth.WebApi.Controllers
 {
     [ApiController]
+    [Route("token")]
     public class TokenController : ControllerBase
     {
         private readonly IJwtService _jwtService;
@@ -24,7 +25,7 @@ namespace JWTAuth.WebApi.Controllers
         /// </summary>
         /// <param name="resource"></param>
         /// <returns>The new created jwt</returns>
-        [HttpPost("token", Name = "Create JWT Token")]
+        [HttpPost(Name = "Create JWT Token")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TokenResource))]
@@ -41,6 +42,10 @@ namespace JWTAuth.WebApi.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status201Created:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
                     var createdResource = _mapper.Map<Token, TokenResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
                 case StatusCodes.Status400BadRequest:
