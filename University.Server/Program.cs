@@ -14,16 +14,6 @@ using University.Server.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: "_myAllowSpecificOrigins",
-                      builder =>
-                      {
-                          builder.WithOrigins("https://localhost",
-                                              "http://localhost");
-                      });
-});
-
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(opts =>
 {
@@ -126,7 +116,11 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseCors("_myAllowSpecificOrigins");
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true) // allow any origin
+    .AllowCredentials()); // allow credentials
 
 app.UseAuthentication();
 
