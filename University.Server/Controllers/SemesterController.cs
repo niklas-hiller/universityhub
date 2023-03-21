@@ -17,15 +17,12 @@ namespace University.Server.Controllers
 
         private readonly ILogger<SemesterController> _logger;
         private readonly ISemesterService _semesterService;
-        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public SemesterController(ILogger<SemesterController> logger, ISemesterService semesterService,
-            IJwtService jwtService, IMapper mapper)
+        public SemesterController(ILogger<SemesterController> logger, ISemesterService semesterService, IMapper mapper)
         {
             _logger = logger;
             _semesterService = semesterService;
-            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -52,6 +49,10 @@ namespace University.Server.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status201Created:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
                     var createdResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
                 case StatusCodes.Status400BadRequest:

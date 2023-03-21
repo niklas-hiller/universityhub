@@ -37,6 +37,7 @@ namespace University.Server.Domain.Persistence.Repositories
                 var response = await iterator.ReadNextAsync();
                 results.AddRange(response.ToList());
             }
+            _logger.LogInformation("Retrieved following modules: ", results);
 
             return results.Select(r => _mapper.Map<T2, T1>(r));
         }
@@ -53,6 +54,8 @@ namespace University.Server.Domain.Persistence.Repositories
             _logger.LogInformation($"Attempting to save new object in database: {item}");
             var itemEntity = _mapper.Map<T1, T2>(item);
             _logger.LogInformation($"Mapped object to entity, creating entity on database: {itemEntity}");
+            itemEntity.CreatedAt = DateTime.UtcNow;
+            itemEntity.UpdatedAt = DateTime.UtcNow;
             await _container.CreateItemAsync(itemEntity, new PartitionKey(itemEntity.Id));
             _logger.LogInformation("Successfully created entity on database!");
         }
@@ -60,6 +63,7 @@ namespace University.Server.Domain.Persistence.Repositories
         public async Task UpdateItemAsync(Guid id, T1 item)
         {
             var itemEntity = _mapper.Map<T1, T2>(item);
+            itemEntity.UpdatedAt = DateTime.UtcNow;
             await _container.UpsertItemAsync(itemEntity, new PartitionKey(id.ToString()));
         }
 
