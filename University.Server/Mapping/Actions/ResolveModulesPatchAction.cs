@@ -5,7 +5,7 @@ using University.Server.Resources;
 
 namespace University.Server.Mapping.Actions
 {
-    public class ResolveModulesPatchAction : IMappingAction<PatchResource, PatchModules>
+    public class ResolveModulesPatchAction : IMappingAction<PatchResource, PatchModel<Module>>
     {
         private readonly IModuleService _moduleService;
 
@@ -14,7 +14,7 @@ namespace University.Server.Mapping.Actions
             _moduleService = moduleService ?? throw new ArgumentNullException(nameof(moduleService));
         }
 
-        public void Process(PatchResource source, PatchModules destination, ResolutionContext context)
+        public void Process(PatchResource source, PatchModel<Module> destination, ResolutionContext context)
         {
             destination.Add = source.Add.Select(id => _moduleService.GetAsync(id).GetAwaiter().GetResult()).ToList();
             destination.Remove = source.Remove.Select(id => _moduleService.GetAsync(id).GetAwaiter().GetResult()).ToList();

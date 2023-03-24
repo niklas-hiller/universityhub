@@ -82,7 +82,7 @@ namespace University.Server.Controllers
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
-            var patch = _mapper.Map<PatchResource, PatchModules>(resource);
+            var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
             var result = await _semesterService.PatchModulesAsync(id, patch);
 
             switch (result.StatusCode)

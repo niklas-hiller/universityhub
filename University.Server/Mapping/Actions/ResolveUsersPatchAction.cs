@@ -5,7 +5,7 @@ using University.Server.Resources;
 
 namespace University.Server.Mapping.Actions
 {
-    public class ResolveUsersPatchAction : IMappingAction<PatchResource, PatchUsers>
+    public class ResolveUsersPatchAction : IMappingAction<PatchResource, PatchModel<User>>
     {
         private readonly IUserService _userService;
 
@@ -14,7 +14,7 @@ namespace University.Server.Mapping.Actions
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public void Process(PatchResource source, PatchUsers destination, ResolutionContext context)
+        public void Process(PatchResource source, PatchModel<User> destination, ResolutionContext context)
         {
             destination.Add = source.Add.Select(id => _userService.GetAsync(id).GetAwaiter().GetResult()).ToList();
             destination.Remove = source.Remove.Select(id => _userService.GetAsync(id).GetAwaiter().GetResult()).ToList();
