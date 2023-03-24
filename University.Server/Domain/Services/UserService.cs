@@ -91,7 +91,7 @@ namespace University.Server.Domain.Services
         {
             var existingUser = await _userRepository.GetItemAsync(id);
 
-            foreach (var add in patch.Add)
+            foreach (var add in patch.AddEntity)
             {
                 if (!existingUser.Assignments.Any(x => x.ReferenceModule.Id == add.Id))
                 {
@@ -104,7 +104,7 @@ namespace University.Server.Domain.Services
                     existingUser.Assignments.Add(assignment);
                 }
             }
-            foreach (var remove in patch.Remove)
+            foreach (var remove in patch.RemoveEntity)
             {
                 if (existingUser.Assignments.Any(x => x.ReferenceModule.Id == remove.Id))
                 {

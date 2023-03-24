@@ -51,7 +51,7 @@ namespace University.Server.Domain.Services
         {
             var existingSemester = await _semesterRepository.GetItemAsync(id);
 
-            foreach (var add in patch.Add)
+            foreach (var add in patch.AddEntity)
             {
                 if (!existingSemester.Modules.Any(x => x.ReferenceModule.Id == add.Id))
                 {
@@ -64,7 +64,7 @@ namespace University.Server.Domain.Services
                     existingSemester.Modules.Add(semesterModule);
                 }
             }
-            foreach (var remove in patch.Remove)
+            foreach (var remove in patch.RemoveEntity)
             {
                 if (existingSemester.Modules.Any(x => x.Id == remove.Id))
                 {

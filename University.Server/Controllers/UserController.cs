@@ -156,7 +156,7 @@ namespace University.Server.Controllers
                     return BadRequest("You can only manipulate assignments of Students.");
                 }
 
-                foreach (Module module in patch.Add.Union(patch.Remove))
+                foreach (Module module in patch.AddEntity.Union(patch.RemoveEntity))
                 {
                     if (module.ModuleType == EModuleType.Compulsory)
                     {

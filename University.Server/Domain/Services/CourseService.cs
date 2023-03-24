@@ -51,7 +51,7 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<Course>> PatchStudentsAsync(Guid id, PatchModel<User> patch)
         {
-            foreach (var user in patch.Add.Union(patch.Remove))
+            foreach (var user in patch.AddEntity.Union(patch.RemoveEntity))
             {
                 if (user.Authorization != EAuthorization.Student)
                 {
@@ -61,7 +61,7 @@ namespace University.Server.Domain.Services
 
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
-            foreach(var add in patch.Add)
+            foreach(var add in patch.AddEntity)
             {
                 if (!existingCourse.Students.Any(x => x.Id == add.Id))
                 {
@@ -70,7 +70,7 @@ namespace University.Server.Domain.Services
                         var patchModules = new PatchModel<Module>();
                         foreach (var module in existingCourse.Modules)
                         {
-                            patchModules.Add.Add(module);
+                            patchModules.AddEntity.Add(module);
                         }
 
                         var result = await _userService.PatchAssignmentsAsync(add.Id, patchModules);
@@ -84,7 +84,7 @@ namespace University.Server.Domain.Services
                     existingCourse.Students.Add(add);
                 }
             }
-            foreach (var remove in patch.Remove)
+            foreach (var remove in patch.RemoveEntity)
             {
                 if (existingCourse.Students.Any(x => x.Id == remove.Id))
                 {
@@ -93,7 +93,7 @@ namespace University.Server.Domain.Services
                         var patchModules = new PatchModel<Module>();
                         foreach (var module in existingCourse.Modules)
                         {
-                            patchModules.Remove.Add(module);
+                            patchModules.RemoveEntity.Add(module);
                         }
 
                         var result = await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
@@ -123,7 +123,7 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<Course>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
-            foreach (var user in patch.Add.Union(patch.Remove))
+            foreach (var user in patch.AddEntity.Union(patch.RemoveEntity))
             {
                 if (user.ModuleType == EModuleType.Optional)
                 {
@@ -133,7 +133,7 @@ namespace University.Server.Domain.Services
 
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
-            foreach (var add in patch.Add)
+            foreach (var add in patch.AddEntity)
             {
                 if (!existingCourse.Modules.Any(x => x.Id == add.Id))
                 {
@@ -142,7 +142,7 @@ namespace University.Server.Domain.Services
                         foreach (var user in existingCourse.Students)
                         {
                             var patchModules = new PatchModel<Module>();
-                            patchModules.Add.Add(add);
+                            patchModules.AddEntity.Add(add);
                             var result = await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                             if (result.StatusCode != StatusCodes.Status200OK)
                             {
@@ -155,7 +155,7 @@ namespace University.Server.Domain.Services
                     existingCourse.Modules.Add(add);
                 }
             }
-            foreach (var remove in patch.Remove)
+            foreach (var remove in patch.RemoveEntity)
             {
                 if (existingCourse.Modules.Any(x => x.Id == remove.Id))
                 {
@@ -164,7 +164,7 @@ namespace University.Server.Domain.Services
                         foreach (var user in existingCourse.Students)
                         {
                             var patchModules = new PatchModel<Module>();
-                            patchModules.Remove.Add(remove);
+                            patchModules.RemoveEntity.Add(remove);
                             var result = await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                             if (result.StatusCode != StatusCodes.Status200OK)
                             {
