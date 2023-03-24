@@ -59,7 +59,7 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<Module>> PatchProfessorsAsync(Guid id, PatchModel<User> patch)
         {
-            foreach(var user in patch.Add.Union(patch.Remove))
+            foreach(var user in patch.AddEntity.Union(patch.RemoveEntity))
             {
                 if (user.Authorization != EAuthorization.Professor)
                 {
@@ -69,14 +69,14 @@ namespace University.Server.Domain.Services
 
             var existingModule = await _moduleRepository.GetItemAsync(id);
 
-            foreach (var add in patch.Add)
+            foreach (var add in patch.AddEntity)
             {
                 if (!existingModule.ProfessorIds.Contains(add.Id))
                 {
                     #region User Assignment Logic
                     {
                         var patchModules = new PatchModel<Module>();
-                        patchModules.Add.Add(existingModule);
+                        patchModules.AddEntity.Add(existingModule);
                         var result = await _userService.PatchAssignmentsAsync(add.Id, patchModules);
                         if (result.StatusCode != StatusCodes.Status200OK)
                         {
@@ -88,14 +88,14 @@ namespace University.Server.Domain.Services
                     existingModule.ProfessorIds.Add(add.Id);
                 }
             }
-            foreach (var remove in patch.Remove)
+            foreach (var remove in patch.RemoveEntity)
             {
                 if (existingModule.ProfessorIds.Contains(remove.Id))
                 {
                     #region User Assignment Logic
                     {
                         var patchModules = new PatchModel<Module>();
-                        patchModules.Remove.Add(existingModule);
+                        patchModules.RemoveEntity.Add(existingModule);
                         var result = await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
                         if (result.StatusCode != StatusCodes.Status200OK)
                         {
