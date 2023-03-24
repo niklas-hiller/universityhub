@@ -124,22 +124,63 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Adds/Removes modules to a user (Students only optional, Professor both, Administrators none) 
+        /// Adds/Removes modules to a user (Only Students and only Optional) 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPatch("{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
+        [HttpPatch("{id}/assignments", Name = "Adds/Removes modules to a user (Only Students and only Optional)")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Obsolete]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
-            // Todo
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var patch = _mapper.Map<PatchResource, PatchModules>(resource);
+
+            // Validation (Todo: Only of themself)
+            {
+                var user = await _userService.GetAsync(id);
+                if (user == null)
+                {
+                    return NotFound("Couldn't find requested user.");
+                }
+
+                if (user.Authorization != EAuthorization.Student)
+                {
+                    return BadRequest("You can only manipulate assignments of Students.");
+                }
+
+                foreach (Module module in patch.Add.Union(patch.Remove))
+                {
+                    if (module.ModuleType == EModuleType.Compulsory)
+                    {
+                        return BadRequest("You can't add/remove compulsory modules to a specific user. Please use courses.");
+                    }
+                }
+            }
+
+            var result = await _userService.PatchAssignmentsAsync(id, patch);
+
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
 
         /// <summary>

@@ -51,7 +51,7 @@ namespace University.Server.Domain.Services
         public async Task<Response<User>> SaveAsync(User user)
         {
             _logger.LogInformation("Attempting to save new user...");
-            user.Password = Sha256Hash("testpassword123");
+            user.Password = Sha256Hash(user.Password);
 
             try
             {
@@ -84,6 +84,45 @@ namespace University.Server.Domain.Services
             else
             {
                 return await _userRepository.GetItemsAsync($"SELECT * FROM c");
+            }
+        }
+
+        public async Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModules patch)
+        {
+            var existingUser = await _userRepository.GetItemAsync(id);
+
+            foreach (var add in patch.Add)
+            {
+                if (!existingUser.Assignments.Any(x => x.ReferenceModule.Id == add.Id))
+                {
+                    var assignment = new Assignment()
+                    {
+                        Id = Guid.NewGuid(),
+                        Status = existingUser.Authorization == EAuthorization.Professor ? EModuleStatus.Educates : EModuleStatus.Enrolled,
+                        ReferenceModule = add
+                    };
+                    existingUser.Assignments.Add(assignment);
+                }
+            }
+            foreach (var remove in patch.Remove)
+            {
+                if (existingUser.Assignments.Any(x => x.ReferenceModule.Id == remove.Id))
+                {
+                    var assignment = existingUser.Assignments.First(x => x.ReferenceModule.Id == remove.Id);
+                    existingUser.Assignments.Remove(assignment);
+                }
+            }
+
+            try
+            {
+                await _userRepository.UpdateItemAsync(existingUser.Id, existingUser);
+
+                return new Response<User>(StatusCodes.Status200OK, existingUser);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when updating the user: {ex.Message}");
             }
         }
 

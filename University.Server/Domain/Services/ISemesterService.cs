@@ -8,6 +8,7 @@ namespace University.Server.Domain.Services
         Task<Response<Semester>> SaveAsync(Semester semester);
         Task<Semester?> GetAsync(Guid id);
         Task<IEnumerable<Semester>> ListAsync();
+        Task<Response<Semester>> PatchModulesAsync(Guid id, PatchModules patch);
         Task<Response<Semester>> DeleteAsync(Guid id);
     }
 }

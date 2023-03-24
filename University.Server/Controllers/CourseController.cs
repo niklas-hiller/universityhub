@@ -114,11 +114,29 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Obsolete]
         public async Task<IActionResult> PatchStudentsAsync(Guid id, [FromBody] PatchResource resource)
         {
-            // Todo
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var patch = _mapper.Map<PatchResource, PatchUsers>(resource);
+            var result = await _courseService.PatchStudentsAsync(id, patch);
+
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var updatedResource = _mapper.Map<Course, CourseResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
 
         /// <summary>
@@ -133,11 +151,29 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Obsolete]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
-            // Todo
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var patch = _mapper.Map<PatchResource, PatchModules>(resource);
+            var result = await _courseService.PatchModulesAsync(id, patch);
+
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var updatedResource = _mapper.Map<Course, CourseResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
 
         /// <summary>

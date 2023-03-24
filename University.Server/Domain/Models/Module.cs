@@ -8,6 +8,6 @@
         public EModuleType ModuleType { get; set; }
         public int MaxSize { get; set; }
 
-        public ICollection<User> Professors { get; set; } = new List<User>();
+        public ICollection<Guid> ProfessorIds { get; set; } = new List<Guid>();
     }
 }

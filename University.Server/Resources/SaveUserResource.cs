@@ -15,6 +15,9 @@ namespace University.Server.Resources
         [MaxLength(90)]
         public string Email { get; set; }
         [Required]
+        [MinLength(8), MaxLength(30)]
+        public string Password { get; set; }
+        [Required]
         public EAuthorization Authorization { get; set; }
     }
 }

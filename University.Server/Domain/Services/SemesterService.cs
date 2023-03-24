@@ -47,6 +47,45 @@ namespace University.Server.Domain.Services
             return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
         }
 
+        public async Task<Response<Semester>> PatchModulesAsync(Guid id, PatchModules patch)
+        {
+            var existingSemester = await _semesterRepository.GetItemAsync(id);
+
+            foreach (var add in patch.Add)
+            {
+                if (!existingSemester.Modules.Any(x => x.ReferenceModule.Id == add.Id))
+                {
+                    var semesterModule = new SemesterModule() 
+                    {
+                        Id = Guid.NewGuid(),
+                        Professor = null,
+                        ReferenceModule = add,
+                    };
+                    existingSemester.Modules.Add(semesterModule);
+                }
+            }
+            foreach (var remove in patch.Remove)
+            {
+                if (existingSemester.Modules.Any(x => x.Id == remove.Id))
+                {
+                    var semesterModule = existingSemester.Modules.First(x => x.ReferenceModule.Id == remove.Id);
+                    existingSemester.Modules.Remove(semesterModule);
+                }
+            }
+
+            try
+            {
+                await _semesterRepository.UpdateItemAsync(existingSemester.Id, existingSemester);
+
+                return new Response<Semester>(StatusCodes.Status200OK, existingSemester);
+            }
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new Response<Semester>(StatusCodes.Status400BadRequest, $"An error occurred when updating the semester: {ex.Message}");
+            }
+        }
+
         public async Task<Response<Semester>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing semester...");
