@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
-using University.Server.Domain.Services;
 using University.Server.Mapping.Actions;
 
 namespace University.Server.Mapping

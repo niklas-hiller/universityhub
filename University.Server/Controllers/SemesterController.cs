@@ -76,11 +76,29 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Obsolete]
         public async Task<IActionResult> PatchModulesAsync(Guid id, [FromBody] PatchResource resource)
         {
-            // Todo
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var patch = _mapper.Map<PatchResource, PatchModules>(resource);
+            var result = await _semesterService.PatchModulesAsync(id, patch);
+
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var updatedResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                case StatusCodes.Status400BadRequest:
+                    return BadRequest(result.Message);
+                default:
+                    return StatusCode(500);
+            }
         }
 
         /// <summary>
