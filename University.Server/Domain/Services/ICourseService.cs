@@ -9,8 +9,8 @@ namespace University.Server.Domain.Services
         Task<Course?> GetAsync(Guid id);
         Task<IEnumerable<Course>> ListAsync();
         Task<Response<Course>> UpdateAsync(Guid id, Course course);
-        Task<Response<Course>> PatchStudentsAsync(Guid id, PatchUsers patch);
-        Task<Response<Course>> PatchModulesAsync(Guid id, PatchModules patch);
+        Task<Response<Course>> PatchStudentsAsync(Guid id, PatchModel<User> patch);
+        Task<Response<Course>> PatchModulesAsync(Guid id, PatchModel<Module> patch);
         Task<Response<Course>> DeleteAsync(Guid id);
     }
 }

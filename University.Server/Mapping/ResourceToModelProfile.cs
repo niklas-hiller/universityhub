@@ -21,9 +21,9 @@ namespace University.Server.Mapping
             CreateMap<UpdateModuleResource, Module>();
             CreateMap<UpdateAssignmentResource, Assignment>();
 
-            CreateMap<PatchResource, PatchUsers>()
+            CreateMap<PatchResource, PatchModel<User>>()
                 .AfterMap<ResolveUsersPatchAction>();
-            CreateMap<PatchResource, PatchModules>()
+            CreateMap<PatchResource, PatchModel<Module>>()
                 .AfterMap<ResolveModulesPatchAction>();
         }
     }

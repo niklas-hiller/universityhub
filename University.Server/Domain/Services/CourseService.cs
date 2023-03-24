@@ -49,7 +49,7 @@ namespace University.Server.Domain.Services
             return await _courseRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<Response<Course>> PatchStudentsAsync(Guid id, PatchUsers patch)
+        public async Task<Response<Course>> PatchStudentsAsync(Guid id, PatchModel<User> patch)
         {
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
@@ -59,7 +59,7 @@ namespace University.Server.Domain.Services
                 {
                     #region User Assignment Logic
                     {
-                        var patchModules = new PatchModules();
+                        var patchModules = new PatchModel<Module>();
                         foreach (var module in existingCourse.Modules)
                         {
                             patchModules.Add.Add(module);
@@ -82,7 +82,7 @@ namespace University.Server.Domain.Services
                 {
                     #region User Assignment Logic
                     {
-                        var patchModules = new PatchModules();
+                        var patchModules = new PatchModel<Module>();
                         foreach (var module in existingCourse.Modules)
                         {
                             patchModules.Remove.Add(module);
@@ -113,7 +113,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Course>> PatchModulesAsync(Guid id, PatchModules patch)
+        public async Task<Response<Course>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
@@ -125,7 +125,7 @@ namespace University.Server.Domain.Services
                     {
                         foreach (var user in existingCourse.Students)
                         {
-                            var patchModules = new PatchModules();
+                            var patchModules = new PatchModel<Module>();
                             patchModules.Add.Add(add);
                             var result = await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                             if (result.StatusCode != StatusCodes.Status200OK)
@@ -147,7 +147,7 @@ namespace University.Server.Domain.Services
                     {
                         foreach (var user in existingCourse.Students)
                         {
-                            var patchModules = new PatchModules();
+                            var patchModules = new PatchModel<Module>();
                             patchModules.Remove.Add(remove);
                             var result = await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                             if (result.StatusCode != StatusCodes.Status200OK)

@@ -87,7 +87,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModules patch)
+        public async Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModel<Module> patch)
         {
             var existingUser = await _userRepository.GetItemAsync(id);
 

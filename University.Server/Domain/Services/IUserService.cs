@@ -10,7 +10,7 @@ namespace University.Server.Domain.Services
         Task<User?> GetAsync(Guid id);
         Task<IEnumerable<User>> ListAsync(EAuthorization? authorization);
         Task<Response<User>> UpdateAsync(Guid id, User user);
-        Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModules patch);
+        Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModel<Module> patch);
         Task<Response<User>> DeleteAsync(Guid id);
     }
 }

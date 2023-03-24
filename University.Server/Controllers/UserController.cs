@@ -141,7 +141,7 @@ namespace University.Server.Controllers
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
-            var patch = _mapper.Map<PatchResource, PatchModules>(resource);
+            var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
 
             // Validation (Todo: Only of themself)
             {

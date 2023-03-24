@@ -57,7 +57,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Module>> PatchProfessorsAsync(Guid id, PatchUsers patch)
+        public async Task<Response<Module>> PatchProfessorsAsync(Guid id, PatchModel<User> patch)
         {
             foreach(var user in patch.Add.Union(patch.Remove))
             {
@@ -75,7 +75,7 @@ namespace University.Server.Domain.Services
                 {
                     #region User Assignment Logic
                     {
-                        var patchModules = new PatchModules();
+                        var patchModules = new PatchModel<Module>();
                         patchModules.Add.Add(existingModule);
                         var result = await _userService.PatchAssignmentsAsync(add.Id, patchModules);
                         if (result.StatusCode != StatusCodes.Status200OK)
@@ -94,7 +94,7 @@ namespace University.Server.Domain.Services
                 {
                     #region User Assignment Logic
                     {
-                        var patchModules = new PatchModules();
+                        var patchModules = new PatchModel<Module>();
                         patchModules.Remove.Add(existingModule);
                         var result = await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
                         if (result.StatusCode != StatusCodes.Status200OK)

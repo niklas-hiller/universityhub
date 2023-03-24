@@ -47,7 +47,7 @@ namespace University.Server.Domain.Services
             return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<Response<Semester>> PatchModulesAsync(Guid id, PatchModules patch)
+        public async Task<Response<Semester>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
             var existingSemester = await _semesterRepository.GetItemAsync(id);
 

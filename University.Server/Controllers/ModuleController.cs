@@ -122,7 +122,7 @@ namespace University.Server.Controllers
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
-            var patch = _mapper.Map<PatchResource, PatchUsers>(resource);
+            var patch = _mapper.Map<PatchResource, PatchModel<User>>(resource);
             var result = await _moduleService.PatchProfessorsAsync(id, patch);
 
             switch (result.StatusCode)

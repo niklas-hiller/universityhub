@@ -120,7 +120,7 @@ namespace University.Server.Controllers
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
-            var patch = _mapper.Map<PatchResource, PatchUsers>(resource);
+            var patch = _mapper.Map<PatchResource, PatchModel<User>>(resource);
             var result = await _courseService.PatchStudentsAsync(id, patch);
 
             switch (result.StatusCode)
@@ -157,7 +157,7 @@ namespace University.Server.Controllers
             {
                 return BadRequest(ModelState.GetErrorMessages());
             }
-            var patch = _mapper.Map<PatchResource, PatchModules>(resource);
+            var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
             var result = await _courseService.PatchModulesAsync(id, patch);
 
             switch (result.StatusCode)
