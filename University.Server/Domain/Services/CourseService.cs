@@ -51,6 +51,14 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<Course>> PatchStudentsAsync(Guid id, PatchModel<User> patch)
         {
+            foreach (var user in patch.Add.Union(patch.Remove))
+            {
+                if (user.Authorization != EAuthorization.Student)
+                {
+                    return new Response<Course>(StatusCodes.Status400BadRequest, "You can't add non-student as users to a module.");
+                }
+            }
+
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
             foreach(var add in patch.Add)
@@ -115,6 +123,14 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<Course>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
+            foreach (var user in patch.Add.Union(patch.Remove))
+            {
+                if (user.ModuleType == EModuleType.Optional)
+                {
+                    return new Response<Course>(StatusCodes.Status400BadRequest, "You can't add optional modules to a course.");
+                }
+            }
+
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
             foreach (var add in patch.Add)
