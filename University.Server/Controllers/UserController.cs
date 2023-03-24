@@ -124,12 +124,12 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Adds/Removes modules to a user (Students only optional, Professor both, Administrators none) 
+        /// Adds/Removes modules to a user (Only Students and only Optional) 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
-        [HttpPatch("{id}/assignments", Name = "Adds/Removes modules to a user (Students only optional, Professor both, Administrators none)")]
+        [HttpPatch("{id}/assignments", Name = "Adds/Removes modules to a user (Only Students and only Optional)")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]

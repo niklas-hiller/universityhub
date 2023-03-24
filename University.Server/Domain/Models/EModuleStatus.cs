@@ -11,21 +11,21 @@ namespace University.Server.Domain.Models
         Enrolled = 1,
 
         // ENROLMENT | Angemeldet
-        Enrolment = 2,
+        // Enrolment = 2,
 
         // PASSED | Bestanden
-        Passed = 3,
+        Passed = 2,
 
         // FAILED | Nicht Bestanden
-        Failed = 4,
+        Failed = 3,
 
         // EXCLUDED | Prüfungszulassung entzogen
-        Excluded = 5,
+        // Excluded = 5,
 
         // TRANSFERRED | Angerechnet / Anerkannt
-        Transferred = 6,
+        // Transferred = 6,
 
         // MISSING | Ergebnis noch ausstehend
-        Missing = 7,
+        // Missing = 7,
     }
 }

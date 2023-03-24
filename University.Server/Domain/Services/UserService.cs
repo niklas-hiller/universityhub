@@ -51,7 +51,7 @@ namespace University.Server.Domain.Services
         public async Task<Response<User>> SaveAsync(User user)
         {
             _logger.LogInformation("Attempting to save new user...");
-            user.Password = Sha256Hash("testpassword123");
+            user.Password = Sha256Hash(user.Password);
 
             try
             {

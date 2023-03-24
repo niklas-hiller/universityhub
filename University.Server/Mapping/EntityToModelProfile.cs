@@ -15,8 +15,7 @@ namespace University.Server.Mapping
             CreateMap<LectureEntity, Lecture>()
                 .AfterMap<ResolveLectureRelationsAction>();
             CreateMap<LocationEntity, Location>();
-            CreateMap<ModuleEntity, Module>()
-                .AfterMap<ResolveModuleRelationsAction>();
+            CreateMap<ModuleEntity, Module>();
             CreateMap<AssignmentEntity, Assignment>()
                 .AfterMap<ResolveAssignmentRelationsAction>();
             CreateMap<SemesterModuleEntity, SemesterModule>()
