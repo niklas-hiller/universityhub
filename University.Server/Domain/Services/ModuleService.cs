@@ -40,11 +40,49 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Module?> GetAsync(Guid id)
+        public async Task<Module?> GetAsyncNullable(Guid id, bool excludeArchived = true)
+        {
+            try
+            {
+                var module = await _moduleRepository.GetItemAsync(id);
+
+                if(module.IsArchived && excludeArchived)
+                {
+                    return null;
+                }
+
+                return module;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Response<Module>> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing module...");
 
-            return await _moduleRepository.GetItemAsync(id);
+            try
+            {
+                var module = await _moduleRepository.GetItemAsync(id);
+
+                if (module.IsArchived)
+                {
+                    return new Response<Module>(StatusCodes.Status404NotFound, $"Module not found.");
+                }
+
+                return new Response<Module>(StatusCodes.Status200OK, module);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Module>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the module: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<Module>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the module: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType)

@@ -172,11 +172,13 @@ namespace University.Server.Controllers
 
             // Validation (Todo: Only of themself)
             {
-                var user = await _userService.GetAsync(id);
-                if (user == null)
+                var response = await _userService.GetAsync(id);
+
+                if (response.ResponseEntity == null) 
                 {
                     return NotFound("Couldn't find requested user.");
                 }
+                var user = response.ResponseEntity;
 
                 if (user.Authorization != EAuthorization.Student)
                 {
@@ -219,13 +221,20 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var user = await _userService.GetAsync(id);
-            if (user == null)
+            var result = await _userService.GetAsync(id);
+
+            switch (result.StatusCode)
             {
-                return NotFound($"Couldn't find any user with the id {id}");
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var retrievedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
+                    return Ok(retrievedResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
             }
-            var resource = _mapper.Map<User, UserResource>(user);
-            return Ok(resource);
         }
 
         /// <summary>

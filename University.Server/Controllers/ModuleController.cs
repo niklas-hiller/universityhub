@@ -142,13 +142,20 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var module = await _moduleService.GetAsync(id);
-            if (module == null || module.IsArchived)
+            var result = await _moduleService.GetAsync(id);
+
+            switch (result.StatusCode)
             {
-                return NotFound($"Couldn't find any module with the id {id}");
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var retrievedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
+                    return Ok(retrievedResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
             }
-            var resource = _mapper.Map<Module, ModuleResource>(module);
-            return Ok(resource);
         }
 
         /// <summary>

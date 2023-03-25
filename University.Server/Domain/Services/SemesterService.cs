@@ -38,11 +38,39 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Semester?> GetAsync(Guid id)
+        public async Task<Semester?> GetAsyncNullable(Guid id)
         {
-            _logger.LogInformation("Attempting to retrieve existing semesters...");
+            try
+            {
+                var semester = await _semesterRepository.GetItemAsync(id);
 
-            return await _semesterRepository.GetItemAsync(id);
+                return semester;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Response<Semester>> GetAsync(Guid id)
+        {
+            _logger.LogInformation("Attempting to retrieve existing semester...");
+
+            try
+            {
+                var semester = await _semesterRepository.GetItemAsync(id);
+
+                return new Response<Semester>(StatusCodes.Status200OK, semester);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the semester: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the semester: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Semester>> ListAsync()

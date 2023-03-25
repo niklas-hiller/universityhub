@@ -16,7 +16,7 @@ namespace University.Server.Mapping.Actions
 
         public void Process(AssignmentEntity source, Assignment destination, ResolutionContext context)
         {
-            destination.ReferenceModule = _moduleService.GetAsync(source.ReferenceModuleId).GetAwaiter().GetResult();
+            destination.ReferenceModule = _moduleService.GetAsyncNullable(source.ReferenceModuleId, false).GetAwaiter().GetResult();
         }
     }
 }

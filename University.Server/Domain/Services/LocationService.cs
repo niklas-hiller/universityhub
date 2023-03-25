@@ -36,11 +36,39 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Location?> GetAsync(Guid id)
+        public async Task<Location?> GetAsyncNullable(Guid id)
+        {
+            try
+            {
+                var location = await _locationRepository.GetItemAsync(id);
+
+                return location;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Response<Location>> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing location...");
 
-            return await _locationRepository.GetItemAsync(id);
+            try
+            {
+                var location = await _locationRepository.GetItemAsync(id);
+
+                return new Response<Location>(StatusCodes.Status200OK, location);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Location>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the location: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<Location>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the location: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Location>> ListAsync()

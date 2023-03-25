@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
@@ -175,13 +176,20 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var course = await _courseService.GetAsync(id);
-            if (course == null)
+            var result = await _courseService.GetAsync(id);
+
+            switch (result.StatusCode)
             {
-                return NotFound($"Couldn't find any course with the id {id}");
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var retrievedResource = _mapper.Map<Course, CourseResource>(result.ResponseEntity);
+                    return Ok(retrievedResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
             }
-            var resource = _mapper.Map<Course, CourseResource>(course);
-            return Ok(resource);
         }
 
         /// <summary>
