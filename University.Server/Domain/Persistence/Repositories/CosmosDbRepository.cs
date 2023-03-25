@@ -18,13 +18,16 @@ namespace University.Server.Domain.Persistence.Repositories
             _logger = logger;
 
             var connectionString = configuration["ConnectionString"] ?? throw new ArgumentNullException("ConnectionString");
-            var cosmosClient = new CosmosClient(connectionString);
+            var options = new CosmosClientOptions
+            {
+                IdleTcpConnectionTimeout = new TimeSpan(0, 0, 10, 0)
+            };
+            var cosmosClient = new CosmosClient(connectionString, options);
             var databaseName = "UniversityHub";
             var containerName = typeof(T2).Name;
 
             var database = cosmosClient.CreateDatabaseIfNotExistsAsync(databaseName).Result;
             _container = database.Database.CreateContainerIfNotExistsAsync(containerName, "/id").Result;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<T1>> GetItemsAsync(string query)
