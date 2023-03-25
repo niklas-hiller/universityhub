@@ -2,7 +2,6 @@
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
-using University.Server.Resources;
 
 namespace University.Server.Domain.Services
 {
@@ -22,16 +21,23 @@ namespace University.Server.Domain.Services
         public async Task<Response<Course>> SaveAsync(Course course)
         {
             _logger.LogInformation("Attempting to save new course...");
+
+            course.Students = new List<User>();
+            course.Modules = new List<Module>();
+
             try
             {
                 await _courseRepository.AddItemAsync(course);
 
                 return new Response<Course>(StatusCodes.Status201Created, course);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the course: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when saving the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the course: {ex.Message}");
             }
         }
 
@@ -61,7 +67,7 @@ namespace University.Server.Domain.Services
 
             var existingCourse = await _courseRepository.GetItemAsync(id);
 
-            foreach(var add in patch.AddEntity)
+            foreach (var add in patch.AddEntity)
             {
                 if (!existingCourse.Students.Any(x => x.Id == add.Id))
                 {
@@ -114,10 +120,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<Course>(StatusCodes.Status200OK, existingCourse);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the course: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the course: {ex.Message}");
             }
         }
 
@@ -184,10 +193,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<Course>(StatusCodes.Status200OK, existingCourse);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the course: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the course: {ex.Message}");
             }
         }
 
@@ -208,10 +220,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<Course>(StatusCodes.Status200OK, existingCourse);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the course: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the course: {ex.Message}");
             }
         }
 
@@ -219,21 +234,19 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to delete existing course...");
 
-            var existingCourse = await _courseRepository.GetItemAsync(id);
-
-            if (existingCourse == null)
-                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
-
             try
             {
-                await _courseRepository.DeleteItemAsync(existingCourse.Id);
+                await _courseRepository.DeleteItemAsync(id);
 
                 return new Response<Course>(StatusCodes.Status204NoContent);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the course: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the course: {ex.Message}");
+                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the course: {ex.Message}");
             }
         }
     }

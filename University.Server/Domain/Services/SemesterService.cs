@@ -20,16 +20,21 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to save new semester...");
 
+            semester.Modules = new List<SemesterModule>();
+
             try
             {
                 await _semesterRepository.AddItemAsync(semester);
 
                 return new Response<Semester>(StatusCodes.Status201Created, semester);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the semester: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Semester>(StatusCodes.Status400BadRequest, $"An error occurred when saving the semester: {ex.Message}");
+                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the semester: {ex.Message}");
             }
         }
 
@@ -55,7 +60,7 @@ namespace University.Server.Domain.Services
             {
                 if (!existingSemester.Modules.Any(x => x.ReferenceModule.Id == add.Id))
                 {
-                    var semesterModule = new SemesterModule() 
+                    var semesterModule = new SemesterModule()
                     {
                         Id = Guid.NewGuid(),
                         Professor = null,
@@ -79,10 +84,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<Semester>(StatusCodes.Status200OK, existingSemester);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the semester: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Semester>(StatusCodes.Status400BadRequest, $"An error occurred when updating the semester: {ex.Message}");
+                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the semester: {ex.Message}");
             }
         }
 
@@ -90,21 +98,19 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to delete existing semester...");
 
-            var existingSemester = await _semesterRepository.GetItemAsync(id);
-
-            if (existingSemester == null)
-                return new Response<Semester>(StatusCodes.Status404NotFound, "Semester not found.");
-
             try
             {
-                await _semesterRepository.DeleteItemAsync(existingSemester.Id);
+                await _semesterRepository.DeleteItemAsync(id);
 
                 return new Response<Semester>(StatusCodes.Status204NoContent);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the semester: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<Semester>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the semester: {ex.Message}");
+                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the semester: {ex.Message}");
             }
         }
     }

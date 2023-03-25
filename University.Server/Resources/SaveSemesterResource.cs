@@ -5,7 +5,7 @@ namespace University.Server.Resources
     public class SaveSemesterResource
     {
         [Required]
-        [MaxLength(50)]
+        [RegularExpression(@"^[a-zA-Z0-9 -]{5,30}$")]
         public string Name { get; set; }
         [Required]
         public DateTime StartDate { get; set; }

@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
@@ -52,6 +46,7 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to save new user...");
             user.Password = Sha256Hash(user.Password);
+            user.Assignments = new List<Assignment>();
 
             try
             {
@@ -59,10 +54,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<User>(StatusCodes.Status201Created, user);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the user: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when saving the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the user: {ex.Message}");
             }
         }
 
@@ -79,7 +77,7 @@ namespace University.Server.Domain.Services
 
             if (authorization != null)
             {
-                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = '{authorization}'");
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = {(byte)authorization}");
             }
             else
             {
@@ -119,10 +117,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<User>(StatusCodes.Status200OK, existingUser);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the user: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when updating the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the user: {ex.Message}");
             }
         }
 
@@ -138,6 +139,32 @@ namespace University.Server.Domain.Services
             existingUser.FirstName = user.FirstName;
             existingUser.LastName = user.LastName;
             existingUser.Email = user.Email;
+
+            try
+            {
+                await _userRepository.UpdateItemAsync(existingUser.Id, existingUser);
+
+                return new Response<User>(StatusCodes.Status200OK, existingUser);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the user: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the user: {ex.Message}");
+            }
+        }
+
+        public async Task<Response<User>> UpdateCredentialsAsync(Guid id, User user)
+        {
+            _logger.LogInformation("Attempting to update existing user...");
+
+            var existingUser = await _userRepository.GetItemAsync(id);
+
+            if (existingUser == null)
+                return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
+
             existingUser.Password = Sha256Hash(user.Password);
 
             try
@@ -146,10 +173,13 @@ namespace University.Server.Domain.Services
 
                 return new Response<User>(StatusCodes.Status200OK, existingUser);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the user: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when updating the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the user: {ex.Message}");
             }
         }
 
@@ -157,21 +187,19 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to delete existing user...");
 
-            var existingUser = await _userRepository.GetItemAsync(id);
-
-            if (existingUser == null)
-                return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
-
             try
             {
                 await _userRepository.DeleteItemAsync(id);
 
                 return new Response<User>(StatusCodes.Status204NoContent);
             }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the user: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Do some logging stuff
-                return new Response<User>(StatusCodes.Status400BadRequest, $"An error occurred when deleting the user: {ex.Message}");
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the user: {ex.Message}");
             }
         }
     }

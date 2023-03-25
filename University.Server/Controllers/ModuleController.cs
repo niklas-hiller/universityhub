@@ -56,12 +56,8 @@ namespace University.Server.Controllers
                     }
                     var createdResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
-                case StatusCodes.Status404NotFound:
-                    return NotFound(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
@@ -95,12 +91,8 @@ namespace University.Server.Controllers
                     }
                     var updatedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
                     return Ok(updatedResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
-                case StatusCodes.Status404NotFound:
-                    return NotFound(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
@@ -134,10 +126,8 @@ namespace University.Server.Controllers
                     }
                     var updatedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
                     return Ok(updatedResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
@@ -195,12 +185,8 @@ namespace University.Server.Controllers
             {
                 case StatusCodes.Status204NoContent:
                     return NoContent();
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
-                case StatusCodes.Status404NotFound:
-                    return NotFound(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
