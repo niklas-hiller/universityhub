@@ -6,7 +6,8 @@ namespace University.Server.Domain.Services
     public interface ICourseService
     {
         Task<Response<Course>> SaveAsync(Course course);
-        Task<Course?> GetAsync(Guid id);
+        Task<Course?> GetAsyncNullable(Guid id);
+        Task<Response<Course>> GetAsync(Guid id);
         Task<IEnumerable<Course>> ListAsync();
         Task<Response<Course>> UpdateAsync(Guid id, Course course);
         Task<Response<Course>> PatchStudentsAsync(Guid id, PatchModel<User> patch);

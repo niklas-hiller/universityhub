@@ -18,8 +18,8 @@ namespace University.Server.Mapping.Actions
 
         public void Process(SemesterModuleEntity source, SemesterModule destination, ResolutionContext context)
         {
-            destination.Professor = _userService.GetAsync(source.ProfessorId).GetAwaiter().GetResult();
-            destination.ReferenceModule = _moduleService.GetAsync(source.ModuleId).GetAwaiter().GetResult();
+            destination.Professor = _userService.GetAsyncNullable(source.ProfessorId).GetAwaiter().GetResult();
+            destination.ReferenceModule = _moduleService.GetAsyncNullable(source.ModuleId, false).GetAwaiter().GetResult();
         }
     }
 }

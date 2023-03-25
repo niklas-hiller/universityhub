@@ -106,13 +106,20 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var semester = await _semesterService.GetAsync(id);
-            if (semester == null)
+            var result = await _semesterService.GetAsync(id);
+
+            switch (result.StatusCode)
             {
-                return NotFound($"Couldn't find any semester with the id {id}");
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var retrievedResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
+                    return Ok(retrievedResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
             }
-            var resource = _mapper.Map<Semester, SemesterResource>(semester);
-            return Ok(resource);
         }
 
         /// <summary>

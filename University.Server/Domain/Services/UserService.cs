@@ -64,11 +64,39 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<User?> GetAsync(Guid id)
+        public async Task<User?> GetAsyncNullable(Guid id)
+        {
+            try
+            {
+                var user = await _userRepository.GetItemAsync(id);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Response<User>> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing user...");
 
-            return await _userRepository.GetItemAsync(id);
+            try
+            {
+                var user = await _userRepository.GetItemAsync(id);
+
+                return new Response<User>(StatusCodes.Status200OK, user);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the user: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the user: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<User>> ListAsync(EAuthorization? authorization)

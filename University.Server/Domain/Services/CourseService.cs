@@ -41,11 +41,39 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Course?> GetAsync(Guid id)
+        public async Task<Course?> GetAsyncNullable(Guid id)
+        {
+            try
+            {
+                var course = await _courseRepository.GetItemAsync(id);
+
+                return course;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Response<Course>> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing course...");
 
-            return await _courseRepository.GetItemAsync(id);
+            try
+            {
+                var course = await _courseRepository.GetItemAsync(id);
+
+                return new Response<Course>(StatusCodes.Status200OK, course);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the course: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the course: {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Course>> ListAsync()

@@ -106,13 +106,20 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var location = await _locationService.GetAsync(id);
-            if (location == null)
+            var result = await _locationService.GetAsync(id);
+
+            switch (result.StatusCode)
             {
-                return NotFound($"Couldn't find any location with the id {id}");
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var retrievedResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
+                    return Ok(retrievedResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
             }
-            var resource = _mapper.Map<Location, LocationResource>(location);
-            return Ok(resource);
         }
 
         /// <summary>
