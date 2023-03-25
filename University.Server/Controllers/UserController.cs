@@ -55,12 +55,8 @@ namespace University.Server.Controllers
                     }
                     var createdResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
-                case StatusCodes.Status404NotFound:
-                    return NotFound(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
@@ -114,12 +110,43 @@ namespace University.Server.Controllers
                     }
                     var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
                     return Ok(updatedResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
-                case StatusCodes.Status404NotFound:
-                    return NotFound(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
+            }
+        }
+
+        /// <summary>
+        /// Updates a User Credentials
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="resource"></param>
+        /// <returns>The updated user</returns>
+        [HttpPut("{id}/credentials", Name = "Update User Credentials")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> PutCredentialsAsync(Guid id, [FromBody] UpdateUserCredentialsResource resource)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.GetErrorMessages());
+            }
+            var user = _mapper.Map<UpdateUserCredentialsResource, User>(resource);
+            var result = await _userService.UpdateAsync(id, user);
+
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status200OK:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
+                    return Ok(updatedResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
@@ -176,10 +203,8 @@ namespace University.Server.Controllers
                     }
                     var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
                     return Ok(updatedResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 
@@ -235,12 +260,8 @@ namespace University.Server.Controllers
             {
                 case StatusCodes.Status204NoContent:
                     return NoContent();
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
-                case StatusCodes.Status404NotFound:
-                    return NotFound(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
 

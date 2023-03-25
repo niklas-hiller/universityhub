@@ -48,10 +48,8 @@ namespace JWTAuth.WebApi.Controllers
                     }
                     var createdResource = _mapper.Map<Token, TokenResource>(result.ResponseEntity);
                     return Created("", value: createdResource);
-                case StatusCodes.Status400BadRequest:
-                    return BadRequest(result.Message);
                 default:
-                    return StatusCode(500);
+                    return StatusCode(result.StatusCode, result.Message);
             }
         }
     }
