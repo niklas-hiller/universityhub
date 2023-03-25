@@ -93,7 +93,10 @@ namespace University.Server.Domain.Services
                 }
             }
 
-            var existingCourse = await _courseRepository.GetItemAsync(id);
+            var existingCourse = await GetAsyncNullable(id);
+
+            if (existingCourse == null)
+                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
 
             foreach (var add in patch.AddEntity)
             {
@@ -168,7 +171,10 @@ namespace University.Server.Domain.Services
                 }
             }
 
-            var existingCourse = await _courseRepository.GetItemAsync(id);
+            var existingCourse = await GetAsyncNullable(id);
+
+            if (existingCourse == null)
+                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
 
             foreach (var add in patch.AddEntity)
             {
@@ -235,7 +241,7 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to update existing course...");
 
-            var existingCourse = await _courseRepository.GetItemAsync(id);
+            var existingCourse = await GetAsyncNullable(id);
 
             if (existingCourse == null)
                 return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");

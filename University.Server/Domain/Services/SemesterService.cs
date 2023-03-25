@@ -82,7 +82,10 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<Semester>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
-            var existingSemester = await _semesterRepository.GetItemAsync(id);
+            var existingSemester = await GetAsyncNullable(id);
+
+            if (existingSemester == null)
+                return new Response<Semester>(StatusCodes.Status404NotFound, "Semester not found.");
 
             foreach (var add in patch.AddEntity)
             {

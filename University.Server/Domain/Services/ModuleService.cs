@@ -110,7 +110,10 @@ namespace University.Server.Domain.Services
                 }
             }
 
-            var existingModule = await _moduleRepository.GetItemAsync(id);
+            var existingModule = await GetAsyncNullable(id);
+
+            if (existingModule == null)
+                return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
 
             foreach (var add in patch.AddEntity)
             {
@@ -171,9 +174,9 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to update existing module...");
 
-            var existingModule = await _moduleRepository.GetItemAsync(id);
+            var existingModule = await GetAsyncNullable(id);
 
-            if (existingModule == null || existingModule.IsArchived)
+            if (existingModule == null)
                 return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
 
             existingModule.Name = module.Name;
