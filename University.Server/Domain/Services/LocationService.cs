@@ -82,7 +82,7 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to update existing location...");
 
-            var existingLocation = await _locationRepository.GetItemAsync(id);
+            var existingLocation = await GetAsyncNullable(id);
 
             if (existingLocation == null)
                 return new Response<Location>(StatusCodes.Status404NotFound, "Location not found.");

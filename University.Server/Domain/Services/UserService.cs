@@ -115,7 +115,10 @@ namespace University.Server.Domain.Services
 
         public async Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModel<Module> patch)
         {
-            var existingUser = await _userRepository.GetItemAsync(id);
+            var existingUser = await GetAsyncNullable(id);
+
+            if (existingUser == null)
+                return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
 
             foreach (var add in patch.AddEntity)
             {
@@ -159,7 +162,7 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to update existing user...");
 
-            var existingUser = await _userRepository.GetItemAsync(id);
+            var existingUser = await GetAsyncNullable(id);
 
             if (existingUser == null)
                 return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
@@ -188,7 +191,7 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to update existing user...");
 
-            var existingUser = await _userRepository.GetItemAsync(id);
+            var existingUser = await GetAsyncNullable(id);
 
             if (existingUser == null)
                 return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
