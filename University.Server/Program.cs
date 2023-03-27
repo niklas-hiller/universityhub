@@ -1,7 +1,7 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -10,9 +10,10 @@ using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services;
-using University.Server.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
+
+ServicePointManager.DefaultConnectionLimit = 20;
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(opts =>
