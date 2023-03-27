@@ -20,8 +20,9 @@ namespace University.Server.Domain.Persistence.Repositories
             var connectionString = configuration["ConnectionString"] ?? throw new ArgumentNullException("ConnectionString");
             var options = new CosmosClientOptions
             {
-                // IdleTcpConnectionTimeout = new TimeSpan(0, 0, 10, 0),
-                ConnectionMode = ConnectionMode.Gateway,
+                IdleTcpConnectionTimeout = new TimeSpan(0, 0, 10, 0),
+                MaxRequestsPerTcpConnection = 50, // Maximale Anzahl von Anfragen pro Verbindung
+                MaxTcpConnectionsPerEndpoint = 16 // Maximale Anzahl von Verbindungen im Pool
             };
             var cosmosClient = new CosmosClient(connectionString, options);
             var databaseName = "UniversityHub";
