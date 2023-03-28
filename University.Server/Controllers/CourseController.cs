@@ -1,12 +1,12 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
-using University.Server.Resources;
+using University.Server.Resources.Request;
+using University.Server.Resources.Response;
 
 namespace University.Server.Controllers
 {
@@ -50,7 +50,8 @@ namespace University.Server.Controllers
             switch (result.StatusCode)
             {
                 case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null) {
+                    if (result.ResponseEntity == null)
+                    {
                         return StatusCode(500);
                     }
                     var createdResource = _mapper.Map<Course, CourseResource>(result.ResponseEntity);

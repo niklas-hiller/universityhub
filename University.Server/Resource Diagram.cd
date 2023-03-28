@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="University.Server.Resources.Response.AssignmentResource">
+    <Position X="4" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\Response\AssignmentResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Status" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.CourseResource">
+    <Position X="12.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAICAAAAAAAgAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\Response\CourseResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Modules" />
+      <Property Name="Students" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.LocationResource">
+    <Position X="14.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAgAAAAAAAAAQAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\Response\LocationResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Coordinates" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.ModuleResource">
+    <Position X="7.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAABAAAAAA=</HashCode>
+      <FileName>Resources\Response\ModuleResource.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="University.Server.Resources.Response.SemesterModuleResource">
+    <Position X="14.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\Response\SemesterModuleResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Professor" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Lectures" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.SemesterResource">
+    <Position X="16.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQwAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Resources\Response\SemesterResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Modules" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.TokenResource">
+    <Position X="5.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Resources\Response\TokenResource.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="University.Server.Resources.Response.UserResource">
+    <Position X="9" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAICAEAAACAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Resources\Response\UserResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Authorization" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Assignments" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.AbstractModuleResource">
+    <Position X="11.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAIAAAgAAAAAAAAAAQAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\AbstractModuleResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ModuleType" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.LectureResource">
+    <Position X="14.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAIAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\Response\LectureResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Location" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="University.Server.Resources.Response.ExtendedLectureResource">
+    <Position X="9" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\Response\ExtendedLectureResource.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Professor" />
+    </ShowAsAssociation>
+  </Class>
+  <Struct Name="University.Server.Domain.Models.Coordinates">
+    <Position X="11" Y="1" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Models\Coordinates.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="University.Server.Domain.Models.EAuthorization">
+    <Position X="5.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAACAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Models\EAuthorization.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="University.Server.Domain.Models.EModuleStatus">
+    <Position X="2.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAIAAAAgAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>Domain\Models\EModuleStatus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="University.Server.Domain.Models.EModuleType">
+    <Position X="8" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAARAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Domain\Models\EModuleType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

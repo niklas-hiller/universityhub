@@ -1,6 +1,6 @@
 ﻿using University.Server.Domain.Models;
 
-namespace University.Server.Resources
+namespace University.Server.Resources.Response
 {
     public class LocationResource
     {

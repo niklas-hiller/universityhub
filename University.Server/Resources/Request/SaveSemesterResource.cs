@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace University.Server.Resources
+namespace University.Server.Resources.Request
 {
     public class SaveSemesterResource
     {

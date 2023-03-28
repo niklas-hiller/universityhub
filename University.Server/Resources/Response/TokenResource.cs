@@ -1,4 +1,4 @@
-﻿namespace University.Server.Resources
+﻿namespace University.Server.Resources.Response
 {
     public class TokenResource
     {
