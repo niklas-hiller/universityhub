@@ -157,5 +157,19 @@ namespace University.Server.Controllers
                     return StatusCode(result.StatusCode, result.Message);
             }
         }
+
+        /// <summary>
+        /// Sets a semester to active, starting calculation of lectures
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The updated semester</returns>
+        [HttpPost("{id}/activate", Name = "Set status of semester to active")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
+        [Obsolete]
+        public async Task<IActionResult> PostActivateAsync(Guid id)
+        {
+            return StatusCode(StatusCodes.Status501NotImplemented);
+        }
     }
 }

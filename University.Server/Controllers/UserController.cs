@@ -70,13 +70,10 @@ namespace University.Server.Controllers
         [HttpPut("{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         [Obsolete]
         public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
         {
-            // Todo
             return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
@@ -249,6 +246,20 @@ namespace University.Server.Controllers
             var users = await _userService.ListAsync(authorization);
             var resources = _mapper.Map<IEnumerable<User>, IEnumerable<UserResource>>(users);
             return resources;
+        }
+
+        /// <summary>
+        /// Retrieves lectures of a specific User by his id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The retrieved lectures</returns>
+        [HttpGet("{id}/lectures", Name = "Get Lectures of User By Id")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
+        [Obsolete]
+        public async Task<IActionResult> GetLecturesAsync(Guid id)
+        {
+            return StatusCode(StatusCodes.Status501NotImplemented);
         }
 
         /// <summary>
