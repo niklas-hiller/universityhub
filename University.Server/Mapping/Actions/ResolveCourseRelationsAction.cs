@@ -18,8 +18,8 @@ namespace University.Server.Mapping.Actions
 
         public void Process(CourseEntity source, Course destination, ResolutionContext context)
         {
-            destination.Students = source.StudentIds.Select(id => _userService.GetAsyncNullable(id).GetAwaiter().GetResult()).ToList();
-            destination.Modules = source.ModuleIds.Select(id => _moduleService.GetAsyncNullable(id, false).GetAwaiter().GetResult()).ToList();
+            destination.Students = _userService.GetManyAsync(source.StudentIds).GetAwaiter().GetResult().ToList();
+            destination.Modules = _moduleService.GetManyAsync(source.ModuleIds).GetAwaiter().GetResult().ToList();
         }
     }
 }

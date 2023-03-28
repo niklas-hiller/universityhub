@@ -16,8 +16,8 @@ namespace University.Server.Mapping.Actions
 
         public void Process(PatchResource source, PatchModel<User> destination, ResolutionContext context)
         {
-            destination.AddEntity = source.Add.Select(id => _userService.GetAsyncNullable(id).GetAwaiter().GetResult()).ToList();
-            destination.RemoveEntity = source.Remove.Select(id => _userService.GetAsyncNullable(id).GetAwaiter().GetResult()).ToList();
+            destination.AddEntity = _userService.GetManyAsync(source.Add).GetAwaiter().GetResult().ToList();
+            destination.RemoveEntity = _userService.GetManyAsync(source.Remove).GetAwaiter().GetResult().ToList();
         }
     }
 }

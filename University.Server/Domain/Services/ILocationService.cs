@@ -6,6 +6,7 @@ namespace University.Server.Domain.Services
     public interface ILocationService
     {
         Task<Response<Location>> SaveAsync(Location location);
+        Task<IEnumerable<Location>> GetManyAsync(ICollection<Guid> ids);
         Task<Location?> GetAsyncNullable(Guid id);
         Task<Response<Location>> GetAsync(Guid id);
         Task<IEnumerable<Location>> ListAsync();

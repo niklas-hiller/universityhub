@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using University.Server.Domain.Models;
+using University.Server.Mapping.Actions;
 using University.Server.Mapping.Converter;
 using University.Server.Resources;
 using University.Server.Resources.Response;
@@ -21,7 +22,8 @@ namespace University.Server.Mapping
                 {
                     return user.Assignments.Select(assignment => context.Mapper.Map<Assignment, AssignmentResource>(assignment));
                 }));
-            CreateMap<Module, ModuleResource>();
+            CreateMap<Module, ModuleResource>()
+                .AfterMap<ResolveModuleRelationsAction>();
             CreateMap<Course, CourseResource>()
                 .ForMember(dest => dest.Students, opt => opt.MapFrom((course, courseResource, i, context) =>
                 {
