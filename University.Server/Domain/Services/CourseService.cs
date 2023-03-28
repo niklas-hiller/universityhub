@@ -1,4 +1,5 @@
-﻿using University.Server.Domain.Models;
+﻿using Microsoft.IdentityModel.Tokens;
+using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services.Communication;
@@ -38,6 +39,24 @@ namespace University.Server.Domain.Services
             catch (Exception ex)
             {
                 return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the course: {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<Course>> GetManyAsync(ICollection<Guid> ids)
+        {
+            if (ids.IsNullOrEmpty())
+            {
+                return Enumerable.Empty<Course>();
+            }
+            var query = $"SELECT * FROM c WHERE c.id IN ('{string.Join("', '", ids)}')";
+            try
+            {
+                return await _courseRepository.GetItemsAsync(query);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                _logger.LogInformation($"Cosmos DB Exception for: {query})");
+                throw ex;
             }
         }
 

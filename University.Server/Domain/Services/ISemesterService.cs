@@ -6,6 +6,7 @@ namespace University.Server.Domain.Services
     public interface ISemesterService
     {
         Task<Response<Semester>> SaveAsync(Semester semester);
+        Task<IEnumerable<Semester>> GetManyAsync(ICollection<Guid> ids);
         Task<Semester?> GetAsyncNullable(Guid id);
         Task<Response<Semester>> GetAsync(Guid id);
         Task<IEnumerable<Semester>> ListAsync();

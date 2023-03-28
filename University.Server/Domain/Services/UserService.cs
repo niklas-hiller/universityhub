@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 using System.Text;
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
@@ -61,6 +62,24 @@ namespace University.Server.Domain.Services
             catch (Exception ex)
             {
                 return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the user: {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<User>> GetManyAsync(ICollection<Guid> ids)
+        {
+            if (ids.IsNullOrEmpty())
+            {
+                return Enumerable.Empty<User>();
+            }
+            var query = $"SELECT * FROM c WHERE c.id IN ('{string.Join("', '", ids)}')";
+            try
+            {
+                return await _userRepository.GetItemsAsync(query);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                _logger.LogInformation($"Cosmos DB Exception for: {query})");
+                throw ex;
             }
         }
 

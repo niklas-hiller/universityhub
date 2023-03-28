@@ -7,6 +7,7 @@ namespace University.Server.Domain.Services
     {
         Task<User?> GetUserByCredentials(string email, string password);
         Task<Response<User>> SaveAsync(User user);
+        Task<IEnumerable<User>> GetManyAsync(ICollection<Guid> ids);
         Task<User?> GetAsyncNullable(Guid id);
         Task<Response<User>> GetAsync(Guid id);
         Task<IEnumerable<User>> ListAsync(EAuthorization? authorization);
