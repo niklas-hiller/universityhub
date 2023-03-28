@@ -1,6 +1,4 @@
-﻿using University.Server.Domain.Models;
-
-namespace University.Server.Resources
+﻿namespace University.Server.Resources.Response
 {
     public class SemesterResource
     {
@@ -9,6 +7,6 @@ namespace University.Server.Resources
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public List<SemesterModule> Modules { get; set; }
+        public List<SemesterModuleResource> Modules { get; set; } = new List<SemesterModuleResource>();
     }
 }

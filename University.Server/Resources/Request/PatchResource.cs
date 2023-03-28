@@ -1,4 +1,4 @@
-namespace University.Server.Resources
+namespace University.Server.Resources.Request
 {
     public class PatchResource
     {

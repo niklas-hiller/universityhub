@@ -1,6 +1,6 @@
 ﻿using University.Server.Domain.Models;
 
-namespace University.Server.Resources
+namespace University.Server.Resources.Response
 {
     public class UserResource
     {
@@ -10,6 +10,6 @@ namespace University.Server.Resources
         public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
 
-        public List<Assignment>? Assignments { get; set; }
+        public List<AssignmentResource> Assignments { get; set; } = new List<AssignmentResource>();
     }
 }

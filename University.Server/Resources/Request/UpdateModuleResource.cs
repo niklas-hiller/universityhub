@@ -1,19 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using University.Server.Domain.Models;
 
-namespace University.Server.Resources
+namespace University.Server.Resources.Request
 {
-    public class SaveModuleResource
+    public class UpdateModuleResource
     {
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9 -]{5,30}$")]
         public string Name { get; set; }
+        [Required]
         [MaxLength(255)]
-        public string? Description { get; set; }
+        public string Description { get; set; }
         [Required]
         public int CreditPoints { get; set; }
-        [Required]
-        public EModuleType ModuleType { get; set; }
         [Required]
         public int MaxSize { get; set; }
     }

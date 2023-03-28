@@ -2,13 +2,13 @@
 
 namespace University.Server.Resources
 {
-    public class CourseResource
+    public abstract class AbstractModuleResource
     {
         public Guid Id { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
-
-        public List<User> Students { get; set; }
-        public List<Module> Modules { get; set; }
+        public int CreditPoints { get; set; }
+        public EModuleType ModuleType { get; set; }
     }
 }

@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
-using University.Server.Resources;
+using University.Server.Resources.Request;
+using University.Server.Resources.Response;
 
 namespace JWTAuth.WebApi.Controllers
 {

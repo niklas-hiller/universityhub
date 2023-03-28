@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
-using University.Server.Resources;
+using University.Server.Resources.Request;
 
 namespace University.Server.Mapping.Actions
 {

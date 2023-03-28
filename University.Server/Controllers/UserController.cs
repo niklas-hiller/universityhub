@@ -5,7 +5,8 @@ using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
-using University.Server.Resources;
+using University.Server.Resources.Request;
+using University.Server.Resources.Response;
 
 namespace University.Server.Controllers
 {
@@ -171,7 +172,7 @@ namespace University.Server.Controllers
             {
                 var response = await _userService.GetAsync(id);
 
-                if (response.ResponseEntity == null) 
+                if (response.ResponseEntity == null)
                 {
                     return NotFound("Couldn't find requested user.");
                 }
