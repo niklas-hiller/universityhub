@@ -66,7 +66,7 @@ namespace University.Server.Controllers
         /// Updates a Course
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the course that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
         [HttpPut("{id}", Name = "Update Course")]
@@ -103,7 +103,7 @@ namespace University.Server.Controllers
         /// Adds/Removes Students to a course
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the course that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
         [HttpPatch("{id}/students", Name = "Add/Removes students to a course")]
@@ -140,7 +140,7 @@ namespace University.Server.Controllers
         /// Adds/Removes Compulsory modules to a all students of a course
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the course that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
         [HttpPatch("{id}/assignments", Name = "Add/Removes compulsory modules to all students of a course")]
@@ -177,7 +177,7 @@ namespace University.Server.Controllers
         /// Retrieves a specific Course by id
         /// </summary>
         /// <remarks>This endpoint can be used by any authenticated user.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the course that should be retrieved.</param>
         /// <returns>The retrieved course</returns>
         [HttpGet("{id}", Name = "Get Course By Id")]
         [Produces("application/json")]
@@ -219,7 +219,7 @@ namespace University.Server.Controllers
         /// Deletes a specific Course by id
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the course that should be deleted.</param>
         [HttpDelete("{id}", Name = "Delete Course By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

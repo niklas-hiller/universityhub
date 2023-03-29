@@ -259,6 +259,36 @@ namespace University.Server.Domain.Services
             }
         }
 
+        public async Task<Response<User>> UpdateAssignmentAsync(Guid userId, Guid moduleId, Assignment assignment)
+        {
+            _logger.LogInformation("Attempting to update existing user assignment...");
+
+            var existingUser = await GetAsyncNullable(userId);
+
+            if (existingUser == null)
+                return new Response<User>(StatusCodes.Status404NotFound, "User not found.");
+
+            var existingAssignment = existingUser.Assignments.FirstOrDefault(assignment => assignment.ReferenceModule.Id == moduleId, null);
+            if (existingAssignment == null)
+                return new Response<User>(StatusCodes.Status404NotFound, "Assignment not found.");
+            existingAssignment.Status = assignment.Status;
+
+            try
+            {
+                await _userRepository.UpdateItemAsync(existingUser.Id, existingUser);
+
+                return new Response<User>(StatusCodes.Status200OK, existingUser);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                return new Response<User>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the user assignment: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return new Response<User>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the user assignment: {ex.Message}");
+            }
+        }
+
         public async Task<Response<User>> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing user...");

@@ -66,7 +66,7 @@ namespace University.Server.Controllers
         /// Updates a Location
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the location that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated location</returns>
         [HttpPut("{id}", Name = "Update Location")]
@@ -103,7 +103,7 @@ namespace University.Server.Controllers
         /// Retrieves a specific Location by id
         /// </summary>
         /// <remarks>This endpoint can be used by any authenticated user.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the location that should be retrieved.</param>
         /// <returns>The retrieved location</returns>
         [HttpGet("{id}", Name = "Get Location By Id")]
         [Produces("application/json")]
@@ -145,7 +145,7 @@ namespace University.Server.Controllers
         /// Deletes a specific Location by id
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the location that should be deleted.</param>
         [HttpDelete("{id}", Name = "Delete Location By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -15,6 +15,7 @@ namespace University.Server.Domain.Services
         Task<Response<User>> UpdateAsync(Guid id, User user);
         Task<Response<User>> UpdateCredentialsAsync(Guid id, User user);
         Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModel<Module> patch);
+        Task<Response<User>> UpdateAssignmentAsync(Guid userId, Guid moduleId, Assignment assignment);
         Task<Response<User>> DeleteAsync(Guid id);
     }
 }
