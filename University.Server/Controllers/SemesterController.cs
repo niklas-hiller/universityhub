@@ -66,7 +66,7 @@ namespace University.Server.Controllers
         /// Add/Removes modules to a semester
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the semester that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated semester</returns>
         [HttpPatch("{id}/modules", Name = "Add/Removes modules to a semester")]
@@ -103,7 +103,7 @@ namespace University.Server.Controllers
         /// Retrieves a specific Semester by id
         /// </summary>
         /// <remarks>This endpoint can be used by any authenticated user.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the semester that should be retrieved.</param>
         /// <returns>The retrieved semester</returns>
         [HttpGet("{id}", Name = "Get Semester By Id")]
         [Produces("application/json")]
@@ -145,7 +145,7 @@ namespace University.Server.Controllers
         /// Deletes a specific Semester by id
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the semester that should be deleted.</param>
         [HttpDelete("{id}", Name = "Delete Semester By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -169,7 +169,7 @@ namespace University.Server.Controllers
         /// Sets a semester to active, starting calculation of lectures
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the semester that should be activated.</param>
         /// <returns>The updated semester</returns>
         [HttpPost("{id}/activate", Name = "Set status of semester to active")]
         [Produces("application/json")]

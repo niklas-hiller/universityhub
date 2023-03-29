@@ -67,7 +67,7 @@ namespace University.Server.Controllers
         /// Updates a Module
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the module that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
         [HttpPut("{id}", Name = "Updates a Module")]
@@ -104,7 +104,7 @@ namespace University.Server.Controllers
         /// Add/Removes available professors to a module
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the module that should be updated.</param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
         [HttpPatch("{id}/professors", Name = "Add/Removes available professors to a module")]
@@ -141,7 +141,7 @@ namespace University.Server.Controllers
         /// Retrieves a specific Module by it's id
         /// </summary>
         /// <remarks>This endpoint can be used by any authenticated user.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the module that should be retrieved.</param>
         /// <returns>The retrieved module</returns>
         [HttpGet("{id}", Name = "Get Module By Id")]
         [Produces("application/json")]
@@ -169,7 +169,7 @@ namespace University.Server.Controllers
         /// Retrieves all modules matching filter
         /// </summary>
         /// <remarks>This endpoint can be used by any authenticated user.</remarks>
-        /// <param name="moduleType"></param>
+        /// <param name="moduleType">The type the retrieved modules should have. If left empty, will retrieve all modules.</param>
         /// <returns>The retrieved modules</returns>
         [HttpGet(Name = "Get all Modules matching filter")]
         [Produces("application/json")]
@@ -186,7 +186,7 @@ namespace University.Server.Controllers
         /// Deletes a specific Module by his id
         /// </summary>
         /// <remarks>This endpoint can only be used by Administrators.</remarks>
-        /// <param name="id"></param>
+        /// <param name="id">The id of the module that should be deleted.</param>
         [HttpDelete("{id}", Name = "Delete Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
