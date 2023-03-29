@@ -57,6 +57,21 @@ namespace University.Server.Domain.Services
             }
         }
 
+        public async Task<IEnumerable<Semester>> GetManyAsyncByTime(DateTime containsDate, TimeSpan? delta = null)
+        {
+            TimeSpan offset = delta ?? TimeSpan.Zero;
+            var query = $"SELECT * FROM c WHERE c.StartDate <= '{containsDate.Add(offset)}' AND c.EndDate >= '{containsDate.Add(offset.Negate())}'";
+            try
+            {
+                return await _semesterRepository.GetItemsAsync(query);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ex)
+            {
+                _logger.LogInformation($"Cosmos DB Exception for: {query})");
+                throw ex;
+            }
+        }
+
         public async Task<Semester?> GetAsyncNullable(Guid id)
         {
             try
