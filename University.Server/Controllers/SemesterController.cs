@@ -30,6 +30,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Creates a new Semester
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="resource"></param>
         /// <returns>The new created semester</returns>
         [HttpPost(Name = "Create Semester")]
@@ -64,6 +65,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Add/Removes modules to a semester
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated semester</returns>
@@ -73,6 +75,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PatchModulesAsync(Guid id, [FromBody] PatchResource resource)
         {
             if (!ModelState.IsValid)
@@ -99,6 +102,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves a specific Semester by id
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="id"></param>
         /// <returns>The retrieved semester</returns>
         [HttpGet("{id}", Name = "Get Semester By Id")]
@@ -126,6 +130,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves a all semesters
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <returns>The retrieved semesters</returns>
         [HttpGet(Name = "Get all Semesters")]
         [Produces("application/json")]
@@ -139,6 +144,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Deletes a specific Semester by id
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         [HttpDelete("{id}", Name = "Delete Semester By Id")]
         [Produces("application/json")]
@@ -162,10 +168,12 @@ namespace University.Server.Controllers
         /// <summary>
         /// Sets a semester to active, starting calculation of lectures
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <returns>The updated semester</returns>
         [HttpPost("{id}/activate", Name = "Set status of semester to active")]
         [Produces("application/json")]
+        [Permission(EAuthorization.Administrator)]
         [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         [Obsolete]
         public async Task<IActionResult> PostActivateAsync(Guid id)

@@ -30,6 +30,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Creates a new Location
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="resource"></param>
         /// <returns>The new created location</returns>
         [HttpPost(Name = "Create Location")]
@@ -64,6 +65,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Updates a Location
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated location</returns>
@@ -73,6 +75,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateLocationResource resource)
         {
             if (!ModelState.IsValid)
@@ -99,6 +102,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves a specific Location by id
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="id"></param>
         /// <returns>The retrieved location</returns>
         [HttpGet("{id}", Name = "Get Location By Id")]
@@ -126,6 +130,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves all locations
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <returns>The retrieved locations</returns>
         [HttpGet(Name = "Get all Locations")]
         [Produces("application/json")]
@@ -139,6 +144,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Deletes a specific Location by id
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         [HttpDelete("{id}", Name = "Delete Location By Id")]
         [Produces("application/json")]
