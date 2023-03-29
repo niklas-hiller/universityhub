@@ -47,6 +47,7 @@ namespace University.Server.Domain.Services
             }
             var claims = new List<Claim>()
             {
+                new Claim("sub", user.Id.ToString()),
                 new Claim("firstName", user.FirstName),
                 new Claim("lastName", user.LastName),
                 new Claim("email", user.Email),
