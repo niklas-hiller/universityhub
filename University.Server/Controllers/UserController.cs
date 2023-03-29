@@ -30,6 +30,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Creates a new User
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="resource"></param>
         /// <returns>The new created user</returns>
         [HttpPost(Name = "Create User")]
@@ -65,6 +66,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Updates a Assignment of a User
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="id2"></param>
         /// <param name="resource"></param>
@@ -72,6 +74,7 @@ namespace University.Server.Controllers
         [HttpPut("{id}/assignments/{id2}", Name = "Updates a Assignment of a User")]
         [Consumes("application/json")]
         [Produces("application/json")]
+        [Permission(EAuthorization.Administrator)]
         [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         [Obsolete]
         public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
@@ -82,6 +85,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Updates a User
         /// </summary>
+        /// <remarks>This endpoint can only be used by target user or administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
@@ -93,6 +97,10 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateUserResource resource)
         {
+            if (!(HttpContext.User.HasClaim("sub", id.ToString()) || HttpContext.User.HasClaim("Authorization", EAuthorization.Administrator.ToString())))
+            {
+                return Forbid();
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -117,6 +125,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Updates a User Credentials
         /// </summary>
+        /// <remarks>This endpoint can only be used by target user or administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
@@ -128,6 +137,10 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutCredentialsAsync(Guid id, [FromBody] UpdateUserCredentialsResource resource)
         {
+            if (!(HttpContext.User.HasClaim("sub", id.ToString()) || HttpContext.User.HasClaim("Authorization", EAuthorization.Administrator.ToString())))
+            {
+                return Forbid();
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -152,6 +165,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Adds/Removes modules to a user (Only Students and only Optional) 
         /// </summary>
+        /// <remarks>This endpoint can only be used by target user or administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated user</returns>
@@ -163,6 +177,10 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
+            if (!(HttpContext.User.HasClaim("sub", id.ToString()) || HttpContext.User.HasClaim("Authorization", EAuthorization.Administrator.ToString())))
+            {
+                return Forbid();
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.GetErrorMessages());
@@ -212,6 +230,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves a specific User by his id
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="id"></param>
         /// <returns>The retrieved user</returns>
         [HttpGet("{id}", Name = "Get User By Id")]
@@ -239,6 +258,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves all users matching filter
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="authorization"></param>
         /// <returns>The retrieved users</returns>
         [HttpGet(Name = "Get all Users matching filter")]
@@ -254,6 +274,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves lectures of a specific User by his id
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="id"></param>
         /// <returns>The retrieved lectures</returns>
         [HttpGet("{id}/lectures", Name = "Get Lectures of User By Id")]
@@ -269,6 +290,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Deletes a specific User by his id
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         [HttpDelete("{id}", Name = "Delete User By Id")]
         [Produces("application/json")]

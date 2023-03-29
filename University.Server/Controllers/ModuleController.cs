@@ -30,6 +30,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Creates a new Module
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="resource"></param>
         /// <returns>The new created module</returns>
         [HttpPost(Name = "Create Module")]
@@ -65,6 +66,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Updates a Module
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
@@ -73,6 +75,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateModuleResource resource)
         {
             if (!ModelState.IsValid)
@@ -100,6 +103,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Add/Removes available professors to a module
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated module</returns>
@@ -109,6 +113,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PatchProfessorsAsync(Guid id, [FromBody] PatchResource resource)
         {
             if (!ModelState.IsValid)
@@ -135,6 +140,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves a specific Module by it's id
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="id"></param>
         /// <returns>The retrieved module</returns>
         [HttpGet("{id}", Name = "Get Module By Id")]
@@ -162,6 +168,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves all modules matching filter
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="moduleType"></param>
         /// <returns>The retrieved modules</returns>
         [HttpGet(Name = "Get all Modules matching filter")]
@@ -178,6 +185,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Deletes a specific Module by his id
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         [HttpDelete("{id}", Name = "Delete Module By Id")]
         [Produces("application/json")]

@@ -24,6 +24,7 @@ namespace JWTAuth.WebApi.Controllers
         /// <summary>
         /// Creates a new JWT Token
         /// </summary>
+        /// <remarks>This endpoint can be used by any user (also unauthenticated) to retrieve a token for authentication.</remarks>
         /// <param name="resource"></param>
         /// <returns>The new created jwt</returns>
         [HttpPost(Name = "Create JWT Token")]

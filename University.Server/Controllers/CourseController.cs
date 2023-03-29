@@ -30,6 +30,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Creates a new Course
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="resource"></param>
         /// <returns>The new created course</returns>
         [HttpPost(Name = "Create Course")]
@@ -64,6 +65,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Updates a Course
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
@@ -73,6 +75,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateCourseResource resource)
         {
             if (!ModelState.IsValid)
@@ -99,6 +102,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Adds/Removes Students to a course
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
@@ -108,6 +112,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PatchStudentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             if (!ModelState.IsValid)
@@ -134,6 +139,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Adds/Removes Compulsory modules to a all students of a course
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns>The updated course</returns>
@@ -143,6 +149,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResource))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             if (!ModelState.IsValid)
@@ -169,6 +176,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves a specific Course by id
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <param name="id"></param>
         /// <returns>The retrieved course</returns>
         [HttpGet("{id}", Name = "Get Course By Id")]
@@ -196,6 +204,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Retrieves all courses
         /// </summary>
+        /// <remarks>This endpoint can be used by any authenticated user.</remarks>
         /// <returns>The retrieved courses</returns>
         [HttpGet(Name = "Get all Courses")]
         [Produces("application/json")]
@@ -209,6 +218,7 @@ namespace University.Server.Controllers
         /// <summary>
         /// Deletes a specific Course by id
         /// </summary>
+        /// <remarks>This endpoint can only be used by Administrators.</remarks>
         /// <param name="id"></param>
         [HttpDelete("{id}", Name = "Delete Course By Id")]
         [Produces("application/json")]
