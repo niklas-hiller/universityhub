@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using University.Server.Attributes;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
@@ -242,6 +243,7 @@ namespace University.Server.Controllers
         /// <returns>The retrieved users</returns>
         [HttpGet(Name = "Get all Users matching filter")]
         [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserResource>))]
         public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
         {
             var users = await _userService.ListAsync(authorization);
@@ -256,11 +258,12 @@ namespace University.Server.Controllers
         /// <returns>The retrieved lectures</returns>
         [HttpGet("{id}/lectures", Name = "Get Lectures of User By Id")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
-        [Obsolete]
-        public async Task<IActionResult> GetLecturesAsync(Guid id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ExtendedLectureResource>))]
+        public async Task<IEnumerable<ExtendedLectureResource>> GetLecturesAsync(Guid id)
         {
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            var semesterModules = await _userService.GetActiveSemesterModulesOfUser(id);
+            var resources = semesterModules.SelectMany(_mapper.Map<SemesterModule, IEnumerable<ExtendedLectureResource>>);
+            return resources;
         }
 
         /// <summary>
