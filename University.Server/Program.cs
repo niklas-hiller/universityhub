@@ -10,6 +10,7 @@ using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Persistence.Repositories;
 using University.Server.Domain.Repositories;
 using University.Server.Domain.Services;
+using University.Server.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,8 @@ builder.Services.AddScoped<ICosmosDbRepository<Semester, SemesterEntity>, Cosmos
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.SaveToken = true;
@@ -104,6 +107,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddCors();
 
 var app = builder.Build();
+
+app.UseGlobalExceptionHandler();
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())

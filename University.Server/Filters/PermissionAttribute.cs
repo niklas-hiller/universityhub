@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 using University.Server.Domain.Models;
-using University.Server.Domain.Services;
 
-namespace University.Server.Attributes
+namespace University.Server.Filters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class PermissionAttribute : AuthorizeAttribute, IAuthorizationFilter
