@@ -1,11 +1,11 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using University.Server.Filters;
+using System.Security.Claims;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
+using University.Server.Filters;
 using University.Server.Resources.Request;
 using University.Server.Resources.Response;
 
@@ -117,7 +117,8 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateUserResource resource)
         {
-            if (!(HttpContext.User.HasClaim("sub", id.ToString()) || HttpContext.User.HasClaim("authorization", EAuthorization.Administrator.ToString())))
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+            if (!(userId == id.ToString() || User.HasClaim("authorization", EAuthorization.Administrator.ToString())))
             {
                 return Forbid();
             }
@@ -157,7 +158,8 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutCredentialsAsync(Guid id, [FromBody] UpdateUserCredentialsResource resource)
         {
-            if (!(HttpContext.User.HasClaim("sub", id.ToString()) || HttpContext.User.HasClaim("authorization", EAuthorization.Administrator.ToString())))
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+            if (!(userId == id.ToString() || User.HasClaim("authorization", EAuthorization.Administrator.ToString())))
             {
                 return Forbid();
             }
@@ -197,7 +199,8 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
-            if (!(HttpContext.User.HasClaim("sub", id.ToString()) || HttpContext.User.HasClaim("authorization", EAuthorization.Administrator.ToString())))
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+            if (!(userId == id.ToString() || User.HasClaim("authorization", EAuthorization.Administrator.ToString())))
             {
                 return Forbid();
             }
