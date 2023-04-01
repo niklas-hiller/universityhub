@@ -131,11 +131,11 @@ namespace University.Server.Domain.Services
 
             // Start Calculation
             var currentModules = new List<SemesterModule>(); // List of Modules that are already used in current timeframe
-            var currentTime = semester.StartDate;   // Current timeframe
+            var currentTime = semester.StartDate.Date;   // Current timeframe
             var lectureDuration = new TimeSpan(0, LECTURE_DURATION, 0);
             var lectureOffset = new TimeSpan(0, 10, 0); // Time between lecture timeslots
             var startDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 9, 0, 0); // First lecture starts at 9 AM
-            var endDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 17, 0, 0); // Last lecture starts at 8 PM
+            var endDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 17, 0, 0); // Last lecture starts at 5 PM
             bool success = calculationTable.Calculate(semester.Modules.SelectMany(module => module.Lectures).ToList(), (row, lecture) =>
             {
                 // Confirm that the module does not have all it's lectures yet
@@ -171,15 +171,12 @@ namespace University.Server.Domain.Services
                     // Clean up list
                     currentModules.Clear();
                     // Go to next timeslot
+                    currentTime.Add(lectureDuration);
                     currentTime.Add(lectureOffset);
                     if (currentTime.TimeOfDay > endDay.TimeOfDay)
                     {
                         // Add one day, and then substract again the difference to the start of day.
                         currentTime.AddDays(1).Subtract(currentTime.TimeOfDay - startDay.TimeOfDay);
-                    }
-                    else
-                    {
-                        currentTime.Add(lectureDuration);
                     }
                 }
 
