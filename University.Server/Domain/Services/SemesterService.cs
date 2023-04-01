@@ -2,7 +2,7 @@
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
-using University.Server.Domain.Services.Communication;
+using University.Server.Exceptions;
 
 namespace University.Server.Domain.Services
 {
@@ -199,15 +199,15 @@ namespace University.Server.Domain.Services
             return result;
         }
 
-        public async Task<Response<Semester>> CalculateAsync(Guid id)
+        public async Task<Semester> CalculateAsync(Guid id)
         {
-            var semester = await GetAsyncNullable(id);
-
-            if (semester == null)
-                return new Response<Semester>(StatusCodes.Status404NotFound, "Semester not found.");
+            var semester = await GetAsync(id);
 
             if (semester.Active)
-                return new Response<Semester>(StatusCodes.Status400BadRequest, "Semester already active.");
+                throw new BadRequestException("Semester already active.");
+
+            if (semester.Modules.Count == 0)
+                throw new BadRequestException("Semester has no modules.");
 
             try
             {
@@ -237,11 +237,11 @@ namespace University.Server.Domain.Services
             }
             catch (InvalidDataException ex)
             {
-                return new Response<Semester>(StatusCodes.Status400BadRequest, ex.Message);
+                throw new BadRequestException(ex.Message);
             }
             catch (Exception ex)
             {
-                return new Response<Semester>(StatusCodes.Status500InternalServerError, ex.Message);
+                throw new InternalServerException(ex.Message);
             }
 
             // Update Database
@@ -249,19 +249,19 @@ namespace University.Server.Domain.Services
             {
                 await _semesterRepository.UpdateItemAsync(semester.Id, semester);
 
-                return new Response<Semester>(StatusCodes.Status201Created, semester);
+                return semester;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when activating the semester: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when activating the semester: {ex.Message}");
+                throw new InternalServerException($"An error occurred when activating the semester: {ex.Message}");
             }
         }
 
-        public async Task<Response<Semester>> SaveAsync(Semester semester)
+        public async Task<Semester> SaveAsync(Semester semester)
         {
             _logger.LogInformation("Attempting to save new semester...");
 
@@ -271,15 +271,15 @@ namespace University.Server.Domain.Services
             {
                 await _semesterRepository.AddItemAsync(semester);
 
-                return new Response<Semester>(StatusCodes.Status201Created, semester);
+                return semester;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the semester: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex);
             }
             catch (Exception ex)
             {
-                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the semester: {ex.Message}");
+                throw new InternalServerException($"An error occurred when saving the semester: {ex.Message}");
             }
         }
 
@@ -331,7 +331,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Semester>> GetAsync(Guid id)
+        public async Task<Semester> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing semester...");
 
@@ -339,15 +339,15 @@ namespace University.Server.Domain.Services
             {
                 var semester = await _semesterRepository.GetItemAsync(id);
 
-                return new Response<Semester>(StatusCodes.Status200OK, semester);
+                return semester;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the semester: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the semester: {ex.Message}");
+                throw new InternalServerException($"An error occurred when retrieving the semester: {ex.Message}");
             }
         }
 
@@ -358,12 +358,12 @@ namespace University.Server.Domain.Services
             return await _semesterRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<Response<Semester>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
+        public async Task<Semester> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
-            var existingSemester = await GetAsyncNullable(id);
+            var existingSemester = await GetAsync(id);
 
-            if (existingSemester == null)
-                return new Response<Semester>(StatusCodes.Status404NotFound, "Semester not found.");
+            if (existingSemester.Active)
+                throw new BadRequestException("Can't add/remove modules to active semester.");
 
             foreach (var add in patch.AddEntity)
             {
@@ -391,44 +391,40 @@ namespace University.Server.Domain.Services
             {
                 await _semesterRepository.UpdateItemAsync(existingSemester.Id, existingSemester);
 
-                return new Response<Semester>(StatusCodes.Status200OK, existingSemester);
+                return existingSemester;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the semester: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the semester: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the semester: {ex.Message}");
             }
         }
 
-        public async Task<Response<Semester>> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing semester...");
 
             try
             {
                 await _semesterRepository.DeleteItemAsync(id);
-
-                return new Response<Semester>(StatusCodes.Status204NoContent);
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Semester>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the semester: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Semester>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the semester: {ex.Message}");
+                throw new InternalServerException($"An error occurred when deleting the semester: {ex.Message}");
             }
         }
 
         public async Task<IEnumerable<SemesterModule>> GetActiveSemesterModulesOfUser(Guid id)
         {
-            var existingUser = await _userService.GetAsyncNullable(id);
+            var existingUser = await _userService.GetAsync(id);
 
-            if (existingUser == null)
-                return Enumerable.Empty<SemesterModule>();
             if (existingUser.Assignments.IsNullOrEmpty())
                 return Enumerable.Empty<SemesterModule>();
 

@@ -1,10 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using University.Server.Filters;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
+using University.Server.Filters;
 using University.Server.Resources.Request;
 using University.Server.Resources.Response;
 
@@ -37,7 +37,7 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ModuleResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveModuleResource resource)
         {
@@ -47,20 +47,10 @@ namespace University.Server.Controllers
             }
 
             var module = _mapper.Map<SaveModuleResource, Module>(resource);
-            var result = await _moduleService.SaveAsync(module);
+            var createdModule = await _moduleService.SaveAsync(module);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var createdResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
-                    return Created("", value: createdResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var createdResource = _mapper.Map<Module, ModuleResource>(createdModule);
+            return Created("", value: createdResource);
         }
 
         /// <summary>
@@ -73,8 +63,8 @@ namespace University.Server.Controllers
         [HttpPut("{id}", Name = "Updates a Module")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateModuleResource resource)
         {
@@ -84,20 +74,10 @@ namespace University.Server.Controllers
             }
 
             var module = _mapper.Map<UpdateModuleResource, Module>(resource);
-            var result = await _moduleService.UpdateAsync(id, module);
+            var updatedModule = await _moduleService.UpdateAsync(id, module);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<Module, ModuleResource>(updatedModule);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -111,8 +91,8 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PatchProfessorsAsync(Guid id, [FromBody] PatchResource resource)
         {
@@ -121,20 +101,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var patch = _mapper.Map<PatchResource, PatchModel<User>>(resource);
-            var result = await _moduleService.PatchProfessorsAsync(id, patch);
+            var updatedModule = await _moduleService.PatchProfessorsAsync(id, patch);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<Module, ModuleResource>(updatedModule);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -146,23 +116,13 @@ namespace University.Server.Controllers
         [HttpGet("{id}", Name = "Get Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ModuleResource))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var result = await _moduleService.GetAsync(id);
+            var retrievedModule = await _moduleService.GetAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var retrievedResource = _mapper.Map<Module, ModuleResource>(result.ResponseEntity);
-                    return Ok(retrievedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var retrievedResource = _mapper.Map<Module, ModuleResource>(retrievedModule);
+            return Ok(retrievedResource);
         }
 
         /// <summary>
@@ -173,8 +133,8 @@ namespace University.Server.Controllers
         /// <returns>The retrieved modules</returns>
         [HttpGet(Name = "Get all Modules matching filter")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ModuleResource>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         public async Task<IEnumerable<ModuleResource>> GetFilteredAsync(EModuleType? moduleType)
         {
             var modules = await _moduleService.ListAsync(moduleType);
@@ -190,20 +150,14 @@ namespace University.Server.Controllers
         [HttpDelete("{id}", Name = "Delete Module By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var result = await _moduleService.DeleteAsync(id);
+            await _moduleService.DeleteAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status204NoContent:
-                    return NoContent();
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            return NoContent();
         }
 
     }

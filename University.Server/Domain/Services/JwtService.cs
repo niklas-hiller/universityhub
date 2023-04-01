@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using University.Server.Domain.Models;
-using University.Server.Domain.Services.Communication;
+using University.Server.Exceptions;
 
 namespace University.Server.Domain.Services
 {
@@ -37,13 +37,13 @@ namespace University.Server.Domain.Services
                 && user.HasClaim("authorization", expectedUser.Authorization.ToString());
         }
 
-        public async Task<Response<Token>> LoginAsync(string email, string password)
+        public async Task<Token> LoginAsync(string email, string password)
         {
             // Retrieve User
             var user = await _userService.GetUserByCredentials(email, password);
             if (user == null)
             {
-                return new Response<Token>(StatusCodes.Status400BadRequest, "Invalid Credentials");
+                throw new BadRequestException("Invalid Credentials.");
             }
             var claims = new List<Claim>()
             {
@@ -65,7 +65,7 @@ namespace University.Server.Domain.Services
 
 
             var login = new Token(_jwtHandler.WriteToken(jwtSecurityToken));
-            return new Response<Token>(StatusCodes.Status201Created, login);
+            return login;
         }
     }
 }

@@ -1,10 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using University.Server.Filters;
 using University.Server.Domain.Models;
 using University.Server.Domain.Services;
 using University.Server.Extensions;
+using University.Server.Filters;
 using University.Server.Resources.Request;
 using University.Server.Resources.Response;
 
@@ -37,7 +37,7 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LocationResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveLocationResource resource)
         {
@@ -46,20 +46,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var location = _mapper.Map<SaveLocationResource, Location>(resource);
-            var result = await _locationService.SaveAsync(location);
+            var createdLocation = await _locationService.SaveAsync(location);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var createdResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
-                    return Created("", value: createdResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var createdResource = _mapper.Map<Location, LocationResource>(createdLocation);
+            return Created("", value: createdResource);
         }
 
         /// <summary>
@@ -73,8 +63,8 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateLocationResource resource)
         {
@@ -83,20 +73,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var location = _mapper.Map<UpdateLocationResource, Location>(resource);
-            var result = await _locationService.UpdateAsync(id, location);
+            var updatedLocation = await _locationService.UpdateAsync(id, location);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<Location, LocationResource>(updatedLocation);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -108,23 +88,13 @@ namespace University.Server.Controllers
         [HttpGet("{id}", Name = "Get Location By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationResource))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var result = await _locationService.GetAsync(id);
+            var retrievedLocation = await _locationService.GetAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var retrievedResource = _mapper.Map<Location, LocationResource>(result.ResponseEntity);
-                    return Ok(retrievedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var retrievedResource = _mapper.Map<Location, LocationResource>(retrievedLocation);
+            return Ok(retrievedResource);
         }
 
         /// <summary>
@@ -134,6 +104,7 @@ namespace University.Server.Controllers
         /// <returns>The retrieved locations</returns>
         [HttpGet(Name = "Get all Locations")]
         [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LocationResource>))]
         public async Task<IEnumerable<LocationResource>> GetAllAsync()
         {
             var locations = await _locationService.ListAsync();
@@ -149,20 +120,14 @@ namespace University.Server.Controllers
         [HttpDelete("{id}", Name = "Delete Location By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var result = await _locationService.DeleteAsync(id);
+            await _locationService.DeleteAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status204NoContent:
-                    return NoContent();
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            return NoContent();
         }
     }
 }

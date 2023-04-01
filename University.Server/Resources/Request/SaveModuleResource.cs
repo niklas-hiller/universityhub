@@ -6,7 +6,7 @@ namespace University.Server.Resources.Request
     public class SaveModuleResource
     {
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9 -]{5,30}$")]
+        [MinLength(5), MaxLength(30)]
         public string Name { get; set; }
         [MaxLength(255)]
         public string? Description { get; set; }

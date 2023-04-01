@@ -31,7 +31,7 @@ namespace JWTAuth.WebApi.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TokenResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> PostAsync([FromBody] LoginResource resource)
         {
             if (!ModelState.IsValid)
@@ -39,20 +39,10 @@ namespace JWTAuth.WebApi.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
 
-            var result = await _jwtService.LoginAsync(resource.Email, resource.Password);
+            var createdToken = await _jwtService.LoginAsync(resource.Email, resource.Password);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var createdResource = _mapper.Map<Token, TokenResource>(result.ResponseEntity);
-                    return Created("", value: createdResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var createdResource = _mapper.Map<Token, TokenResource>(createdToken);
+            return Created("", value: createdResource);
         }
     }
 }

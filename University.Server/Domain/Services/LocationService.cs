@@ -2,7 +2,7 @@
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
-using University.Server.Domain.Services.Communication;
+using University.Server.Exceptions;
 
 namespace University.Server.Domain.Services
 {
@@ -17,7 +17,7 @@ namespace University.Server.Domain.Services
             _locationRepository = locationRepository;
         }
 
-        public async Task<Response<Location>> SaveAsync(Location location)
+        public async Task<Location> SaveAsync(Location location)
         {
             _logger.LogInformation("Attempting to save new location...");
 
@@ -25,15 +25,15 @@ namespace University.Server.Domain.Services
             {
                 await _locationRepository.AddItemAsync(location);
 
-                return new Response<Location>(StatusCodes.Status201Created, location);
+                return location;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Location>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the location: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex);
             }
             catch (Exception ex)
             {
-                return new Response<Location>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the location: {ex.Message}");
+                throw new InternalServerException($"An error occurred when saving the location: {ex.Message}");
             }
         }
 
@@ -70,7 +70,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Location>> GetAsync(Guid id)
+        public async Task<Location> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing location...");
 
@@ -78,15 +78,15 @@ namespace University.Server.Domain.Services
             {
                 var location = await _locationRepository.GetItemAsync(id);
 
-                return new Response<Location>(StatusCodes.Status200OK, location);
+                return location;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Location>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the location: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Location>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the location: {ex.Message}");
+                throw new InternalServerException($"An error occurred when retrieving the location: {ex.Message}");
             }
         }
 
@@ -97,14 +97,11 @@ namespace University.Server.Domain.Services
             return await _locationRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<Response<Location>> UpdateAsync(Guid id, Location location)
+        public async Task<Location> UpdateAsync(Guid id, Location location)
         {
             _logger.LogInformation("Attempting to update existing location...");
 
-            var existingLocation = await GetAsyncNullable(id);
-
-            if (existingLocation == null)
-                return new Response<Location>(StatusCodes.Status404NotFound, "Location not found.");
+            var existingLocation = await GetAsync(id);
 
             existingLocation.Name = location.Name;
             existingLocation.Size = location.Size;
@@ -113,35 +110,33 @@ namespace University.Server.Domain.Services
             {
                 await _locationRepository.UpdateItemAsync(existingLocation.Id, existingLocation);
 
-                return new Response<Location>(StatusCodes.Status200OK, existingLocation);
+                return existingLocation;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Location>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the location: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Location>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the location: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the location: {ex.Message}");
             }
         }
 
-        public async Task<Response<Location>> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing location...");
 
             try
             {
                 await _locationRepository.DeleteItemAsync(id);
-
-                return new Response<Location>(StatusCodes.Status204NoContent);
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Location>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the location: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Location>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the location: {ex.Message}");
+                throw new InternalServerException($"An error occurred when deleting the location: {ex.Message}");
             }
         }
     }

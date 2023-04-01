@@ -1,20 +1,19 @@
 ﻿using University.Server.Domain.Models;
-using University.Server.Domain.Services.Communication;
 
 namespace University.Server.Domain.Services
 {
     public interface IUserService
     {
         Task<User?> GetUserByCredentials(string email, string password);
-        Task<Response<User>> SaveAsync(User user);
+        Task<User> SaveAsync(User user);
         Task<IEnumerable<User>> GetManyAsync(ICollection<Guid> ids);
         Task<User?> GetAsyncNullable(Guid id);
-        Task<Response<User>> GetAsync(Guid id);
+        Task<User> GetAsync(Guid id);
         Task<IEnumerable<User>> ListAsync(EAuthorization? authorization);
-        Task<Response<User>> UpdateAsync(Guid id, User user);
-        Task<Response<User>> UpdateCredentialsAsync(Guid id, User user);
-        Task<Response<User>> PatchAssignmentsAsync(Guid id, PatchModel<Module> patch);
-        Task<Response<User>> UpdateAssignmentAsync(Guid userId, Guid moduleId, Assignment assignment);
-        Task<Response<User>> DeleteAsync(Guid id);
+        Task<User> UpdateAsync(Guid id, User user);
+        Task<User> UpdateCredentialsAsync(Guid id, User user);
+        Task<User> PatchAssignmentsAsync(Guid id, PatchModel<Module> patch);
+        Task<User> UpdateAssignmentAsync(Guid userId, Guid moduleId, Assignment assignment);
+        Task DeleteAsync(Guid id);
     }
 }
