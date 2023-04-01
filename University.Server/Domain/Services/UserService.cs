@@ -12,13 +12,11 @@ namespace University.Server.Domain.Services
     {
         private readonly ILogger<UserService> _logger;
         private readonly ICosmosDbRepository<User, UserEntity> _userRepository;
-        private readonly ISemesterService _semesterService;
 
-        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository, ISemesterService semesterService)
+        public UserService(ILogger<UserService> logger, ICosmosDbRepository<User, UserEntity> userRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
-            _semesterService = semesterService;
         }
 
         private string Sha256Hash(string rawData)
@@ -83,30 +81,6 @@ namespace University.Server.Domain.Services
                 _logger.LogInformation($"Cosmos DB Exception for: {query})");
                 throw ex;
             }
-        }
-
-        public async Task<IEnumerable<SemesterModule>> GetActiveSemesterModulesOfUser(Guid id)
-        {
-            var existingUser = await GetAsyncNullable(id);
-
-            if (existingUser == null)
-                return Enumerable.Empty<SemesterModule>();
-            if (existingUser.Assignments.IsNullOrEmpty())
-                return Enumerable.Empty<SemesterModule>();
-
-            var activeAssignmentIds = existingUser.Assignments
-                .Where(assignment => assignment.Status == EModuleStatus.Enrolled || assignment.Status == EModuleStatus.Educates)
-                .Select(assignment => assignment.ReferenceModule.Id);
-
-            var activeSemesters = await _semesterService.GetManyAsyncByTime(DateTime.Now, new TimeSpan(30, 0, 0, 0));
-            if (activeSemesters.IsNullOrEmpty())
-                return Enumerable.Empty<SemesterModule>();
-
-            var semesterModules = activeSemesters
-                .SelectMany(semester => semester.Modules)
-                .Where(semesterModule => activeAssignmentIds.Contains(semesterModule.ReferenceModule.Id));
-
-            return semesterModules;
         }
 
         public async Task<User?> GetAsyncNullable(Guid id)
