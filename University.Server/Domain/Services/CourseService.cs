@@ -2,7 +2,7 @@
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
-using University.Server.Domain.Services.Communication;
+using University.Server.Exceptions;
 
 namespace University.Server.Domain.Services
 {
@@ -19,7 +19,7 @@ namespace University.Server.Domain.Services
             _userService = userService;
         }
 
-        public async Task<Response<Course>> SaveAsync(Course course)
+        public async Task<Course> SaveAsync(Course course)
         {
             _logger.LogInformation("Attempting to save new course...");
 
@@ -30,15 +30,15 @@ namespace University.Server.Domain.Services
             {
                 await _courseRepository.AddItemAsync(course);
 
-                return new Response<Course>(StatusCodes.Status201Created, course);
+                return course;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the course: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex);
             }
             catch (Exception ex)
             {
-                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the course: {ex.Message}");
+                throw new InternalServerException($"An error occurred when saving the course: {ex.Message}");
             }
         }
 
@@ -75,7 +75,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Course>> GetAsync(Guid id)
+        public async Task<Course> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing course...");
 
@@ -83,15 +83,15 @@ namespace University.Server.Domain.Services
             {
                 var course = await _courseRepository.GetItemAsync(id);
 
-                return new Response<Course>(StatusCodes.Status200OK, course);
+                return course;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the course: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the course: {ex.Message}");
+                throw new InternalServerException($"An error occurred when retrieving the course: {ex.Message}");
             }
         }
 
@@ -102,20 +102,17 @@ namespace University.Server.Domain.Services
             return await _courseRepository.GetItemsAsync("SELECT * FROM c");
         }
 
-        public async Task<Response<Course>> PatchStudentsAsync(Guid id, PatchModel<User> patch)
+        public async Task<Course> PatchStudentsAsync(Guid id, PatchModel<User> patch)
         {
             foreach (var user in patch.AddEntity.Union(patch.RemoveEntity))
             {
                 if (user.Authorization != EAuthorization.Student)
                 {
-                    return new Response<Course>(StatusCodes.Status400BadRequest, "You can't add non-student as users to a module.");
+                    throw new BadRequestException("You can't add non-student as users to a module.");
                 }
             }
 
-            var existingCourse = await GetAsyncNullable(id);
-
-            if (existingCourse == null)
-                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
+            var existingCourse = await GetAsync(id);
 
             foreach (var add in patch.AddEntity)
             {
@@ -129,11 +126,7 @@ namespace University.Server.Domain.Services
                             patchModules.AddEntity.Add(module);
                         }
 
-                        var result = await _userService.PatchAssignmentsAsync(add.Id, patchModules);
-                        if (result.StatusCode != StatusCodes.Status200OK)
-                        {
-                            return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {result.Message}");
-                        }
+                        await _userService.PatchAssignmentsAsync(add.Id, patchModules);
                     }
                     #endregion
 
@@ -152,11 +145,7 @@ namespace University.Server.Domain.Services
                             patchModules.RemoveEntity.Add(module);
                         }
 
-                        var result = await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
-                        if (result.StatusCode != StatusCodes.Status200OK)
-                        {
-                            return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {result.Message}");
-                        }
+                        await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
                     }
                     #endregion
 
@@ -168,32 +157,29 @@ namespace University.Server.Domain.Services
             {
                 await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
-                return new Response<Course>(StatusCodes.Status200OK, existingCourse);
+                return existingCourse;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the course: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the course: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the course: {ex.Message}");
             }
         }
 
-        public async Task<Response<Course>> PatchModulesAsync(Guid id, PatchModel<Module> patch)
+        public async Task<Course> PatchModulesAsync(Guid id, PatchModel<Module> patch)
         {
             foreach (var user in patch.AddEntity.Union(patch.RemoveEntity))
             {
                 if (user.ModuleType == EModuleType.Optional)
                 {
-                    return new Response<Course>(StatusCodes.Status400BadRequest, "You can't add optional modules to a course.");
+                    throw new BadRequestException("You can't add optional modules to a course.");
                 }
             }
 
-            var existingCourse = await GetAsyncNullable(id);
-
-            if (existingCourse == null)
-                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
+            var existingCourse = await GetAsync(id);
 
             foreach (var add in patch.AddEntity)
             {
@@ -205,11 +191,7 @@ namespace University.Server.Domain.Services
                         {
                             var patchModules = new PatchModel<Module>();
                             patchModules.AddEntity.Add(add);
-                            var result = await _userService.PatchAssignmentsAsync(user.Id, patchModules);
-                            if (result.StatusCode != StatusCodes.Status200OK)
-                            {
-                                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {result.Message}");
-                            }
+                            await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                         }
                     }
                     #endregion
@@ -227,11 +209,7 @@ namespace University.Server.Domain.Services
                         {
                             var patchModules = new PatchModel<Module>();
                             patchModules.RemoveEntity.Add(remove);
-                            var result = await _userService.PatchAssignmentsAsync(user.Id, patchModules);
-                            if (result.StatusCode != StatusCodes.Status200OK)
-                            {
-                                return new Response<Course>(StatusCodes.Status400BadRequest, $"An error occurred when updating the course: {result.Message}");
-                            }
+                            await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                         }
                     }
                     #endregion
@@ -244,26 +222,23 @@ namespace University.Server.Domain.Services
             {
                 await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
-                return new Response<Course>(StatusCodes.Status200OK, existingCourse);
+                return existingCourse;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the course: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the course: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the course: {ex.Message}");
             }
         }
 
-        public async Task<Response<Course>> UpdateAsync(Guid id, Course course)
+        public async Task<Course> UpdateAsync(Guid id, Course course)
         {
             _logger.LogInformation("Attempting to update existing course...");
 
-            var existingCourse = await GetAsyncNullable(id);
-
-            if (existingCourse == null)
-                return new Response<Course>(StatusCodes.Status404NotFound, "Course not found.");
+            var existingCourse = await GetAsync(id);
 
             existingCourse.Description = course.Description;
 
@@ -271,35 +246,33 @@ namespace University.Server.Domain.Services
             {
                 await _courseRepository.UpdateItemAsync(existingCourse.Id, existingCourse);
 
-                return new Response<Course>(StatusCodes.Status200OK, existingCourse);
+                return existingCourse;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the course: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the course: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the course: {ex.Message}");
             }
         }
 
-        public async Task<Response<Course>> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing course...");
 
             try
             {
                 await _courseRepository.DeleteItemAsync(id);
-
-                return new Response<Course>(StatusCodes.Status204NoContent);
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Course>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the course: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Course>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the course: {ex.Message}");
+                throw new InternalServerException($"An error occurred when deleting the course: {ex.Message}");
             }
         }
     }

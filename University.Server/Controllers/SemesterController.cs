@@ -37,7 +37,7 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SemesterResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveSemesterResource resource)
         {
@@ -46,20 +46,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var semester = _mapper.Map<SaveSemesterResource, Semester>(resource);
-            var result = await _semesterService.SaveAsync(semester);
+            var createdSemester = await _semesterService.SaveAsync(semester);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var createdResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
-                    return Created("", value: createdResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var createdResource = _mapper.Map<Semester, SemesterResource>(createdSemester);
+            return Created("", value: createdResource);
         }
 
         /// <summary>
@@ -73,8 +63,8 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PatchModulesAsync(Guid id, [FromBody] PatchResource resource)
         {
@@ -83,20 +73,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
-            var result = await _semesterService.PatchModulesAsync(id, patch);
+            var updatedSemester = await _semesterService.PatchModulesAsync(id, patch);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<Semester, SemesterResource>(updatedSemester);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -108,23 +88,13 @@ namespace University.Server.Controllers
         [HttpGet("{id}", Name = "Get Semester By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SemesterResource))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var result = await _semesterService.GetAsync(id);
+            var retrievedSemester = await _semesterService.GetAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var retrievedResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
-                    return Ok(retrievedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var retrievedResource = _mapper.Map<Semester, SemesterResource>(retrievedSemester);
+            return Ok(retrievedResource);
         }
 
         /// <summary>
@@ -134,6 +104,7 @@ namespace University.Server.Controllers
         /// <returns>The retrieved semesters</returns>
         [HttpGet(Name = "Get all Semesters")]
         [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SemesterResource>))]
         public async Task<IEnumerable<SemesterResource>> GetAllAsync()
         {
             var semesters = await _semesterService.ListAsync();
@@ -149,20 +120,14 @@ namespace University.Server.Controllers
         [HttpDelete("{id}", Name = "Delete Semester By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var result = await _semesterService.DeleteAsync(id);
+            await _semesterService.DeleteAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status204NoContent:
-                    return NoContent();
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            return NoContent();
         }
 
         /// <summary>
@@ -175,24 +140,14 @@ namespace University.Server.Controllers
         [Produces("application/json")]
         [Permission(EAuthorization.Administrator)]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SemesterResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> PostActivateAsync(Guid id)
         {
-            var result = await _semesterService.CalculateAsync(id);
+            var createdSemester = await _semesterService.CalculateAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var createdResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
-                    return Created("", value: createdResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var createdResource = _mapper.Map<Semester, SemesterResource>(createdSemester);
+            return Created("", value: createdResource);
         }
     }
 }

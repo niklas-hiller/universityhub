@@ -2,7 +2,7 @@
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
-using University.Server.Domain.Services.Communication;
+using University.Server.Exceptions;
 
 namespace University.Server.Domain.Services
 {
@@ -19,7 +19,7 @@ namespace University.Server.Domain.Services
             _userService = userService;
         }
 
-        public async Task<Response<Module>> SaveAsync(Module module)
+        public async Task<Module> SaveAsync(Module module)
         {
             _logger.LogInformation("Attempting to save new module...");
 
@@ -29,15 +29,15 @@ namespace University.Server.Domain.Services
             {
                 await _moduleRepository.AddItemAsync(module);
 
-                return new Response<Module>(StatusCodes.Status201Created, module);
+                return module;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Module>((int)ex.StatusCode, $"Cosmos DB raised an error when saving the module: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex);
             }
             catch (Exception ex)
             {
-                return new Response<Module>(StatusCodes.Status500InternalServerError, $"An error occurred when saving the module: {ex.Message}");
+                throw new InternalServerException($"An error occurred when saving the module: {ex.Message}");
             }
         }
 
@@ -79,7 +79,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Module>> GetAsync(Guid id)
+        public async Task<Module> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing module...");
 
@@ -89,18 +89,18 @@ namespace University.Server.Domain.Services
 
                 if (module.IsArchived)
                 {
-                    return new Response<Module>(StatusCodes.Status404NotFound, $"Module not found.");
+                    throw new NotFoundException("Module not found.");
                 }
 
-                return new Response<Module>(StatusCodes.Status200OK, module);
+                return module;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Module>((int)ex.StatusCode, $"Cosmos DB raised an error when retrieving the module: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Module>(StatusCodes.Status500InternalServerError, $"An error occurred when retrieving the module: {ex.Message}");
+                throw new InternalServerException($"An error occurred when retrieving the module: {ex.Message}");
             }
         }
 
@@ -119,20 +119,17 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Response<Module>> PatchProfessorsAsync(Guid id, PatchModel<User> patch)
+        public async Task<Module> PatchProfessorsAsync(Guid id, PatchModel<User> patch)
         {
             foreach (var user in patch.AddEntity.Union(patch.RemoveEntity))
             {
                 if (user.Authorization != EAuthorization.Professor)
                 {
-                    return new Response<Module>(StatusCodes.Status400BadRequest, "You can't add non-professors as users to a module.");
+                    throw new BadRequestException("You can't add non-professors as users to a module.");
                 }
             }
 
-            var existingModule = await GetAsyncNullable(id);
-
-            if (existingModule == null)
-                return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
+            var existingModule = await GetAsync(id);
 
             foreach (var add in patch.AddEntity)
             {
@@ -142,11 +139,7 @@ namespace University.Server.Domain.Services
                     {
                         var patchModules = new PatchModel<Module>();
                         patchModules.AddEntity.Add(existingModule);
-                        var result = await _userService.PatchAssignmentsAsync(add.Id, patchModules);
-                        if (result.StatusCode != StatusCodes.Status200OK)
-                        {
-                            return new Response<Module>(StatusCodes.Status400BadRequest, $"An error occurred when updating the module: {result.Message}");
-                        }
+                        await _userService.PatchAssignmentsAsync(add.Id, patchModules);
                     }
                     #endregion
 
@@ -161,11 +154,7 @@ namespace University.Server.Domain.Services
                     {
                         var patchModules = new PatchModel<Module>();
                         patchModules.RemoveEntity.Add(existingModule);
-                        var result = await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
-                        if (result.StatusCode != StatusCodes.Status200OK)
-                        {
-                            return new Response<Module>(StatusCodes.Status400BadRequest, $"An error occurred when updating the module: {result.Message}");
-                        }
+                        await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
                     }
                     #endregion
 
@@ -177,26 +166,23 @@ namespace University.Server.Domain.Services
             {
                 await _moduleRepository.UpdateItemAsync(existingModule.Id, existingModule);
 
-                return new Response<Module>(StatusCodes.Status200OK, existingModule);
+                return existingModule;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Module>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the module: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Module>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the module: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the module: {ex.Message}");
             }
         }
 
-        public async Task<Response<Module>> UpdateAsync(Guid id, Module module)
+        public async Task<Module> UpdateAsync(Guid id, Module module)
         {
             _logger.LogInformation("Attempting to update existing module...");
 
-            var existingModule = await GetAsyncNullable(id);
-
-            if (existingModule == null)
-                return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
+            var existingModule = await GetAsync(id);
 
             existingModule.Name = module.Name;
             existingModule.Description = module.Description;
@@ -207,42 +193,37 @@ namespace University.Server.Domain.Services
             {
                 await _moduleRepository.UpdateItemAsync(existingModule.Id, existingModule);
 
-                return new Response<Module>(StatusCodes.Status200OK, existingModule);
+                return existingModule;
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Module>((int)ex.StatusCode, $"Cosmos DB raised an error when updating the module: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Module>(StatusCodes.Status500InternalServerError, $"An error occurred when updating the module: {ex.Message}");
+                throw new InternalServerException($"An error occurred when updating the module: {ex.Message}");
             }
         }
 
-        public async Task<Response<Module>> DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing module...");
 
-            var existingModule = await _moduleRepository.GetItemAsync(id);
-
-            if (existingModule == null)
-                return new Response<Module>(StatusCodes.Status404NotFound, "Module not found.");
+            var existingModule = await GetAsync(id);
 
             try
             {
                 // Modules are not deleted, but archived instead.
                 existingModule.IsArchived = true;
                 await _moduleRepository.UpdateItemAsync(existingModule.Id, existingModule);
-
-                return new Response<Module>(StatusCodes.Status204NoContent);
             }
             catch (Microsoft.Azure.Cosmos.CosmosException ex)
             {
-                return new Response<Module>((int)ex.StatusCode, $"Cosmos DB raised an error when deleting the module: {ex.Message}");
+                throw RequestException.ResolveCosmosException(ex, id);
             }
             catch (Exception ex)
             {
-                return new Response<Module>(StatusCodes.Status500InternalServerError, $"An error occurred when deleting the module: {ex.Message}");
+                throw new InternalServerException($"An error occurred when deleting the module: {ex.Message}");
             }
         }
     }

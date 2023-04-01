@@ -5,7 +5,7 @@ namespace University.Server.Resources.Request
     public class SaveCourseResource
     {
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9 -]{5,30}$")]
+        [MinLength(5), MaxLength(30)]
         public string Name { get; set; }
         [Required]
         [MaxLength(255)]

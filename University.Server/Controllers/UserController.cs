@@ -39,7 +39,7 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
         {
@@ -49,20 +49,10 @@ namespace University.Server.Controllers
             }
 
             var user = _mapper.Map<SaveUserResource, User>(resource);
-            var result = await _userService.SaveAsync(user);
+            var createdUser = await _userService.SaveAsync(user);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status201Created:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var createdResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
-                    return Created("", value: createdResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var createdResource = _mapper.Map<User, UserResource>(createdUser);
+            return Created("", value: createdResource);
         }
 
         /// <summary>
@@ -78,8 +68,8 @@ namespace University.Server.Controllers
         [Produces("application/json")]
         [Permission(EAuthorization.Administrator)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> PutAssignmentsAsync(Guid id, Guid id2, [FromBody] UpdateAssignmentResource resource)
         {
             if (!ModelState.IsValid)
@@ -88,20 +78,10 @@ namespace University.Server.Controllers
             }
 
             var assignment = _mapper.Map<UpdateAssignmentResource, Assignment>(resource);
-            var result = await _userService.UpdateAssignmentAsync(id, id2, assignment);
+            var updatedUser = await _userService.UpdateAssignmentAsync(id, id2, assignment);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -115,8 +95,8 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> PutAsync(Guid id, [FromBody] UpdateUserResource resource)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -129,20 +109,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var user = _mapper.Map<UpdateUserResource, User>(resource);
-            var result = await _userService.UpdateAsync(id, user);
+            var updatedUser = await _userService.UpdateAsync(id, user);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -156,8 +126,8 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> PutCredentialsAsync(Guid id, [FromBody] UpdateUserCredentialsResource resource)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -170,20 +140,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var user = _mapper.Map<UpdateUserCredentialsResource, User>(resource);
-            var result = await _userService.UpdateAsync(id, user);
+            var updatedUser = await _userService.UpdateAsync(id, user);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -197,8 +157,8 @@ namespace University.Server.Controllers
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> PatchAssignmentsAsync(Guid id, [FromBody] PatchResource resource)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -212,15 +172,9 @@ namespace University.Server.Controllers
             }
             var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
 
-            // Validation (Todo: Only of themself)
+            // Validation
             {
-                var response = await _userService.GetAsync(id);
-
-                if (response.ResponseEntity == null)
-                {
-                    return NotFound("Couldn't find requested user.");
-                }
-                var user = response.ResponseEntity;
+                var user = await _userService.GetAsync(id);
 
                 if (user.Authorization != EAuthorization.Student)
                 {
@@ -236,20 +190,10 @@ namespace University.Server.Controllers
                 }
             }
 
-            var result = await _userService.PatchAssignmentsAsync(id, patch);
+            var updatedUser = await _userService.PatchAssignmentsAsync(id, patch);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var updatedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
-                    return Ok(updatedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+            return Ok(updatedResource);
         }
 
         /// <summary>
@@ -261,23 +205,13 @@ namespace University.Server.Controllers
         [HttpGet("{id}", Name = "Get User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserResource))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var result = await _userService.GetAsync(id);
+            var retrievedUser = await _userService.GetAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status200OK:
-                    if (result.ResponseEntity == null)
-                    {
-                        return StatusCode(500);
-                    }
-                    var retrievedResource = _mapper.Map<User, UserResource>(result.ResponseEntity);
-                    return Ok(retrievedResource);
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            var retrievedResource = _mapper.Map<User, UserResource>(retrievedUser);
+            return Ok(retrievedResource);
         }
 
         /// <summary>
@@ -289,6 +223,7 @@ namespace University.Server.Controllers
         [HttpGet(Name = "Get all Users matching filter")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserResource>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
         {
             var users = await _userService.ListAsync(authorization);
@@ -305,6 +240,7 @@ namespace University.Server.Controllers
         [HttpGet("{id}/lectures", Name = "Get Lectures of User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ExtendedLectureResource>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IEnumerable<ExtendedLectureResource>> GetLecturesAsync(Guid id)
         {
             var semesterModules = await _semesterService.GetActiveSemesterModulesOfUser(id);
@@ -320,20 +256,14 @@ namespace University.Server.Controllers
         [HttpDelete("{id}", Name = "Delete User By Id")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [Permission(EAuthorization.Administrator)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var result = await _userService.DeleteAsync(id);
+            await _userService.DeleteAsync(id);
 
-            switch (result.StatusCode)
-            {
-                case StatusCodes.Status204NoContent:
-                    return NoContent();
-                default:
-                    return StatusCode(result.StatusCode, result.Message);
-            }
+            return NoContent();
         }
 
     }
