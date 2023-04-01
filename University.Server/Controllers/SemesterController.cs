@@ -174,11 +174,25 @@ namespace University.Server.Controllers
         [HttpPost("{id}/activate", Name = "Set status of semester to active")]
         [Produces("application/json")]
         [Permission(EAuthorization.Administrator)]
-        [ProducesResponseType(StatusCodes.Status501NotImplemented)]
-        [Obsolete]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SemesterResource))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PostActivateAsync(Guid id)
         {
-            return StatusCode(StatusCodes.Status501NotImplemented);
+            var result = await _semesterService.CalculateAsync(id);
+
+            switch (result.StatusCode)
+            {
+                case StatusCodes.Status201Created:
+                    if (result.ResponseEntity == null)
+                    {
+                        return StatusCode(500);
+                    }
+                    var createdResource = _mapper.Map<Semester, SemesterResource>(result.ResponseEntity);
+                    return Created("", value: createdResource);
+                default:
+                    return StatusCode(result.StatusCode, result.Message);
+            }
         }
     }
 }

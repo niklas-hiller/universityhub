@@ -18,12 +18,14 @@ namespace University.Server.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly ISemesterService _semesterService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, ISemesterService semesterService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _semesterService = semesterService;
             _mapper = mapper;
         }
 
@@ -305,7 +307,7 @@ namespace University.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ExtendedLectureResource>))]
         public async Task<IEnumerable<ExtendedLectureResource>> GetLecturesAsync(Guid id)
         {
-            var semesterModules = await _userService.GetActiveSemesterModulesOfUser(id);
+            var semesterModules = await _semesterService.GetActiveSemesterModulesOfUser(id);
             var resources = semesterModules.SelectMany(_mapper.Map<SemesterModule, IEnumerable<ExtendedLectureResource>>);
             return resources;
         }
