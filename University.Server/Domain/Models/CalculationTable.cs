@@ -1,6 +1,5 @@
 ﻿namespace University.Server.Domain.Models
 {
-    // T1 = professor , T2 = module
     public class CalculationTable<T1, T2> where T1 : Base where T2 : Base
     {
         public List<CalculationRow<T1, T2>> Rows { get; set; } = new List<CalculationRow<T1, T2>>();
@@ -12,8 +11,8 @@
                                  .ToList();
             foreach (var row in sortedRows)
             {
-                if (condition != null 
-                    ? row.TryAssign(assignableObject, condition) 
+                if (condition != null
+                    ? row.TryAssign(assignableObject, condition)
                     : row.TryAssign(assignableObject))
                 {
                     return true;

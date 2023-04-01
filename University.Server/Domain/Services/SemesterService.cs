@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System.Linq;
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Repositories;
@@ -15,7 +14,7 @@ namespace University.Server.Domain.Services
         private readonly ILocationService _locationService;
         private readonly ICourseService _courseService;
 
-        public SemesterService(ILogger<SemesterService> logger, ICosmosDbRepository<Semester, SemesterEntity> semesterRepository, 
+        public SemesterService(ILogger<SemesterService> logger, ICosmosDbRepository<Semester, SemesterEntity> semesterRepository,
             IUserService userService, ILocationService locationService, ICourseService courseService)
         {
             _logger = logger;
@@ -31,7 +30,7 @@ namespace University.Server.Domain.Services
             IEnumerable<User> professors = await _userService.GetManyAsync(semester.Modules.SelectMany(module => module.ReferenceModule.ProfessorIds).ToList());
 
             // Insert Professor + Module in Calculation Table
-            foreach(var semesterModule in semester.Modules)
+            foreach (var semesterModule in semester.Modules)
             {
                 semesterModule.ReferenceModule.ProfessorIds.ToList().ForEach(id =>
                 {
@@ -44,7 +43,7 @@ namespace University.Server.Domain.Services
             bool success = calculationTable.Calculate(semester.Modules.Select(module => module.ReferenceModule).ToList());
             if (!success)
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("There was an error when calculating which professor to assign to each module of the semester. Does every module have atleast one professor?");
             }
 
             // Assign Professor to the actual semester module
@@ -83,7 +82,7 @@ namespace University.Server.Domain.Services
             bool success = calculationTable.Calculate(semester.Modules.Select(module => module.ReferenceModule).ToList());
             if (!success)
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("There was an error when calculating which location to assign to each module of the semester. Does every module have atleast one location with enough size?");
             }
 
             // Assign Location to the actual semester module
@@ -101,7 +100,7 @@ namespace University.Server.Domain.Services
             return result;
         }
 
-        private async Task<Dictionary<SemesterModule, IEnumerable<Lecture>>> CalculateLectures(Semester semester, 
+        private async Task<Dictionary<SemesterModule, IEnumerable<Lecture>>> CalculateLectures(Semester semester,
             Dictionary<SemesterModule, User> professorAssignments, Dictionary<SemesterModule, Location> locationAssignments)
         {
             const int CREDIT_POINT_FACTOR = 3;
@@ -137,7 +136,8 @@ namespace University.Server.Domain.Services
             var lectureOffset = new TimeSpan(0, 10, 0); // Time between lecture timeslots
             var startDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 9, 0, 0); // First lecture starts at 9 AM
             var endDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 17, 0, 0); // Last lecture starts at 5 PM
-            bool success = calculationTable.Calculate(semester.Modules.SelectMany(module => module.Lectures).ToList(), (row, lecture) => {
+            bool success = calculationTable.Calculate(semester.Modules.SelectMany(module => module.Lectures).ToList(), (row, lecture) =>
+            {
                 // Confirm that the module does not have all it's lectures yet
                 if (row.Assigned.Count >= row.Target.ReferenceModule.CreditPoints * CREDIT_POINT_FACTOR)
                 {
@@ -165,7 +165,7 @@ namespace University.Server.Domain.Services
                 {
                     assignableObject.Duration = LECTURE_DURATION;
                     assignableObject.Date = currentTime.Date;
-                } 
+                }
                 else
                 {
                     // Clean up list
@@ -186,7 +186,7 @@ namespace University.Server.Domain.Services
             });
             if (!success)
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("There was an error when calculating the lectures of each module this semester.");
             }
 
             // Assign Location to the actual semester module
@@ -209,30 +209,42 @@ namespace University.Server.Domain.Services
             if (semester.Active)
                 return new Response<Semester>(StatusCodes.Status400BadRequest, "Semester already active.");
 
-            // Calculation of Professors and Locations
-            Dictionary<SemesterModule, User> professorAssignments = await CalculateProfessors(semester);
-            Dictionary<SemesterModule, Location> locationAssignments = await CalculateLocations(semester);
-
-            // Calculation of Lecture Date (Requires Professors and Locations)
-            Dictionary<SemesterModule, IEnumerable<Lecture>> lectureAssignments = await CalculateLectures(semester, professorAssignments, locationAssignments);
-
-            // Update Semester Object
-            semester.Active = true;
-            foreach (var semesterModule in semester.Modules)
+            try
             {
-                // Assing professors
-                semesterModule.Professor = professorAssignments[semesterModule];
-                // Assign lectures
-                semesterModule.Lectures = lectureAssignments[semesterModule].ToList();
-                // Assign locations
-                foreach (var lecture in semesterModule.Lectures)
+                // Calculation of Professors and Locations
+                Dictionary<SemesterModule, User> professorAssignments = await CalculateProfessors(semester);
+                Dictionary<SemesterModule, Location> locationAssignments = await CalculateLocations(semester);
+
+                // Calculation of Lecture Date (Requires Professors and Locations)
+                Dictionary<SemesterModule, IEnumerable<Lecture>> lectureAssignments = await CalculateLectures(semester, professorAssignments, locationAssignments);
+
+                // Update Semester Object
+                semester.Active = true;
+                foreach (var semesterModule in semester.Modules)
                 {
-                    lecture.CreatedAt = DateTime.Now;
-                    lecture.UpdatedAt = DateTime.Now;
-                    lecture.Location = locationAssignments[semesterModule];
+                    // Assing professors
+                    semesterModule.Professor = professorAssignments[semesterModule];
+                    // Assign lectures
+                    semesterModule.Lectures = lectureAssignments[semesterModule].ToList();
+                    // Assign locations
+                    foreach (var lecture in semesterModule.Lectures)
+                    {
+                        lecture.CreatedAt = DateTime.Now;
+                        lecture.UpdatedAt = DateTime.Now;
+                        lecture.Location = locationAssignments[semesterModule];
+                    }
                 }
             }
+            catch (InvalidDataException ex)
+            {
+                return new Response<Semester>(StatusCodes.Status400BadRequest, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return new Response<Semester>(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
+            // Update Database
             try
             {
                 await _semesterRepository.UpdateItemAsync(semester.Id, semester);

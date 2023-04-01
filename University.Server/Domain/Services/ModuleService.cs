@@ -65,7 +65,7 @@ namespace University.Server.Domain.Services
             {
                 var module = await _moduleRepository.GetItemAsync(id);
 
-                if(module.IsArchived && excludeArchived)
+                if (module.IsArchived && excludeArchived)
                 {
                     return null;
                 }
