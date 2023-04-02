@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class CalculationRow<T1, T2> where T1 : Base where T2 : Base
+    public class CalculationRow<T1, T2> where T1 : class where T2 : class
     {
         public T1 Target { get; set; }
         public ICollection<T2> Available { get; set; }

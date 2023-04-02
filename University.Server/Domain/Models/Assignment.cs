@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class Assignment : Base
+    public class Assignment
     {
         public EModuleStatus Status { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class Lecture : Base
+    public class Lecture
     {
         public int Duration { get; set; }
         public Location Location { get; set; }

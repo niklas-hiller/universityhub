@@ -235,8 +235,6 @@ namespace University.Server.Domain.Services
                     // Assign locations
                     foreach (var lecture in semesterModule.Lectures)
                     {
-                        lecture.CreatedAt = DateTime.Now;
-                        lecture.UpdatedAt = DateTime.Now;
                         lecture.Location = locationAssignments[semesterModule];
                     }
                 }
@@ -363,7 +361,6 @@ namespace University.Server.Domain.Services
                 {
                     var semesterModule = new SemesterModule()
                     {
-                        Id = Guid.NewGuid(),
                         Professor = null,
                         ReferenceModule = add,
                     };
@@ -374,7 +371,7 @@ namespace University.Server.Domain.Services
             _logger.LogInformation($"Initiating removing {patch.RemoveEntity.Count} modules from semester...");
             foreach (var remove in patch.RemoveEntity)
             {
-                if (existingSemester.Modules.Any(x => x.Id == remove.Id))
+                if (existingSemester.Modules.Any(x => x.ReferenceModule.Id == remove.Id))
                 {
                     var semesterModule = existingSemester.Modules.First(x => x.ReferenceModule.Id == remove.Id);
                     existingSemester.Modules.Remove(semesterModule);

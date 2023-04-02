@@ -135,7 +135,6 @@ namespace University.Server.Domain.Services
                 {
                     var assignment = new Assignment()
                     {
-                        Id = Guid.NewGuid(),
                         Status = existingUser.Authorization == EAuthorization.Professor ? EModuleStatus.Educates : EModuleStatus.Enrolled,
                         ReferenceModule = add
                     };
