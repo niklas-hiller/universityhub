@@ -129,11 +129,11 @@ namespace University.Server.Domain.Services
 
             // Start Calculation
             var currentModules = new List<SemesterModule>(); // List of Modules that are already used in current timeframe
-            var currentTime = semester.StartDate.Date;   // Current timeframe
             var lectureDuration = new TimeSpan(0, LECTURE_DURATION, 0);
             var lectureOffset = new TimeSpan(0, 10, 0); // Time between lecture timeslots
-            var startDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 9, 0, 0); // First lecture starts at 9 AM
-            var endDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 17, 0, 0); // Last lecture starts at 5 PM
+            var startDay = new DateTime(semester.StartDate.Year, semester.StartDate.Month, semester.StartDate.Day, 9, 0, 0); // First lecture starts at 9 AM
+            var endDay = new DateTime(semester.StartDate.Year, semester.StartDate.Month, semester.StartDate.Day, 17, 0, 0); // Last lecture starts at 5 PM
+            var currentTime = startDay;   // Current timeframe
             _logger.LogInformation($"Semester start at: {semester.StartDate}");
             _logger.LogInformation($"Semester ends at: {semester.EndDate}");
             bool success = calculationTable.Calculate(lectures, (row, lecture) =>
@@ -166,7 +166,7 @@ namespace University.Server.Domain.Services
                 {
                     _logger.LogInformation($"Found possible module for this timeframe! ({currentTime})");
                     assignableObject.Duration = LECTURE_DURATION;
-                    assignableObject.Date = currentTime.Date;
+                    assignableObject.Date = currentTime;
                 }
                 else
                 {
