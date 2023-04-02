@@ -42,7 +42,7 @@ namespace University.Server.Domain.Persistence.Repositories
         {
             var results = new List<T2>();
 
-            using(var iterator = _container.GetItemQueryIterator<T2>(new QueryDefinition(query)))
+            using (var iterator = _container.GetItemQueryIterator<T2>(new QueryDefinition(query)))
             {
                 while (iterator.HasMoreResults)
                 {
