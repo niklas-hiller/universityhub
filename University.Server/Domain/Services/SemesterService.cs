@@ -322,21 +322,6 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Semester?> GetAsyncNullable(Guid id)
-        {
-            try
-            {
-                var semester = await _semesterRepository.GetItemAsync(id);
-
-                return semester;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
-        }
-
         public async Task<Semester> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing semester...");

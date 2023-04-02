@@ -10,9 +10,7 @@ namespace University.Server.Domain.Services
 
         Task<IEnumerable<User>> GetManyAsync(IEnumerable<Guid> ids);
 
-        Task<User?> GetAsyncNullable(Guid id);
-
-        Task<User> GetAsync(Guid id);
+        Task<User> GetAsync(Guid id, bool excludeArchived = true);
 
         Task<IEnumerable<User>> ListAsync(EAuthorization? authorization);
 

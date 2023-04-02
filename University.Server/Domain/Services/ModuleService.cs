@@ -59,27 +59,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Module?> GetAsyncNullable(Guid id, bool excludeArchived = true)
-        {
-            try
-            {
-                var module = await _moduleRepository.GetItemAsync(id);
-
-                if (module.IsArchived && excludeArchived)
-                {
-                    return null;
-                }
-
-                return module;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
-        }
-
-        public async Task<Module> GetAsync(Guid id)
+        public async Task<Module> GetAsync(Guid id, bool excludeArchived = true)
         {
             _logger.LogInformation("Attempting to retrieve existing module...");
 
@@ -87,7 +67,7 @@ namespace University.Server.Domain.Services
             {
                 var module = await _moduleRepository.GetItemAsync(id);
 
-                if (module.IsArchived)
+                if (module.IsArchived && excludeArchived)
                 {
                     throw new NotFoundException("Module not found.");
                 }

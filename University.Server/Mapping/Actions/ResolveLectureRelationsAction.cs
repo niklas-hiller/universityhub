@@ -16,7 +16,7 @@ namespace University.Server.Mapping.Actions
 
         public void Process(LectureEntity source, Lecture destination, ResolutionContext context)
         {
-            destination.Location = _locationService.GetAsyncNullable(source.LocationId).GetAwaiter().GetResult();
+            destination.Location = _locationService.GetAsync(source.LocationId).GetAwaiter().GetResult();
         }
     }
 }

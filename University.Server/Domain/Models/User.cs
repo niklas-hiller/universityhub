@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class User : Base
+    public class User : Archivable
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

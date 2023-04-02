@@ -8,8 +8,6 @@ namespace University.Server.Domain.Services
 
         Task<IEnumerable<Course>> GetManyAsync(IEnumerable<Guid> ids);
 
-        Task<Course?> GetAsyncNullable(Guid id);
-
         Task<Course> GetAsync(Guid id);
 
         Task<IEnumerable<Course>> ListAsync();
