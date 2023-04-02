@@ -14,8 +14,6 @@ using University.Server.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ServicePointManager.DefaultConnectionLimit = 20;
-
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(opts =>
 {
