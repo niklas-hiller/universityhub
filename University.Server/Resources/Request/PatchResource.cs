@@ -2,7 +2,7 @@ namespace University.Server.Resources.Request
 {
     public class PatchResource
     {
-        public ICollection<Guid> Add { get; set; }
-        public ICollection<Guid> Remove { get; set; }
+        public IEnumerable<Guid> Add { get; set; }
+        public IEnumerable<Guid> Remove { get; set; }
     }
 }

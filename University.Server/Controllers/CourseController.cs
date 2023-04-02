@@ -46,9 +46,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var course = _mapper.Map<SaveCourseResource, Course>(resource);
-            var createdCourse = await _courseService.SaveAsync(course);
 
+            var createdCourse = await _courseService.SaveAsync(course);
             var createdResource = _mapper.Map<Course, CourseResource>(createdCourse);
+
             return Created("", value: createdResource);
         }
 
@@ -73,9 +74,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var course = _mapper.Map<UpdateCourseResource, Course>(resource);
-            var updatedCourse = await _courseService.UpdateAsync(id, course);
 
+            var updatedCourse = await _courseService.UpdateAsync(id, course);
             var updatedResource = _mapper.Map<Course, CourseResource>(updatedCourse);
+
             return Ok(updatedResource);
         }
 
@@ -100,9 +102,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var patch = _mapper.Map<PatchResource, PatchModel<User>>(resource);
-            var updatedCourse = await _courseService.PatchStudentsAsync(id, patch);
 
+            var updatedCourse = await _courseService.PatchStudentsAsync(id, patch);
             var updatedResource = _mapper.Map<Course, CourseResource>(updatedCourse);
+
             return Ok(updatedResource);
         }
 
@@ -127,9 +130,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
-            var updatedCourse = await _courseService.PatchModulesAsync(id, patch);
 
+            var updatedCourse = await _courseService.PatchModulesAsync(id, patch);
             var updatedResource = _mapper.Map<Course, CourseResource>(updatedCourse);
+
             return Ok(updatedResource);
         }
 
@@ -146,8 +150,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var retrievedCourse = await _courseService.GetAsync(id);
-
             var retrievedResource = _mapper.Map<Course, CourseResource>(retrievedCourse);
+
             return Ok(retrievedResource);
         }
 
@@ -159,11 +163,12 @@ namespace University.Server.Controllers
         [HttpGet(Name = "Get all Courses")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CourseResource>))]
-        public async Task<IEnumerable<CourseResource>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var courses = await _courseService.ListAsync();
-            var resources = _mapper.Map<IEnumerable<Course>, IEnumerable<CourseResource>>(courses);
-            return resources;
+            var retrievedCourses = await _courseService.ListAsync();
+            var retrievedResources = _mapper.Map<IEnumerable<Course>, IEnumerable<CourseResource>>(retrievedCourses);
+
+            return Ok(retrievedResources);
         }
 
         /// <summary>

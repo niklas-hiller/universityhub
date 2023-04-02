@@ -283,7 +283,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Semester>> GetManyAsync(ICollection<Guid> ids)
+        public async Task<IEnumerable<Semester>> GetManyAsync(IEnumerable<Guid> ids)
         {
             if (ids.IsNullOrEmpty())
             {

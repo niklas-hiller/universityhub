@@ -47,9 +47,10 @@ namespace University.Server.Controllers
             }
 
             var module = _mapper.Map<SaveModuleResource, Module>(resource);
-            var createdModule = await _moduleService.SaveAsync(module);
 
+            var createdModule = await _moduleService.SaveAsync(module);
             var createdResource = _mapper.Map<Module, ModuleResource>(createdModule);
+
             return Created("", value: createdResource);
         }
 
@@ -74,9 +75,10 @@ namespace University.Server.Controllers
             }
 
             var module = _mapper.Map<UpdateModuleResource, Module>(resource);
-            var updatedModule = await _moduleService.UpdateAsync(id, module);
 
+            var updatedModule = await _moduleService.UpdateAsync(id, module);
             var updatedResource = _mapper.Map<Module, ModuleResource>(updatedModule);
+
             return Ok(updatedResource);
         }
 
@@ -101,9 +103,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var patch = _mapper.Map<PatchResource, PatchModel<User>>(resource);
-            var updatedModule = await _moduleService.PatchProfessorsAsync(id, patch);
 
+            var updatedModule = await _moduleService.PatchProfessorsAsync(id, patch);
             var updatedResource = _mapper.Map<Module, ModuleResource>(updatedModule);
+
             return Ok(updatedResource);
         }
 
@@ -120,8 +123,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var retrievedModule = await _moduleService.GetAsync(id);
-
             var retrievedResource = _mapper.Map<Module, ModuleResource>(retrievedModule);
+
             return Ok(retrievedResource);
         }
 
@@ -135,11 +138,12 @@ namespace University.Server.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ModuleResource>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
-        public async Task<IEnumerable<ModuleResource>> GetFilteredAsync(EModuleType? moduleType)
+        public async Task<IActionResult> GetFilteredAsync(EModuleType? moduleType)
         {
-            var modules = await _moduleService.ListAsync(moduleType);
-            var resources = _mapper.Map<IEnumerable<Module>, IEnumerable<ModuleResource>>(modules);
-            return resources;
+            var retrievedModules = await _moduleService.ListAsync(moduleType);
+            var retrievedResources = _mapper.Map<IEnumerable<Module>, IEnumerable<ModuleResource>>(retrievedModules);
+
+            return Ok(retrievedResources);
         }
 
         /// <summary>

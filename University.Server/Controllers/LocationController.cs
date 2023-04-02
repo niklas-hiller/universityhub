@@ -46,9 +46,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var location = _mapper.Map<SaveLocationResource, Location>(resource);
-            var createdLocation = await _locationService.SaveAsync(location);
 
+            var createdLocation = await _locationService.SaveAsync(location);
             var createdResource = _mapper.Map<Location, LocationResource>(createdLocation);
+
             return Created("", value: createdResource);
         }
 
@@ -73,9 +74,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var location = _mapper.Map<UpdateLocationResource, Location>(resource);
-            var updatedLocation = await _locationService.UpdateAsync(id, location);
 
+            var updatedLocation = await _locationService.UpdateAsync(id, location);
             var updatedResource = _mapper.Map<Location, LocationResource>(updatedLocation);
+
             return Ok(updatedResource);
         }
 
@@ -92,8 +94,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var retrievedLocation = await _locationService.GetAsync(id);
-
             var retrievedResource = _mapper.Map<Location, LocationResource>(retrievedLocation);
+
             return Ok(retrievedResource);
         }
 
@@ -105,11 +107,12 @@ namespace University.Server.Controllers
         [HttpGet(Name = "Get all Locations")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LocationResource>))]
-        public async Task<IEnumerable<LocationResource>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var locations = await _locationService.ListAsync();
-            var resources = _mapper.Map<IEnumerable<Location>, IEnumerable<LocationResource>>(locations);
-            return resources;
+            var retrievedLocations = await _locationService.ListAsync();
+            var retrievedResources = _mapper.Map<IEnumerable<Location>, IEnumerable<LocationResource>>(retrievedLocations);
+
+            return Ok(retrievedResources);
         }
 
         /// <summary>

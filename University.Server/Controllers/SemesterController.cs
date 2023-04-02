@@ -46,9 +46,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var semester = _mapper.Map<SaveSemesterResource, Semester>(resource);
-            var createdSemester = await _semesterService.SaveAsync(semester);
 
+            var createdSemester = await _semesterService.SaveAsync(semester);
             var createdResource = _mapper.Map<Semester, SemesterResource>(createdSemester);
+
             return Created("", value: createdResource);
         }
 
@@ -73,9 +74,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var patch = _mapper.Map<PatchResource, PatchModel<Module>>(resource);
-            var updatedSemester = await _semesterService.PatchModulesAsync(id, patch);
 
+            var updatedSemester = await _semesterService.PatchModulesAsync(id, patch);
             var updatedResource = _mapper.Map<Semester, SemesterResource>(updatedSemester);
+
             return Ok(updatedResource);
         }
 
@@ -92,8 +94,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var retrievedSemester = await _semesterService.GetAsync(id);
-
             var retrievedResource = _mapper.Map<Semester, SemesterResource>(retrievedSemester);
+
             return Ok(retrievedResource);
         }
 
@@ -105,11 +107,12 @@ namespace University.Server.Controllers
         [HttpGet(Name = "Get all Semesters")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SemesterResource>))]
-        public async Task<IEnumerable<SemesterResource>> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var semesters = await _semesterService.ListAsync();
-            var resources = _mapper.Map<IEnumerable<Semester>, IEnumerable<SemesterResource>>(semesters);
-            return resources;
+            var retrievedSemesters = await _semesterService.ListAsync();
+            var retrievedResources = _mapper.Map<IEnumerable<Semester>, IEnumerable<SemesterResource>>(retrievedSemesters);
+
+            return Ok(retrievedResources);
         }
 
         /// <summary>
@@ -145,8 +148,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> PostActivateAsync(Guid id)
         {
             var createdSemester = await _semesterService.CalculateAsync(id);
-
             var createdResource = _mapper.Map<Semester, SemesterResource>(createdSemester);
+
             return Created("", value: createdResource);
         }
     }
