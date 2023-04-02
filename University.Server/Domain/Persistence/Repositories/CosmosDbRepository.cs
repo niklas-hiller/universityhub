@@ -34,14 +34,16 @@ namespace University.Server.Domain.Persistence.Repositories
 
         public async Task<IEnumerable<T1>> GetItemsAsync(string query)
         {
-            var iterator = _container.GetItemQueryIterator<T2>(new QueryDefinition(query));
             var results = new List<T2>();
 
-            while (iterator.HasMoreResults)
+            using(var iterator = _container.GetItemQueryIterator<T2>(new QueryDefinition(query)))
             {
-                var response = await iterator.ReadNextAsync();
-                results.AddRange(response.ToList());
-            }
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.ToList());
+                }
+            };
 
             return results.Select(r => _mapper.Map<T2, T1>(r));
         }
