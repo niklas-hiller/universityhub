@@ -16,7 +16,7 @@ namespace University.Server.Mapping.Actions
 
         public void Process(Module source, ModuleResource destination, ResolutionContext context)
         {
-            destination.Professors = source.ProfessorIds.Select(id => context.Mapper.Map<UserResource>(_userService.GetAsync(id).GetAwaiter().GetResult())).ToList();
+            destination.Professors = source.ProfessorIds.Select(id => context.Mapper.Map<UserResource>(_userService.GetAsync(id, false).GetAwaiter().GetResult())).ToList();
         }
     }
 }
