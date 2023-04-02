@@ -154,9 +154,9 @@ namespace University.Server.Domain.Services
                     return false;
                 }
                 // Confirm that the course that has this module, is available
-                if (currentModules.Any(currentModule => 
-                    courses.Any(course => 
-                        course.Modules.Any(courseModule => courseModule.Id == row.Target.ReferenceModule.Id) 
+                if (currentModules.Any(currentModule =>
+                    courses.Any(course =>
+                        course.Modules.Any(courseModule => courseModule.Id == row.Target.ReferenceModule.Id)
                         && course.Modules.Any(courseModule => courseModule.Id == currentModule.ReferenceModule.Id)
                     )
                 ))
