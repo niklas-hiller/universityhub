@@ -60,21 +60,6 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Course?> GetAsyncNullable(Guid id)
-        {
-            try
-            {
-                var course = await _courseRepository.GetItemAsync(id);
-
-                return course;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
-        }
-
         public async Task<Course> GetAsync(Guid id)
         {
             _logger.LogInformation("Attempting to retrieve existing course...");
@@ -277,6 +262,19 @@ namespace University.Server.Domain.Services
         public async Task DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete existing course...");
+
+            var existingCourse = await GetAsync(id);
+
+            var patchModules = new PatchModel<Module>();
+            foreach (var module in existingCourse.Modules)
+            {
+                patchModules.RemoveEntity.Add(module);
+            }
+            _logger.LogInformation($"Initiating removing {patchModules.RemoveEntity.Count} modules of this course from users of this course...");
+            foreach (var user in existingCourse.Students)
+            {
+                await _userService.PatchAssignmentsAsync(user.Id, patchModules);
+            }
 
             try
             {

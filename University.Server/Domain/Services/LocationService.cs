@@ -55,28 +55,18 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<Location?> GetAsyncNullable(Guid id)
-        {
-            try
-            {
-                var location = await _locationRepository.GetItemAsync(id);
-
-                return location;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
-        }
-
-        public async Task<Location> GetAsync(Guid id)
+        public async Task<Location> GetAsync(Guid id, bool excludeArchived = true)
         {
             _logger.LogInformation("Attempting to retrieve existing location...");
 
             try
             {
                 var location = await _locationRepository.GetItemAsync(id);
+
+                if (location.IsArchived && excludeArchived)
+                {
+                    throw new NotFoundException("Location not found.");
+                }
 
                 return location;
             }
@@ -94,7 +84,7 @@ namespace University.Server.Domain.Services
         {
             _logger.LogInformation("Attempting to retrieve existing locations...");
 
-            return await _locationRepository.GetItemsAsync("SELECT * FROM c");
+            return await _locationRepository.GetItemsAsync("SELECT * FROM c WHERE c.IsArchived = false");
         }
 
         public async Task<Location> UpdateAsync(Guid id, Location location)

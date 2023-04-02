@@ -8,9 +8,7 @@ namespace University.Server.Domain.Services
 
         Task<IEnumerable<Module>> GetManyAsync(IEnumerable<Guid> ids);
 
-        Task<Module?> GetAsyncNullable(Guid id, bool excludeArchived = true);
-
-        Task<Module> GetAsync(Guid id);
+        Task<Module> GetAsync(Guid id, bool excludeArchived = true);
 
         Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType);
 

@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class Location : Base
+    public class Location : Archivable
     {
         public string Name { get; set; }
         public Coordinates Coordinates { get; set; }

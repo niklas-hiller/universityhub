@@ -40,7 +40,7 @@ namespace University.Server.Domain.Services
         public async Task<User?> GetUserByCredentials(string email, string password)
         {
             var users = await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Email = '{email}' AND c.Password = '{Sha256Hash(password)}'");
-            return users.FirstOrDefault();
+            return users.FirstOrDefault(user => !user.IsArchived);
         }
 
         public async Task<User> SaveAsync(User user)
@@ -83,28 +83,18 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<User?> GetAsyncNullable(Guid id)
-        {
-            try
-            {
-                var user = await _userRepository.GetItemAsync(id);
-
-                return user;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
-        }
-
-        public async Task<User> GetAsync(Guid id)
+        public async Task<User> GetAsync(Guid id, bool excludeArchived = true)
         {
             _logger.LogInformation("Attempting to retrieve existing user...");
 
             try
             {
                 var user = await _userRepository.GetItemAsync(id);
+
+                if (user.IsArchived && excludeArchived)
+                {
+                    throw new NotFoundException("User not found.");
+                }
 
                 return user;
             }
@@ -124,11 +114,11 @@ namespace University.Server.Domain.Services
 
             if (authorization != null)
             {
-                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = {(byte)authorization}");
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.Authorization = {(byte)authorization} AND c.IsArchived = false");
             }
             else
             {
-                return await _userRepository.GetItemsAsync($"SELECT * FROM c");
+                return await _userRepository.GetItemsAsync($"SELECT * FROM c WHERE c.IsArchived = false");
             }
         }
 

@@ -8,9 +8,7 @@ namespace University.Server.Domain.Services
 
         Task<IEnumerable<Location>> GetManyAsync(IEnumerable<Guid> ids);
 
-        Task<Location?> GetAsyncNullable(Guid id);
-
-        Task<Location> GetAsync(Guid id);
+        Task<Location> GetAsync(Guid id, bool excludeArchived = true);
 
         Task<IEnumerable<Location>> ListAsync();
 

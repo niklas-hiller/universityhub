@@ -12,8 +12,6 @@ namespace University.Server.Domain.Services
 
         Task<IEnumerable<Semester>> GetManyAsyncByTime(DateTime containsDate, TimeSpan? delta = null);
 
-        Task<Semester?> GetAsyncNullable(Guid id);
-
         Task<Semester> GetAsync(Guid id);
 
         Task<IEnumerable<Semester>> ListAsync();
