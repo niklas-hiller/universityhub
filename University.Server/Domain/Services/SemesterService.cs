@@ -114,11 +114,9 @@ namespace University.Server.Domain.Services
             List<Lecture> lectures = new List<Lecture>();
             for (int i = 0; i < totalLectures; i++)
             {
-                lectures.Add(new Lecture()
-                {
-                    Duration = LECTURE_DURATION,
-                });
+                lectures.Add(new Lecture());
             }
+            _logger.LogInformation($"Generating {lectures.Count} Lectures...");
 
             // Insert Location + Module in Calculation Table
             foreach (var semesterModule in semester.Modules)
@@ -136,7 +134,9 @@ namespace University.Server.Domain.Services
             var lectureOffset = new TimeSpan(0, 10, 0); // Time between lecture timeslots
             var startDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 9, 0, 0); // First lecture starts at 9 AM
             var endDay = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 17, 0, 0); // Last lecture starts at 5 PM
-            bool success = calculationTable.Calculate(semester.Modules.SelectMany(module => module.Lectures).ToList(), (row, lecture) =>
+            _logger.LogInformation($"Semester start at: {semester.StartDate}");
+            _logger.LogInformation($"Semester ends at: {semester.EndDate}");
+            bool success = calculationTable.Calculate(lectures, (row, lecture) =>
             {
                 // Confirm that the module does not have all it's lectures yet
                 if (row.Assigned.Count >= row.Target.ReferenceModule.CreditPoints * CREDIT_POINT_FACTOR)
@@ -158,31 +158,34 @@ namespace University.Server.Domain.Services
                 {
                     return false;
                 }
+                currentModules.Add(row.Target);
                 return true;
             }, (assignableObject, iterationSuccess) =>
             {
                 if (iterationSuccess)
                 {
+                    _logger.LogInformation($"Found possible module for this timeframe! ({currentTime})");
                     assignableObject.Duration = LECTURE_DURATION;
                     assignableObject.Date = currentTime.Date;
                 }
                 else
                 {
+                    _logger.LogInformation($"Couldn't find any more possible modules for this timeframe. ({currentTime})");
                     // Clean up list
                     currentModules.Clear();
                     // Go to next timeslot
-                    currentTime.Add(lectureDuration);
-                    currentTime.Add(lectureOffset);
+                    currentTime = currentTime.Add(lectureDuration);
+                    currentTime = currentTime.Add(lectureOffset);
                     if (currentTime.TimeOfDay > endDay.TimeOfDay)
                     {
                         // Add one day, and then substract again the difference to the start of day.
-                        currentTime.AddDays(1).Subtract(currentTime.TimeOfDay - startDay.TimeOfDay);
+                        currentTime = currentTime.AddDays(1).Subtract(currentTime.TimeOfDay - startDay.TimeOfDay);
                     }
                 }
 
                 // If the iteration was successful, there are no more lectures, if it failed, there are still lectures
                 // true = assign again, false = do not assign again
-                return iterationSuccess;
+                return !iterationSuccess;
             });
             if (!success)
             {
@@ -214,9 +217,12 @@ namespace University.Server.Domain.Services
                 // Calculation of Professors and Locations
                 Dictionary<SemesterModule, User> professorAssignments = await CalculateProfessors(semester);
                 Dictionary<SemesterModule, Location> locationAssignments = await CalculateLocations(semester);
+                _logger.LogInformation($"Calculated following professor assignments: {professorAssignments}");
+                _logger.LogInformation($"Calculated following location assignments: {locationAssignments}");
 
                 // Calculation of Lecture Date (Requires Professors and Locations)
                 Dictionary<SemesterModule, IEnumerable<Lecture>> lectureAssignments = await CalculateLectures(semester, professorAssignments, locationAssignments);
+                _logger.LogInformation($"Calculated following lecture assignments: {lectureAssignments}");
 
                 // Update Semester Object
                 semester.Active = true;
@@ -304,7 +310,7 @@ namespace University.Server.Domain.Services
         public async Task<IEnumerable<Semester>> GetManyAsyncByTime(DateTime containsDate, TimeSpan? delta = null)
         {
             TimeSpan offset = delta ?? TimeSpan.Zero;
-            var query = $"SELECT * FROM c WHERE c.StartDate <= '{containsDate.Add(offset)}' AND c.EndDate >= '{containsDate.Add(offset.Negate())}'";
+            var query = $"SELECT * FROM c WHERE c.StartDate <= '{containsDate.Add(offset).ToString("yyyy-MM-dd HH:mm:ss.fff")}' AND c.EndDate >= '{containsDate.Add(offset.Negate()).ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
             try
             {
                 return await _semesterRepository.GetItemsAsync(query);
@@ -365,6 +371,7 @@ namespace University.Server.Domain.Services
             if (existingSemester.Active)
                 throw new BadRequestException("Can't add/remove modules to active semester.");
 
+            _logger.LogInformation($"Initiating adding {patch.AddEntity.Count} modules to semester...");
             foreach (var add in patch.AddEntity)
             {
                 if (!existingSemester.Modules.Any(x => x.ReferenceModule.Id == add.Id))
@@ -378,6 +385,8 @@ namespace University.Server.Domain.Services
                     existingSemester.Modules.Add(semesterModule);
                 }
             }
+
+            _logger.LogInformation($"Initiating removing {patch.RemoveEntity.Count} modules from semester...");
             foreach (var remove in patch.RemoveEntity)
             {
                 if (existingSemester.Modules.Any(x => x.Id == remove.Id))
@@ -426,7 +435,10 @@ namespace University.Server.Domain.Services
             var existingUser = await _userService.GetAsync(id);
 
             if (existingUser.Assignments.IsNullOrEmpty())
+            {
+                _logger.LogInformation($"User {id} did not have any assignments!");
                 return Enumerable.Empty<SemesterModule>();
+            }
 
             var activeAssignmentIds = existingUser.Assignments
                 .Where(assignment => assignment.Status == EModuleStatus.Enrolled || assignment.Status == EModuleStatus.Educates)
@@ -434,7 +446,10 @@ namespace University.Server.Domain.Services
 
             var activeSemesters = await GetManyAsyncByTime(DateTime.Now, new TimeSpan(30, 0, 0, 0));
             if (activeSemesters.IsNullOrEmpty())
+            {
+                _logger.LogInformation("Couldn't find any active semester!");
                 return Enumerable.Empty<SemesterModule>();
+            }
 
             var semesterModules = activeSemesters
                 .SelectMany(semester => semester.Modules)
