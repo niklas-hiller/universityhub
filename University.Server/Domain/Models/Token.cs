@@ -4,8 +4,9 @@
     {
         public string Value { get; set; }
 
-        public Token(string token) { 
-            Value = token; 
+        public Token(string token)
+        {
+            Value = token;
         }
     }
 }

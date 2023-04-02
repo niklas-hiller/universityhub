@@ -118,7 +118,6 @@ app.UseGlobalExceptionHandler();
 //     app.UseSwaggerUI();
 // }
 
-
 app.UseSwagger();
 app.UseSwaggerUI();
 

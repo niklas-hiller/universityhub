@@ -151,7 +151,7 @@ namespace University.Server.Controllers
         }
 
         /// <summary>
-        /// Adds/Removes modules to a user (Only Students and only Optional) 
+        /// Adds/Removes modules to a user (Only Students and only Optional)
         /// </summary>
         /// <remarks>This endpoint can only be used by target user or administrators.</remarks>
         /// <param name="id">The id of the user that should be updated.</param>
@@ -271,6 +271,5 @@ namespace University.Server.Controllers
 
             return NoContent();
         }
-
     }
 }

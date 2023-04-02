@@ -1,6 +1,4 @@
-﻿using University.Server.Domain.Models;
-
-namespace University.Server.Domain.Persistence.Entities
+﻿namespace University.Server.Domain.Persistence.Entities
 {
     public class SemesterModuleEntity : BaseEntity
     {

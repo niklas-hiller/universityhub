@@ -15,7 +15,6 @@ namespace University.Server.Controllers
     [Authorize]
     public class ModuleController : Controller
     {
-
         private readonly ILogger<ModuleController> _logger;
         private readonly IModuleService _moduleService;
         private readonly IMapper _mapper;
@@ -163,6 +162,5 @@ namespace University.Server.Controllers
 
             return NoContent();
         }
-
     }
 }
