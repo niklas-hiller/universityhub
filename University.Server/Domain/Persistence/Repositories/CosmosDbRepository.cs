@@ -6,7 +6,7 @@ using University.Server.Domain.Repositories;
 
 namespace University.Server.Domain.Persistence.Repositories
 {
-    public class CosmosDbRepository<T1, T2> : ICosmosDbRepository<T1, T2> where T1 : Base where T2 : BaseEntity
+    public class CosmosDbRepository<T1, T2> : ICosmosDbRepository<T1, T2>, IDisposable where T1 : Base where T2 : BaseEntity
     {
         private readonly IMapper _mapper;
         private readonly ILogger<CosmosDbRepository<T1, T2>> _logger;
@@ -21,8 +21,6 @@ namespace University.Server.Domain.Persistence.Repositories
             var options = new CosmosClientOptions
             {
                 IdleTcpConnectionTimeout = new TimeSpan(0, 0, 10, 0),
-                MaxRequestsPerTcpConnection = 50, // Maximale Anzahl von Anfragen pro Verbindung
-                MaxTcpConnectionsPerEndpoint = 16 // Maximale Anzahl von Verbindungen im Pool
             };
             var cosmosClient = new CosmosClient(connectionString, options);
             var databaseName = "UniversityHub";
@@ -30,6 +28,14 @@ namespace University.Server.Domain.Persistence.Repositories
 
             var database = cosmosClient.CreateDatabaseIfNotExistsAsync(databaseName).Result;
             _container = database.Database.CreateContainerIfNotExistsAsync(containerName, "/id").Result;
+
+            _logger.LogInformation($"Opened database connection to {typeof(T2).Name} container.");
+        }
+
+        public void Dispose()
+        {
+            _container.Database.Client.Dispose();
+            _logger.LogInformation($"Closed database connection to {typeof(T2).Name} container.");
         }
 
         public async Task<IEnumerable<T1>> GetItemsAsync(string query)
