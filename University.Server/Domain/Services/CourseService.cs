@@ -114,6 +114,7 @@ namespace University.Server.Domain.Services
 
             var existingCourse = await GetAsync(id);
 
+            _logger.LogInformation($"Initiating adding {patch.AddEntity.Count} students to course...");
             foreach (var add in patch.AddEntity)
             {
                 if (!existingCourse.Students.Any(x => x.Id == add.Id))
@@ -135,6 +136,8 @@ namespace University.Server.Domain.Services
                     existingCourse.Students.Add(add);
                 }
             }
+
+            _logger.LogInformation($"Initiating removing {patch.RemoveEntity.Count} students from course...");
             foreach (var remove in patch.RemoveEntity)
             {
                 if (existingCourse.Students.Any(x => x.Id == remove.Id))
@@ -153,7 +156,8 @@ namespace University.Server.Domain.Services
 
                     #endregion User Assignment Logic
 
-                    existingCourse.Students.Remove(remove);
+                    var student = existingCourse.Students.First(x => x.Id == remove.Id);
+                    existingCourse.Students.Remove(student);
                 }
             }
 
@@ -185,6 +189,7 @@ namespace University.Server.Domain.Services
 
             var existingCourse = await GetAsync(id);
 
+            _logger.LogInformation($"Initiating adding {patch.AddEntity.Count} modules to course...");
             foreach (var add in patch.AddEntity)
             {
                 if (!existingCourse.Modules.Any(x => x.Id == add.Id))
@@ -205,6 +210,8 @@ namespace University.Server.Domain.Services
                     existingCourse.Modules.Add(add);
                 }
             }
+
+            _logger.LogInformation($"Initiating removing {patch.RemoveEntity.Count} modules from course...");
             foreach (var remove in patch.RemoveEntity)
             {
                 if (existingCourse.Modules.Any(x => x.Id == remove.Id))
@@ -222,7 +229,8 @@ namespace University.Server.Domain.Services
 
                     #endregion User Assignment Logic
 
-                    existingCourse.Modules.Remove(remove);
+                    var module = existingCourse.Modules.First(x => x.Id == remove.Id);
+                    existingCourse.Modules.Remove(module);
                 }
             }
 

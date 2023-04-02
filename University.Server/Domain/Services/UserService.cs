@@ -136,6 +136,9 @@ namespace University.Server.Domain.Services
         {
             var existingUser = await GetAsync(id);
 
+            _logger.LogInformation($"Updating assignments of {existingUser.FirstName} {existingUser.LastName} ({existingUser.Id}).");
+
+            _logger.LogInformation($"Initiating adding {patch.AddEntity.Count} assignments to user...");
             foreach (var add in patch.AddEntity)
             {
                 if (!existingUser.Assignments.Any(x => x.ReferenceModule.Id == add.Id))
@@ -147,14 +150,18 @@ namespace University.Server.Domain.Services
                         ReferenceModule = add
                     };
                     existingUser.Assignments.Add(assignment);
+                    _logger.LogInformation("User did not had assignment and added it now.");
                 }
             }
+
+            _logger.LogInformation($"Initiating removing {patch.RemoveEntity.Count} assignments from user...");
             foreach (var remove in patch.RemoveEntity)
             {
                 if (existingUser.Assignments.Any(x => x.ReferenceModule.Id == remove.Id))
                 {
                     var assignment = existingUser.Assignments.First(x => x.ReferenceModule.Id == remove.Id);
                     existingUser.Assignments.Remove(assignment);
+                    _logger.LogInformation("Found assignment and removed it from user assignments.");
                 }
             }
 
