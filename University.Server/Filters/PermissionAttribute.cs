@@ -25,11 +25,14 @@ namespace University.Server.Filters
                     return user.HasClaim(CLAIM, EAuthorization.Student.ToString())
                         || user.HasClaim(CLAIM, EAuthorization.Professor.ToString())
                         || user.HasClaim(CLAIM, EAuthorization.Administrator.ToString());
+
                 case EAuthorization.Professor:
                     return user.HasClaim(CLAIM, EAuthorization.Professor.ToString())
                         || user.HasClaim(CLAIM, EAuthorization.Administrator.ToString());
+
                 case EAuthorization.Administrator:
                     return user.HasClaim(CLAIM, EAuthorization.Administrator.ToString());
+
                 default:
                     return false;
             }

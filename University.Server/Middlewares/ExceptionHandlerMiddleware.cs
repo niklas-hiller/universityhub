@@ -36,16 +36,19 @@ namespace University.Server.Middlewares
                         problem.Title = "Some conditions were not fulfilled.";
                         problem.Status = (int)e.StatusCode;
                         break;
+
                     case NotFoundException e:
                         problem.Type = "Not Found";
                         problem.Title = "Entity not found.";
                         problem.Status = (int)e.StatusCode;
                         break;
+
                     case InternalServerException e:
                         problem.Type = "Internal Server Error";
                         problem.Title = "Server ran into unexpected error.";
                         problem.Status = (int)e.StatusCode;
                         break;
+
                     default:
                         problem.Type = "Internal Server Error";
                         problem.Title = "Server ran into really unexpected error.";

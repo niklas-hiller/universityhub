@@ -15,7 +15,6 @@ namespace University.Server.Controllers
     [Authorize]
     public class LocationController : Controller
     {
-
         private readonly ILogger<LocationController> _logger;
         private readonly ILocationService _locationService;
         private readonly IMapper _mapper;

@@ -2,7 +2,6 @@
 using University.Server.Domain.Models;
 using University.Server.Mapping.Actions;
 using University.Server.Mapping.Converter;
-using University.Server.Resources;
 using University.Server.Resources.Response;
 
 namespace University.Server.Mapping

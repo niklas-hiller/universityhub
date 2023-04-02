@@ -15,7 +15,6 @@ namespace University.Server.Controllers
     [Authorize]
     public class CourseController : Controller
     {
-
         private readonly ILogger<CourseController> _logger;
         private readonly ICourseService _courseService;
         private readonly IMapper _mapper;

@@ -63,7 +63,6 @@ namespace University.Server.Domain.Services
                 issuedAt: DateTime.Now,
                 signingCredentials: _signingCredentials);
 
-
             var login = new Token(_jwtHandler.WriteToken(jwtSecurityToken));
             return login;
         }

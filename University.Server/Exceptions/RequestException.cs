@@ -22,8 +22,10 @@ namespace University.Server.Exceptions
             {
                 case HttpStatusCode.BadRequest:
                     return new BadRequestException($"CosmosDB: {ex.Message}");
+
                 case HttpStatusCode.NotFound:
                     return new NotFoundException(guid != null ? $"CosmosDB: Couldn't find the entity with id '{guid}'." : $"CosmosDB: {ex.Message}");
+
                 default:
                     return new InternalServerException($"CosmosDB: {ex.Message}");
             }

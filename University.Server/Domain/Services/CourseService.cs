@@ -119,6 +119,7 @@ namespace University.Server.Domain.Services
                 if (!existingCourse.Students.Any(x => x.Id == add.Id))
                 {
                     #region User Assignment Logic
+
                     {
                         var patchModules = new PatchModel<Module>();
                         foreach (var module in existingCourse.Modules)
@@ -128,7 +129,8 @@ namespace University.Server.Domain.Services
 
                         await _userService.PatchAssignmentsAsync(add.Id, patchModules);
                     }
-                    #endregion
+
+                    #endregion User Assignment Logic
 
                     existingCourse.Students.Add(add);
                 }
@@ -138,6 +140,7 @@ namespace University.Server.Domain.Services
                 if (existingCourse.Students.Any(x => x.Id == remove.Id))
                 {
                     #region User Assignment Logic
+
                     {
                         var patchModules = new PatchModel<Module>();
                         foreach (var module in existingCourse.Modules)
@@ -147,7 +150,8 @@ namespace University.Server.Domain.Services
 
                         await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
                     }
-                    #endregion
+
+                    #endregion User Assignment Logic
 
                     existingCourse.Students.Remove(remove);
                 }
@@ -186,6 +190,7 @@ namespace University.Server.Domain.Services
                 if (!existingCourse.Modules.Any(x => x.Id == add.Id))
                 {
                     #region User Assignment Logic
+
                     {
                         foreach (var user in existingCourse.Students)
                         {
@@ -194,7 +199,8 @@ namespace University.Server.Domain.Services
                             await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                         }
                     }
-                    #endregion
+
+                    #endregion User Assignment Logic
 
                     existingCourse.Modules.Add(add);
                 }
@@ -204,6 +210,7 @@ namespace University.Server.Domain.Services
                 if (existingCourse.Modules.Any(x => x.Id == remove.Id))
                 {
                     #region User Assignment Logic
+
                     {
                         foreach (var user in existingCourse.Students)
                         {
@@ -212,7 +219,8 @@ namespace University.Server.Domain.Services
                             await _userService.PatchAssignmentsAsync(user.Id, patchModules);
                         }
                     }
-                    #endregion
+
+                    #endregion User Assignment Logic
 
                     existingCourse.Modules.Remove(remove);
                 }

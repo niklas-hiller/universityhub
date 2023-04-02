@@ -136,12 +136,14 @@ namespace University.Server.Domain.Services
                 if (!existingModule.ProfessorIds.Contains(add.Id))
                 {
                     #region User Assignment Logic
+
                     {
                         var patchModules = new PatchModel<Module>();
                         patchModules.AddEntity.Add(existingModule);
                         await _userService.PatchAssignmentsAsync(add.Id, patchModules);
                     }
-                    #endregion
+
+                    #endregion User Assignment Logic
 
                     existingModule.ProfessorIds.Add(add.Id);
                 }
@@ -151,12 +153,14 @@ namespace University.Server.Domain.Services
                 if (existingModule.ProfessorIds.Contains(remove.Id))
                 {
                     #region User Assignment Logic
+
                     {
                         var patchModules = new PatchModel<Module>();
                         patchModules.RemoveEntity.Add(existingModule);
                         await _userService.PatchAssignmentsAsync(remove.Id, patchModules);
                     }
-                    #endregion
+
+                    #endregion User Assignment Logic
 
                     existingModule.ProfessorIds.Remove(remove.Id);
                 }
