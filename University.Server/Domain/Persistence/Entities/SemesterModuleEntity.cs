@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Persistence.Entities
 {
-    public class SemesterModuleEntity : BaseEntity
+    public class SemesterModuleEntity
     {
         public ICollection<LectureEntity> Lectures { get; set; } = new List<LectureEntity>();
         public Guid ProfessorId { get; set; } = Guid.Empty;

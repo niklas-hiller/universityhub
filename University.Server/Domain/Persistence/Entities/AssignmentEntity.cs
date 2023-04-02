@@ -2,7 +2,7 @@
 
 namespace University.Server.Domain.Persistence.Entities
 {
-    public class AssignmentEntity : BaseEntity
+    public class AssignmentEntity
     {
         public EModuleStatus Status { get; set; }
 

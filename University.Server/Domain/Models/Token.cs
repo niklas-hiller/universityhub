@@ -1,6 +1,6 @@
 ﻿namespace University.Server.Domain.Models
 {
-    public class Token : Base
+    public class Token
     {
         public string Value { get; set; }
 

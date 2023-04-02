@@ -2,7 +2,6 @@
 using University.Server.Domain.Models;
 using University.Server.Domain.Persistence.Entities;
 using University.Server.Domain.Services;
-using University.Server.Exceptions;
 
 namespace University.Server.Mapping.Actions
 {
@@ -19,10 +18,10 @@ namespace University.Server.Mapping.Actions
 
         public void Process(SemesterModuleEntity source, SemesterModule destination, ResolutionContext context)
         {
-            destination.Professor = source.ProfessorId == Guid.Empty
-                ? _userService.GetAsync(source.ProfessorId).GetAwaiter().GetResult() 
+            destination.Professor = source.ProfessorId != Guid.Empty
+                ? _userService.GetAsync(source.ProfessorId).GetAwaiter().GetResult()
                 : null;
-            
+
             destination.ReferenceModule = _moduleService.GetAsync(source.ModuleId, false).GetAwaiter().GetResult();
         }
     }
