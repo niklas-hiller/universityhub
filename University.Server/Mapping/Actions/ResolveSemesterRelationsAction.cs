@@ -19,8 +19,8 @@ namespace University.Server.Mapping.Actions
 
         public void Process(SemesterModuleEntity source, SemesterModule destination, ResolutionContext context)
         {
-            destination.Professor = source.ProfessorId != null 
-                ? _userService.GetAsync((Guid)source.ProfessorId).GetAwaiter().GetResult() 
+            destination.Professor = source.ProfessorId == Guid.Empty
+                ? _userService.GetAsync(source.ProfessorId).GetAwaiter().GetResult() 
                 : null;
             
             destination.ReferenceModule = _moduleService.GetAsync(source.ModuleId, false).GetAwaiter().GetResult();

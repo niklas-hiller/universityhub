@@ -18,7 +18,7 @@ namespace University.Server.Mapping
             CreateMap<Assignment, AssignmentEntity>()
                 .ForMember(dest => dest.ReferenceModuleId, opt => opt.MapFrom(src => src.ReferenceModule.Id));
             CreateMap<SemesterModule, SemesterModuleEntity>()
-                .ForMember(dest => dest.ProfessorId, opt => opt.MapFrom(src => src.Professor != null ? src.Professor.Id : default))
+                .ForMember(dest => dest.ProfessorId, opt => opt.MapFrom(src => src.Professor != null ? src.Professor.Id : Guid.Empty))
                 .ForMember(dest => dest.ModuleId, opt => opt.MapFrom(src => src.ReferenceModule.Id))
                 .ForMember(dest => dest.Lectures, opt => opt.MapFrom(src => src.Lectures));
             CreateMap<Semester, SemesterEntity>()
