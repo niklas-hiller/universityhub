@@ -5,7 +5,7 @@ namespace University.Server.Domain.Services
     public interface IModuleService
     {
         Task<Module> SaveAsync(Module module);
-        Task<IEnumerable<Module>> GetManyAsync(ICollection<Guid> ids);
+        Task<IEnumerable<Module>> GetManyAsync(IEnumerable<Guid> ids);
         Task<Module?> GetAsyncNullable(Guid id, bool excludeArchived = true);
         Task<Module> GetAsync(Guid id);
         Task<IEnumerable<Module>> ListAsync(EModuleType? moduleType);

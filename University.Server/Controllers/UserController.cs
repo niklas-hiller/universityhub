@@ -49,9 +49,10 @@ namespace University.Server.Controllers
             }
 
             var user = _mapper.Map<SaveUserResource, User>(resource);
-            var createdUser = await _userService.SaveAsync(user);
 
+            var createdUser = await _userService.SaveAsync(user);
             var createdResource = _mapper.Map<User, UserResource>(createdUser);
+
             return Created("", value: createdResource);
         }
 
@@ -78,9 +79,10 @@ namespace University.Server.Controllers
             }
 
             var assignment = _mapper.Map<UpdateAssignmentResource, Assignment>(resource);
-            var updatedUser = await _userService.UpdateAssignmentAsync(id, id2, assignment);
 
+            var updatedUser = await _userService.UpdateAssignmentAsync(id, id2, assignment);
             var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+
             return Ok(updatedResource);
         }
 
@@ -109,9 +111,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var user = _mapper.Map<UpdateUserResource, User>(resource);
-            var updatedUser = await _userService.UpdateAsync(id, user);
 
+            var updatedUser = await _userService.UpdateAsync(id, user);
             var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+
             return Ok(updatedResource);
         }
 
@@ -140,9 +143,10 @@ namespace University.Server.Controllers
                 return BadRequest(ModelState.GetErrorMessages());
             }
             var user = _mapper.Map<UpdateUserCredentialsResource, User>(resource);
-            var updatedUser = await _userService.UpdateAsync(id, user);
 
+            var updatedUser = await _userService.UpdateAsync(id, user);
             var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+
             return Ok(updatedResource);
         }
 
@@ -191,8 +195,8 @@ namespace University.Server.Controllers
             }
 
             var updatedUser = await _userService.PatchAssignmentsAsync(id, patch);
-
             var updatedResource = _mapper.Map<User, UserResource>(updatedUser);
+
             return Ok(updatedResource);
         }
 
@@ -209,8 +213,8 @@ namespace University.Server.Controllers
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var retrievedUser = await _userService.GetAsync(id);
-
             var retrievedResource = _mapper.Map<User, UserResource>(retrievedUser);
+
             return Ok(retrievedResource);
         }
 
@@ -224,11 +228,12 @@ namespace University.Server.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserResource>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
-        public async Task<IEnumerable<UserResource>> GetFilteredAsync(EAuthorization? authorization)
+        public async Task<IActionResult> GetFilteredAsync(EAuthorization? authorization)
         {
-            var users = await _userService.ListAsync(authorization);
-            var resources = _mapper.Map<IEnumerable<User>, IEnumerable<UserResource>>(users);
-            return resources;
+            var retrievedUsers = await _userService.ListAsync(authorization);
+            var retrievedResources = _mapper.Map<IEnumerable<User>, IEnumerable<UserResource>>(retrievedUsers);
+
+            return Ok(retrievedResources);
         }
 
         /// <summary>
@@ -241,11 +246,12 @@ namespace University.Server.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ExtendedLectureResource>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<IEnumerable<ExtendedLectureResource>> GetLecturesAsync(Guid id)
+        public async Task<IActionResult> GetLecturesAsync(Guid id)
         {
-            var semesterModules = await _semesterService.GetActiveSemesterModulesOfUser(id);
-            var resources = semesterModules.SelectMany(_mapper.Map<SemesterModule, IEnumerable<ExtendedLectureResource>>);
-            return resources;
+            var retrievedSemesterModules = await _semesterService.GetActiveSemesterModulesOfUser(id);
+            var retrievedResources = retrievedSemesterModules.SelectMany(_mapper.Map<SemesterModule, IEnumerable<ExtendedLectureResource>>);
+
+            return Ok(retrievedResources);
         }
 
         /// <summary>

@@ -65,7 +65,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<User>> GetManyAsync(ICollection<Guid> ids)
+        public async Task<IEnumerable<User>> GetManyAsync(IEnumerable<Guid> ids)
         {
             if (ids.IsNullOrEmpty())
             {

@@ -10,6 +10,6 @@ namespace University.Server.Resources.Response
         public string Email { get; set; }
         public EAuthorization Authorization { get; set; }
 
-        public List<AssignmentResource> Assignments { get; set; } = new List<AssignmentResource>();
+        public ICollection<AssignmentResource> Assignments { get; set; } = new List<AssignmentResource>();
     }
 }

@@ -40,8 +40,8 @@ namespace JWTAuth.WebApi.Controllers
             }
 
             var createdToken = await _jwtService.LoginAsync(resource.Email, resource.Password);
-
             var createdResource = _mapper.Map<Token, TokenResource>(createdToken);
+
             return Created("", value: createdResource);
         }
     }

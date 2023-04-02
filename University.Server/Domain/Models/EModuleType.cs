@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace University.Server.Domain.Models
+﻿namespace University.Server.Domain.Models
 {
     public enum EModuleType : byte
     {

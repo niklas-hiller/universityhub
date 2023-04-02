@@ -8,6 +8,6 @@
         public DateTime EndDate { get; set; }
         public bool Active { get; set; }
 
-        public List<SemesterModuleResource> Modules { get; set; } = new List<SemesterModuleResource>();
+        public ICollection<SemesterModuleResource> Modules { get; set; } = new List<SemesterModuleResource>();
     }
 }

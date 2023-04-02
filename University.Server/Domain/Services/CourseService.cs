@@ -42,7 +42,7 @@ namespace University.Server.Domain.Services
             }
         }
 
-        public async Task<IEnumerable<Course>> GetManyAsync(ICollection<Guid> ids)
+        public async Task<IEnumerable<Course>> GetManyAsync(IEnumerable<Guid> ids)
         {
             if (ids.IsNullOrEmpty())
             {

@@ -6,7 +6,7 @@ namespace University.Server.Domain.Services
     {
         Task<Semester> SaveAsync(Semester semester);
         Task<Semester> CalculateAsync(Guid id);
-        Task<IEnumerable<Semester>> GetManyAsync(ICollection<Guid> ids);
+        Task<IEnumerable<Semester>> GetManyAsync(IEnumerable<Guid> ids);
         Task<IEnumerable<Semester>> GetManyAsyncByTime(DateTime containsDate, TimeSpan? delta = null);
         Task<Semester?> GetAsyncNullable(Guid id);
         Task<Semester> GetAsync(Guid id);

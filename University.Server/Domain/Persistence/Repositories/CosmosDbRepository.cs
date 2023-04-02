@@ -42,7 +42,6 @@ namespace University.Server.Domain.Persistence.Repositories
                 var response = await iterator.ReadNextAsync();
                 results.AddRange(response.ToList());
             }
-            _logger.LogInformation("Retrieved following modules: ", results);
 
             return results.Select(r => _mapper.Map<T2, T1>(r));
         }
